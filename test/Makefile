@@ -1,0 +1,15 @@
+OPTIMIZATION?=-O3
+INCLUDES = ../src/
+CFLAGS?= -std=c99 -pedantic $(OPTIMIZATION) -Wall -W $(ARCH) -g -rdynamic -ggdb -I$(INCLUDES)
+
+benchmark.o: benchmark.c
+test_list.o: test_list.c ../src/list.h
+
+../bin:
+	mkdir -p ../bin
+
+test_list: test_list.o ../bin
+	$(CC) test_list.o ../src/list.o -o ../bin/test_list
+
+test: test_list
+	../bin/$<
