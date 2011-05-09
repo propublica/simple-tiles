@@ -36,23 +36,22 @@ simplet_list_push(simplet_list_t *list, void* val){
   return val;
 }
 
-// TODO: Fix this so as not to rely on length
 void*
 simplet_list_pop(simplet_list_t *list){
-  if(list->length <= 0) return NULL;
+  if(!(list->head || list->tail)) return NULL;
 
   simplet_node_t *node = list->tail;
   void *val = node->value;
   
-  if(--list->length) {
-    list->tail = node->prev;
-    list->tail->next = node->next;
-  } else {
-    list->tail = list->head = NULL;
-  }
+  if (node->prev)
+    node->prev->next = NULL;
+  else
+    list->head = NULL;
 
-  //list->length--;
+  list->tail = node->prev;
+
   free(node);
+  list->length--;
   return val;
 }
 
