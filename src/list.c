@@ -10,18 +10,18 @@ simplet_list_new(){
   list->tail   = NULL;
   list->free   = NULL;
   list->length = 0;
-  
+
   return list;
 }
 
 void*
 simplet_list_push(simplet_list_t *list, void* val){
   simplet_node_t *node;
-  
-  if(!(node = malloc(sizeof(*node)))) 
+
+  if(!(node = malloc(sizeof(*node))))
     return NULL;
   node->value = val;
-  
+
   if(!(list->head || list->tail)) {
     list->head = list->tail = node;
     node->next = node->prev = NULL;
@@ -31,7 +31,7 @@ simplet_list_push(simplet_list_t *list, void* val){
     list->tail->next = node;
     list->tail = node;
   }
-  
+
   list->length++;
   return val;
 }
@@ -42,7 +42,7 @@ simplet_list_pop(simplet_list_t *list){
 
   simplet_node_t *node = list->tail;
   void *val = node->value;
-  
+
   if (node->prev)
     node->prev->next = NULL;
   else
