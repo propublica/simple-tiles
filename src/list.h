@@ -38,7 +38,7 @@ simplet_listiter_t*
 simplet_get_list_iter(simplet_list_t* list);
 
 void*
-simplet_get_next(simplet_listiter_t* iter);
+simplet_list_next(simplet_listiter_t* iter);
 
 #ifdef __cplusplus
 }

@@ -13,8 +13,27 @@
 int frees = 0;
 
 void
-freed(void *val){
+freed(){
   frees++;
+}
+
+typedef struct {
+  int val;
+} wrap_t;
+
+static simplet_list_t*
+build_list(){
+  simplet_list_t *list;
+  if(!(list = simplet_list_new(list)))
+    assert(0);
+  wrap_t test  = { 5 };
+  wrap_t test2 = { 6 }; 
+  wrap_t test3 = { 7 }; 
+  
+  simplet_list_push(list, &test);
+  simplet_list_push(list, &test2);
+  simplet_list_push(list, &test3);
+  return list;
 }
 
 
@@ -25,50 +44,32 @@ test_push(){
     assert(0);
 
   assert(list->length == 0);
-  int test = 5; 
+  wrap_t test = { 5 }; 
   simplet_list_push(list, &test);
-  assert(*(int *)list->head->value == test);
-  assert(*(int *)list->tail->value == test);
+  assert(list->head->value == &test);
+  assert(list->tail->value == &test);
   assert(list->length == 1);  
   simplet_list_free(list);
 }
 
 static void
 test_pop(){
-  simplet_list_t *list;
-  if(!(list = simplet_list_new(list)))
-    assert(0);
-  int test = 5; 
-  int test2 = 6; 
-  int test3 = 7; 
+  simplet_list_t *list = build_list();
   
-  simplet_list_push(list, &test);
-  simplet_list_push(list, &test2);
-  simplet_list_push(list, &test3);
-  
-  int ret;
-  ret = *(int *)simplet_list_pop(list);
-  assert(ret == 7);
-  ret = *(int *)simplet_list_pop(list);
-  assert(ret == 6);
-  ret = *(int *)simplet_list_pop(list);
-  assert(ret == 5);
+  wrap_t *ret;
+  ret = simplet_list_pop(list);
+  assert(ret->val == 7);
+  ret = simplet_list_pop(list);
+  assert(ret->val == 6);
+  ret = simplet_list_pop(list);
+  assert(ret->val == 5);
   
   simplet_list_free(list);
 }
 
 static void
 test_destroy(){
-  simplet_list_t *list;
-  if(!(list = simplet_list_new(list)))
-    assert(0);
-  int test = 5; 
-  int test2 = 6; 
-  int test3 = 7; 
-  
-  simplet_list_push(list, &test);
-  simplet_list_push(list, &test2);
-  simplet_list_push(list, &test3);
+  simplet_list_t *list = build_list();
   
   list->free = freed;
   
@@ -78,6 +79,15 @@ test_destroy(){
 
 static void
 test_iter(){
+  simplet_list_t *list = build_list();
+  simplet_listiter_t *iter = simplet_get_list_iter(list);
+  wrap_t *ret;
+  assert((ret = simplet_list_next(iter))->val == 5);
+  assert((ret = simplet_list_next(iter))->val == 6);
+  assert((ret = simplet_list_next(iter))->val == 7);
+  assert(simplet_list_next(iter) == NULL);
+  
+  simplet_list_free(list);
 }
 
 
