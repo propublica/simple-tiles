@@ -4,7 +4,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct simplet_point {
+
+typedef struct {
   double x;
   double y;
 } simplet_point_t;

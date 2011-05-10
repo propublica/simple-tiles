@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-typedef struct simplet_bounds {
+typedef struct {
   simplet_point_t *nw;
   simplet_point_t *se;
   double width;

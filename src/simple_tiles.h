@@ -16,7 +16,7 @@ typedef struct {
 } simplet_styles_t;
 
 typedef struct {
-  simplet_flist_t *filters; /* list of filters */
+  simplet_flist_t *rules; /* list of rules */
 } simplet_rules_t;
 
 typedef struct {
@@ -29,9 +29,10 @@ typedef struct {
 
 typedef struct {
   OGRDataSourceH source;
-  simplet_bounds_t *bounds;
+  simplet_bounds_t *size;
   simplet_styles_t *styles;
   simplet_rules_t  *rules;
+  projPJ  *proj;
   cairo_t *ctx;
 } simplet_map_t;
 

@@ -17,9 +17,9 @@ simplet_list_new(){
 void*
 simplet_list_push(simplet_list_t *list, void* val){
   simplet_node_t *node;
-
   if(!(node = malloc(sizeof(*node))))
     return NULL;
+
   node->value = val;
 
   if(!(list->head || list->tail)) {
@@ -38,7 +38,8 @@ simplet_list_push(simplet_list_t *list, void* val){
 
 void*
 simplet_list_pop(simplet_list_t *list){
-  if(!(list->head || list->tail)) return NULL;
+  if(!list->tail)
+    return NULL;
 
   simplet_node_t *node = list->tail;
   void *val = node->value;
