@@ -43,6 +43,20 @@ typedef struct {
   double height;
 } simplet_bounds_t;
 
+enum simplet_filters {
+  SIMPLET_FIELD_FILTER_LT,
+  SIMPLET_FIELD_FILTER_LTE,
+  SIMPLET_FIELD_FILTER_EQ,
+  SIMPLET_FIELD_FILTER_GT,
+  SIMPLET_FIELD_FILTER_GTE,
+  SIMPLET_ALL
+}
+
+enum simplet_styles {
+  SIMPLET_FILL,
+  SIMPLET_STROKE
+}
+
 #ifdef __cplusplus
 }
 #endif
