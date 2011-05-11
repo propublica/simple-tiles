@@ -1,5 +1,5 @@
-#ifndef __SIMPLE_TILES_LIST_H__
-#define __SIMPLE_TILES_LIST_H__
+#ifndef SIMPLE_TILES_LIST_H
+#define SIMPLE_TILES_LIST_H
 
 #ifdef __cplusplus
 extern "C" {

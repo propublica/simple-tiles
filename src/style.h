@@ -1,5 +1,5 @@
-#ifndef __SIMPLE_TILES_STYLE_H__
-#define __SIMPLE_TILES_STYLE_H__
+#ifndef SIMPLE_TILES_STYLE_H
+#define SIMPLE_TILES_STYLE_H
 
 
 #ifdef __cplusplus

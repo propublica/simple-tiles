@@ -1,5 +1,5 @@
-#ifndef __SIMPLET_BOUNDS_H__
-#define __SIMPLET_BOUNDS_H__
+#ifndef SIMPLET_BOUNDS_H
+#define SIMPLET_BOUNDS_H
 
 #include "point.h"
 

@@ -1,0 +1,5 @@
+Expose api in simple_tiles.h
+
+think about namespacing correctly.
+
+think about status codes and valid tests.
