@@ -9,7 +9,7 @@ test_list.o: test_list.c ../src/list.h
 	mkdir -p ../bin
 
 test_list: test_list.o ../bin
-	$(CC) test_list.o ../src/list.o -o ../bin/test_list
+	$(CC) $(CFLAGS) test_list.o ../src/list.o -o ../bin/test_list
 
 test: test_list
 	../bin/$<

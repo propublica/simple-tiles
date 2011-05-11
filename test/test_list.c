@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "list.h"
+#include <list.h>
 
 
 #define test(fn) \
