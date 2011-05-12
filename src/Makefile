@@ -2,7 +2,7 @@ OPTIMIZATION?=-O3
 DEBUG ?= -g -rdynamic -ggdb
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -Wall -W $(ARCH) $(DEBUG)
 LIBS = -L/Library/Frameworks/GDAL.framework/unix/lib/ -lGDAL `pkg-config --cflags --libs cairo`
-OBJ = map.o list.o bounds.o point.o style.o
+OBJ = list.o bounds.o point.o style.o map.o
 
 all: $(OBJ)
 

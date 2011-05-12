@@ -3,3 +3,7 @@ Expose api in simple_tiles.h
 think about namespacing correctly.
 
 think about status codes and valid tests.
+
+
+style and rule should have they're own constructors / destructors and not be 
+wrapped in map

@@ -24,7 +24,6 @@ typedef struct simplet_map_t {
   simplet_bounds_t     *bounds;
   simplet_list_t       *rules;
   OGRSpatialReferenceH *proj;
-  cairo_t              *ctx;
   int valid;
   unsigned int width;
   unsigned int height;
@@ -52,13 +51,13 @@ int
 simplet_map_add_rule(simplet_map_t *map, char *sqlquery);
 
 int
-simplet_map_add_style(simplet_map_t *map, char *key, char *value);
+simplet_map_add_style(simplet_map_t *map, char *key, char *arg);
 
 int
 simplet_map_isvalid(simplet_map_t *map);
 
 int
-simplet_map_render(char *string);
+simplet_map_render(simplet_map_t *map);
 
 #ifdef __cplusplus
 }

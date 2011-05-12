@@ -11,7 +11,7 @@ main(){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, 1000, 1000, 1000, 1000);
   // Only one layer per map for now
-  simplet_map_layer(map,  "./test.shp");
+  simplet_map_layer(map, "./test.shp");
   simplet_map_add_rule(map,  "SELECT * from test where TEST < 5");
   simplet_map_add_style(map, "fill",   "#cc0000");
   simplet_map_add_style(map, "stroke", "#aaaaaa");
