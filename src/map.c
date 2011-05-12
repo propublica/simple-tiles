@@ -137,6 +137,6 @@ simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
 }
 
 int
-simplet_map_render(simplet_map_t *map, char *path){
+simplet_map_render_to_png(simplet_map_t *map, char *path){
   
 }

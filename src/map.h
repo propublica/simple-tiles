@@ -57,7 +57,8 @@ int
 simplet_map_isvalid(simplet_map_t *map);
 
 int
-simplet_map_render(simplet_map_t *map);
+simplet_map_render_to_png(simplet_map_t *map, char *path);
+
 
 #ifdef __cplusplus
 }
