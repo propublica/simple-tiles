@@ -29,9 +29,8 @@ void
 simplet_apply_styles(cairo_t *ctx, simplet_list_t *styles){
   simplet_listiter_t *iter = simplet_get_list_iter(styles);
   simplet_style_t *style;
-  while((style = simplet_list_next(iter))){
+  while((style = simplet_list_next(iter)))
     style->call(ctx, style->arg);
-  }
 }
 
 

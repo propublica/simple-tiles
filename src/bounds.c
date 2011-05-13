@@ -13,36 +13,24 @@ simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
   bounds->width  = fabs(bounds->nw->x - bounds->se->x);
   bounds->height = fabs(bounds->nw->y - bounds->se->y);
 }
-
+// error handling needed
 OGRGeometryH *
 simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj) {
-  char *fmt = "POLYGON ((%d %d, %d %d, %d %d, %d %d))";
-  char *str;
-  int len = snprintf(NULL, 0, fmt, bounds->nw->x,
-                                   bounds->nw->y,
-                                   bounds->se->x,
-                                   bounds->nw->y,
-                                   bounds->se->x,
-                                   bounds->se->y,
-                                   bounds->nw->x,
-                                   bounds->se->y);
-  if(!(str = malloc((len + 1) * sizeof(char))))
+  OGRGeometryH *tmpLine;
+  if(!(tmpLine = OGR_G_CreateGeometry(wkbLineString)))
     return NULL;
-  snprintf(str, len + 1, fmt, bounds->nw->x,
-                              bounds->nw->y,
-                              bounds->se->x,
-                              bounds->nw->y,
-                              bounds->se->x,
-                              bounds->se->y,
-                              bounds->nw->x,
-                              bounds->se->y);
+  OGR_G_TransformTo(tmpLine, proj);
+  OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->nw->y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->se->y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->nw->y);
   
-  OGRGeometryH *ogrbounds;
-  if((OGR_G_CreateFromWkt(&str, proj, ogrbounds) != OGRERR_NONE))
+  OGRGeometryH *ogrBounds;
+  if(!(ogrBounds = OGR_G_ConvexHull(tmpLine)))
     return NULL;
-  free(str);
+  OGR_G_DestroyGeometry(tmpLine);
   
-  return ogrbounds;
+  return ogrBounds;
 }
 
 void
