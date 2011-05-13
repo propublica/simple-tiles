@@ -13,7 +13,7 @@ simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
   bounds->width  = fabs(bounds->nw->x - bounds->se->x);
   bounds->height = fabs(bounds->nw->y - bounds->se->y);
 }
-// error handling needed
+
 OGRGeometryH *
 simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj) {
   OGRGeometryH *tmpLine;
