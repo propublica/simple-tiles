@@ -1,5 +1,5 @@
 #include <stdlib.h>
-
+#include <stdio.h>
 #include "math.h"
 #include "bounds.h"
 
@@ -12,6 +12,37 @@ simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
   bounds->se->y = fmin(y, bounds->se->y);
   bounds->width  = fabs(bounds->nw->x - bounds->se->x);
   bounds->height = fabs(bounds->nw->y - bounds->se->y);
+}
+
+OGRGeometryH *
+simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj) {
+  char *fmt = "POLYGON ((%d %d, %d %d, %d %d, %d %d))";
+  char *str;
+  int len = snprintf(NULL, 0, fmt, bounds->nw->x,
+                                   bounds->nw->y,
+                                   bounds->se->x,
+                                   bounds->nw->y,
+                                   bounds->se->x,
+                                   bounds->se->y,
+                                   bounds->nw->x,
+                                   bounds->se->y);
+  if(!(str = malloc((len + 1) * sizeof(char))))
+    return NULL;
+  snprintf(str, len + 1, fmt, bounds->nw->x,
+                              bounds->nw->y,
+                              bounds->se->x,
+                              bounds->nw->y,
+                              bounds->se->x,
+                              bounds->se->y,
+                              bounds->nw->x,
+                              bounds->se->y);
+  
+  OGRGeometryH *ogrbounds;
+  if((OGR_G_CreateFromWkt(&str, proj, ogrbounds) != OGRERR_NONE))
+    return NULL;
+  free(str);
+  
+  return ogrbounds;
 }
 
 void

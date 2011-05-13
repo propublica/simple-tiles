@@ -12,6 +12,10 @@ typedef struct {
   char *arg;
 } simplet_style_t;
 
+
+void
+simplet_apply_styles(cairo_t *ctx, simplet_list_t *styles);
+
 void
 simplet_style_fill(cairo_t *ctx, char *arg);
 
@@ -21,13 +25,8 @@ simplet_style_stroke(cairo_t *ctx, char *arg);
 void
 simplet_style_weight(cairo_t *ctx, char *arg);
 
-simplet_style_t styleTable[] = {
-  { "fill",   simplet_style_fill,   NULL},
-  { "stroke", simplet_style_stroke, NULL},
-  { "weight", simplet_style_weight, NULL}
-};
-
-const int SIMPLET_STYLES_LENGTH = sizeof(simplet_style_t) / sizeof(*styleTable);
+simplet_style_t*
+simplet_lookup_style(char *key);
 
 
 #ifdef __cplusplus

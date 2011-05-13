@@ -1,6 +1,7 @@
 #ifndef SIMPLE_TILES_H
 #define SIMPLE_TILES_H
-
+#include "map.h"
+#include "style.h"
 
 #ifdef __cplusplus
 extern "C" {

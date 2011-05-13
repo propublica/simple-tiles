@@ -1,10 +1,9 @@
 #include <stdlib.h>
-#include <string.h>
+#include <assert.h>
 
 #include "map.h"
 #include "style.h"
-
-
+#include "util.h"
 
 static void
 rule_free(void *rule){
@@ -14,15 +13,19 @@ rule_free(void *rule){
   free(tmp);
 }
 
-static char*
-copy_string(char *src){
-  int len = strlen(src);
-  char *dest;
-  if(!(dest = malloc(len + 1)))
-    return NULL;
-  memcpy(src, dest, len);
-  dest[len] = '\0';
-  return dest;
+// move to rules.c
+int 
+process_rule(simplet_map_t *map, simplet_rule_t *rule, OGRGeometryH *bounds, cairo_t *ctx){
+  OGRLayerH *layer = OGR_DS_ExecuteSQL(map->source, rule->ogrsql, bounds, "");
+  
+  simplet_apply_styles(ctx, rule->styles);
+  
+  OGRFeatureH *feature;
+  while((feature = OGR_L_GetNextFeature(layer))){
+    
+  }
+  OGR_DS_ReleaseResultSet(map->source, layer);
+  return 1;
 }
 
 
@@ -38,7 +41,6 @@ simplet_map_new(){
   map->source = NULL;
   map->bounds = NULL;
   map->proj   = NULL;
-  map->ctx    = NULL;
   map->height = 0;
   map->width  = 0;
   map->valid  = MAP_OK;
@@ -60,13 +62,14 @@ simplet_map_free(simplet_map_t *map){
 
 int
 simplet_map_set_srs(simplet_map_t *map, char *proj){
+  printf("%s", proj);
   if(!(map->proj = OSRNewSpatialReference(proj)))
     return (map->valid = MAP_ERR);
   return MAP_OK;
 }
 
 int
-simplet_map_size(simplet_map_t *map, int width, int height){
+simplet_map_set_size(simplet_map_t *map, int width, int height){
   map->height = height;
   map->width  = width;
   return MAP_OK;
@@ -83,7 +86,7 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
 }
 
 int
-simplet_map_layer(simplet_map_t *map, char *datastring){
+simplet_map_add_layer(simplet_map_t *map, char *datastring){
   if(!(map->source = OGROpen(datastring, 0, NULL)))
     return (map->valid = MAP_ERR);
   return MAP_OK;
@@ -92,6 +95,8 @@ simplet_map_layer(simplet_map_t *map, char *datastring){
 int
 simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
   simplet_rule_t *rule;
+  
+  // move to rules.c
   if(!(rule = malloc(sizeof(*rule))))
     return (map->valid = MAP_ERR);
   
@@ -108,6 +113,7 @@ simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
   if(!simplet_list_push(map->rules, rule))
     return (map->valid = MAP_ERR);
   
+  assert(map->valid == MAP_OK);
   return MAP_OK;
 }
 
@@ -117,26 +123,58 @@ simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
     return (map->valid = MAP_ERR);
   simplet_rule_t *rule = map->rules->tail->value;
   
+  // move to styles.c
   simplet_style_t *style;
-  if(!(style = malloc(sizeof(*style))))
+  if(!(style = simplet_lookup_style(key)))
     return (map->valid = MAP_ERR);
-  
-  for(int i = 0; i < SIMPLET_STYLES_LENGTH; i++){
-    if(strcmp(key, styleTable[i].key)){
-      style->call = styleTable[i].call;
-      style->key  = copy_string(styleTable[i].key);
-      style->arg  = copy_string(arg);
-    }
-  }
-  
+    
+  style->arg = copy_string(arg);
+
   if(!(style->arg || style->call))
     return (map->valid = MAP_ERR);
   
   simplet_list_push(rule->styles, style);
+  
+  assert(map->valid == MAP_OK);
+  return MAP_OK;
+}
+
+int
+simplet_map_isvalid(simplet_map_t *map){
+  if(map->valid == MAP_ERR)
+    return MAP_ERR;
+  if(!map->bounds)
+    return MAP_ERR;
+  if(!map->source)
+    return MAP_ERR;
+  if(!map->proj)
+    return MAP_ERR;
+  if(!map->height)
+    return MAP_ERR;
+  if(!map->width)
+    return MAP_ERR;
+  if(!map->rules->tail)
+    return MAP_ERR;
   return MAP_OK;
 }
 
 int
 simplet_map_render_to_png(simplet_map_t *map, char *path){
+  if(!simplet_map_isvalid(map))
+    return (map->valid = MAP_ERR);
   
+  cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
+  if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+    return (map->valid = MAP_ERR);
+  cairo_t *ctx = cairo_create(surface);
+  
+  OGRGeometryH *bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
+  
+  simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
+  simplet_rule_t *rule;
+  while((rule = simplet_list_next(iter))) {
+    process_rule(map, rule, bounds, ctx);
+  };
+  cairo_destroy(ctx);
+  OGR_G_DestroyGeometry(bounds);
 }
