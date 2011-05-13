@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
-
+#include <gdal/cpl_port.h>
+#include <gdal/cpl_error.h>
 #include "map.h"
 #include "style.h"
 #include "util.h"
@@ -62,14 +64,21 @@ simplet_map_free(simplet_map_t *map){
 
 int
 simplet_map_set_srs(simplet_map_t *map, char *proj){
-  printf("%s", proj);
-  if(!(map->proj = OSRNewSpatialReference(proj)))
+  assert(map->valid == MAP_OK);
+  
+  if(!(map->proj = OSRNewSpatialReference(NULL)))
     return (map->valid = MAP_ERR);
+  
+  if(OSRSetFromUserInput(map->proj, proj) != OGRERR_NONE)
+    return (map->valid = MAP_ERR);
+  
   return MAP_OK;
 }
 
 int
 simplet_map_set_size(simplet_map_t *map, int width, int height){
+  assert(map->valid == MAP_OK);
+  
   map->height = height;
   map->width  = width;
   return MAP_OK;
@@ -77,6 +86,8 @@ simplet_map_set_size(simplet_map_t *map, int width, int height){
 
 int
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny){
+  assert(map->valid == MAP_OK);
+  
   simplet_bounds_t *bounds;
   if(!(bounds = simplet_bounds_new(bounds)))
     return (map->valid = MAP_ERR);
@@ -87,6 +98,7 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
 
 int
 simplet_map_add_layer(simplet_map_t *map, char *datastring){
+  OGRRegisterAll();
   if(!(map->source = OGROpen(datastring, 0, NULL)))
     return (map->valid = MAP_ERR);
   return MAP_OK;
@@ -94,14 +106,15 @@ simplet_map_add_layer(simplet_map_t *map, char *datastring){
 
 int
 simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
-  simplet_rule_t *rule;
+  assert(map->valid == MAP_OK);
   
   // move to rules.c
+  simplet_rule_t *rule;
   if(!(rule = malloc(sizeof(*rule))))
     return (map->valid = MAP_ERR);
   
   simplet_list_t *styles;
-  if(!(rule->styles = simplet_list_new(*styles)))
+  if(!(rule->styles = simplet_list_new(styles)))
     return (map->valid = MAP_ERR);
   
   char *sql;
@@ -119,11 +132,12 @@ simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
 
 int
 simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
+  assert(map->valid == MAP_OK);
+  
   if(!map->rules->tail)
     return (map->valid = MAP_ERR);
   simplet_rule_t *rule = map->rules->tail->value;
   
-  // move to styles.c
   simplet_style_t *style;
   if(!(style = simplet_lookup_style(key)))
     return (map->valid = MAP_ERR);
@@ -135,7 +149,6 @@ simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
   
   simplet_list_push(rule->styles, style);
   
-  assert(map->valid == MAP_OK);
   return MAP_OK;
 }
 
