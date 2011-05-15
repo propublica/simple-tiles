@@ -1,4 +1,4 @@
-OPTIMIZATION?=-O0
+OPTIMIZATION?=-O3
 DEBUG ?= -g -rdynamic -ggdb
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -Wall -W $(ARCH) \
 	$(shell pkg-config --cflags cairo) \
@@ -18,7 +18,6 @@ style.o: style.c map.h list.h bounds.h point.h style.h util.h
 util.o: util.c util.h
 
 api: api.o $(OBJ)
-#	$(CC)  -o api $(CFLAGS) $(LDFLAGS) api.o $(OBJ)
 
 dep:
 	@$(CC) -MM *.c

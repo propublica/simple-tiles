@@ -37,9 +37,15 @@ process_rule(simplet_map_t *map, simplet_rule_t *rule, cairo_t *ctx){
     OGRGeometryH *geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
+    // needs to be recursive
     for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
       OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
-
+      for(int j = 0; j < OGR_G_GetPointCount(subgeom); j++){
+        double x;
+        double y;
+        OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
+        //printf("%f %f", x,y);
+      }
     }
     OGR_F_Destroy(feature);
   }
