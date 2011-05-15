@@ -1,5 +1,5 @@
-#ifndef SIMPLET_POINT_H
-#define SIMPLET_POINT_H
+#ifndef _SIMPLET_POINT_H
+#define _SIMPLET_POINT_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
-#ifndef SIMPLE_TILES_H
-#define SIMPLE_TILES_H
+#ifndef _SIMPLE_TILES_H
+#define _SIMPLE_TILES_H
 #include "map.h"
 #include "style.h"
 

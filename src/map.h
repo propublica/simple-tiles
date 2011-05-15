@@ -1,5 +1,5 @@
-#ifndef SIMPLE_TILES_MAP_H
-#define SIMPLE_TILES_MAP_H
+#ifndef _SIMPLE_TILES_MAP_H
+#define _SIMPLE_TILES_MAP_H
 
 #include <gdal/ogr_api.h>
 #include <gdal/ogr_srs_api.h>

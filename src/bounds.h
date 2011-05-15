@@ -1,5 +1,5 @@
-#ifndef SIMPLET_BOUNDS_H
-#define SIMPLET_BOUNDS_H
+#ifndef _SIMPLET_BOUNDS_H
+#define _SIMPLET_BOUNDS_H
 
 #include <gdal/ogr_api.h>
 #include <gdal/ogr_srs_api.h>

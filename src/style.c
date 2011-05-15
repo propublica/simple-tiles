@@ -1,7 +1,8 @@
 #include "map.h"
 #include "style.h"
 #include "util.h"
-
+// Refactor candidate.
+// OGR has styles! http://www.gdal.org/ogr/ogr_feature_style.html
 simplet_style_t styleTable[] = {
   { "fill",   simplet_style_fill,   NULL},
   { "stroke", simplet_style_stroke, NULL},
@@ -12,17 +13,17 @@ const int SIMPLET_STYLES_LENGTH = sizeof(simplet_style_t) / sizeof(*styleTable);
 
 void
 simplet_style_fill(cairo_t *ctx, char *arg){
-  
+
 }
 
 void
 simplet_style_stroke(cairo_t *ctx, char *arg){
-  
+
 }
 
 void
 simplet_style_weight(cairo_t *ctx, char *arg){
-  
+
 }
 
 void
@@ -39,13 +40,13 @@ simplet_lookup_style(char *key){
   simplet_style_t* style;
   if(!(style = malloc(sizeof(*style))))
     return NULL;
-  
+
   for(int i = 0; i < SIMPLET_STYLES_LENGTH; i++){
     if(strcmp(key, styleTable[i].key)){
       style->call = styleTable[i].call;
       style->key  = copy_string(styleTable[i].key);
     }
   }
-  
+
   return style;
 }
