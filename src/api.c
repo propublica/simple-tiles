@@ -12,7 +12,7 @@ main(){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -179.231086, 17.831509, 179.859681, 71.441059);
   // Only one layer per map for now
-  simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
+  simplet_map_add_layer(map, "/Users/jladmin/dev/simple-tiles/data/tl_2010_us_cd108.shp");
   simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108 where TEST < 5");
   simplet_map_add_style(map, "fill",   "#cc0000");
   simplet_map_add_style(map, "stroke", "#aaaaaa");
@@ -21,9 +21,8 @@ main(){
   simplet_map_add_style(map, "stroke", "#444444");
   simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");
 
-
   if(simplet_map_isvalid(map))
     simplet_map_render_to_png(map, "./out.png");
-  
+
   simplet_map_free(map);
 }

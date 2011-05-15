@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "math.h"
 #include "bounds.h"
+#include "point.h"
 
 
 void
@@ -24,12 +25,12 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj) {
   OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->se->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->nw->y);
-  
+
   OGRGeometryH *ogrBounds;
   if(!(ogrBounds = OGR_G_ConvexHull(tmpLine)))
     return NULL;
   OGR_G_DestroyGeometry(tmpLine);
-  
+
   return ogrBounds;
 }
 
@@ -40,6 +41,15 @@ simplet_bounds_free(simplet_bounds_t *bounds){
   free(bounds);
 }
 
+simplet_point_t*
+simplet_bounds_project(simplet_bounds_t* source, double x, double y, simplet_bounds_t* other){
+  simplet_point_t* point;
+  double x_proj = (x - source->nw->x) * source->width / other->width + other->nw->x;
+  double y_proj = (y - source->nw->y) * source->height / other->height + other->nw->y;
+  if(!(point = simplet_point_new(x_proj, y_proj)))
+    return NULL;
+  return point;
+}
 
 simplet_bounds_t*
 simplet_bounds_new(){
