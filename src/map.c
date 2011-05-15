@@ -15,8 +15,33 @@ rule_free(void *rule){
   free(tmp);
 }
 
+// needs to be recursive
+static int
+draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
+  double x;
+  double y;
+  for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
+    OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
+    if(subgeom == NULL)
+      continue;
+    if(OGR_G_GetGeometryCount(subgeom) > 0) {
+      draw_polygon(map, subgeom, ctx);
+      continue;
+    }
+    OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
+    cairo_move_to(ctx, x, y);
+    cairo_new_path(ctx);
+    for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
+      OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
+      cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
+    }
+    cairo_close_path(ctx);
+    cairo_stroke(ctx);
+  }
+}
+
 // move to rules.c
-int
+static int
 process_rule(simplet_map_t *map, simplet_rule_t *rule, cairo_t *ctx){
   OGRGeometryH *bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   assert(bounds != NULL);
@@ -25,27 +50,16 @@ process_rule(simplet_map_t *map, simplet_rule_t *rule, cairo_t *ctx){
   if(!layer)
     return 0;
 
-  simplet_apply_styles(ctx, rule->styles);
-  simplet_bounds_t *imagesize;
-  if(!(imagesize = simplet_bounds_new()))
-    return 0;
-  simplet_bounds_extend(imagesize, 0, 0);
-  simplet_bounds_extend(imagesize, map->width, map->height);
-
   OGRFeatureH *feature;
   while((feature = OGR_L_GetNextFeature(layer))){
     OGRGeometryH *geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
-    // needs to be recursive
-    for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
-      OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
-      for(int j = 0; j < OGR_G_GetPointCount(subgeom); j++){
-        double x;
-        double y;
-        OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
-        //printf("%f %f", x,y);
-      }
+    switch(OGR_G_GetGeometryType(geom)){
+    case wkbPolygon:
+    case wkbMultiPolygon:
+      draw_polygon(map, geom, ctx);
+      break;
     }
     OGR_F_Destroy(feature);
   }
@@ -206,16 +220,18 @@ int
 simplet_map_render_to_png(simplet_map_t *map, char *path){
   if(simplet_map_isvalid(map) == MAP_ERR)
     return (map->valid = MAP_ERR);
-
+  printf("projected: %i", OSRIsProjected(map->proj));
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return (map->valid = MAP_ERR);
   cairo_t *ctx = cairo_create(surface);
-
+  cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
   simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
   simplet_rule_t *rule;
+  cairo_set_line_width(ctx, 0.05);
   while((rule = simplet_list_next(iter)))
     process_rule(map, rule, ctx);
-
+  cairo_surface_write_to_png(surface, path);
   cairo_destroy(ctx);
+  return MAP_OK;
 }

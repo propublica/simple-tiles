@@ -41,16 +41,6 @@ simplet_bounds_free(simplet_bounds_t *bounds){
   free(bounds);
 }
 
-simplet_point_t*
-simplet_bounds_project(simplet_bounds_t* source, double x, double y, simplet_bounds_t* other){
-  simplet_point_t* point;
-  double x_proj = (x - source->nw->x) * source->width / other->width + other->nw->x;
-  double y_proj = (y - source->nw->y) * source->height / other->height + other->nw->y;
-  if(!(point = simplet_point_new(x_proj, y_proj)))
-    return NULL;
-  return point;
-}
-
 simplet_bounds_t*
 simplet_bounds_new(){
   simplet_bounds_t *bounds;

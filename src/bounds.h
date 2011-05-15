@@ -28,9 +28,6 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj);
 void
 simplet_bounds_free(simplet_bounds_t *bounds);
 
-simplet_point_t*
-simplet_bounds_project(simplet_bounds_t* source, double x, double y, simplet_bounds_t* other);
-
 #ifdef __cplusplus
 }
 #endif
