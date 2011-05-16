@@ -11,15 +11,16 @@
 
 static void
 rule_free(void *rule){
-  simplet_rule_t *tmp = rule;
-  simplet_list_free(tmp->styles);
+  simplet_rule_t* tmp = rule;
+  simplet_list_t* styles = tmp->styles;
+  styles->free = simplet_style_vfree;
+  simplet_list_free(styles);
   free(tmp->ogrsql);
   free(tmp);
 }
 
-// needs to be recursive
 static int
-draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
+draw_polygon(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule, cairo_t *ctx){
   double x;
   double y;
   double last_x;
@@ -29,7 +30,7 @@ draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
     if(subgeom == NULL)
       continue;
     if(OGR_G_GetGeometryCount(subgeom) > 0) {
-      draw_polygon(map, subgeom, ctx);
+      draw_polygon(map, subgeom, rule, ctx);
       continue;
     }
 
@@ -56,10 +57,7 @@ draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
     cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
     cairo_close_path(ctx);
-    cairo_set_source_rgb(ctx, 1, 0, 0);
-    cairo_fill_preserve(ctx);
-    cairo_set_source_rgb(ctx, 0, 0, 0);
-    cairo_stroke_preserve(ctx);
+    simplet_apply_styles(ctx, rule->styles, 3, "weight", "fill", "stroke");
     cairo_clip(ctx);
     cairo_restore(ctx);
   }
@@ -83,7 +81,7 @@ process_rule(simplet_map_t *map, simplet_rule_t *rule, cairo_t *ctx){
     switch(OGR_G_GetGeometryType(geom)){
     case wkbPolygon:
     case wkbMultiPolygon:
-      draw_polygon(map, geom, ctx);
+      draw_polygon(map, geom, rule, ctx);
       break;
     }
     OGR_F_Destroy(feature);
@@ -179,7 +177,7 @@ simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
     return (map->valid = MAP_ERR);
 
   char *sql;
-  if(!(sql = copy_string(sqlquery)))
+  if(!(sql = simplet_copy_string(sqlquery)))
     return (map->valid = MAP_ERR);
 
   rule->ogrsql = sql;
@@ -198,14 +196,10 @@ simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
   if(!map->rules->tail)
     return (map->valid = MAP_ERR);
   simplet_rule_t *rule = map->rules->tail->value;
-
+  
+  // Fail silently on unknown styles.
   simplet_style_t *style;
-  if(!(style = simplet_lookup_style(key)))
-    return (map->valid = MAP_ERR);
-
-  style->arg = copy_string(arg);
-
-  if(!(style->arg || style->call))
+  if(!(style = simplet_style_new(key, arg)))
     return (map->valid = MAP_ERR);
 
   simplet_list_push(rule->styles, style);
@@ -245,6 +239,7 @@ int
 simplet_map_render_to_png(simplet_map_t *map, char *path){
   if(simplet_map_isvalid(map) == MAP_ERR)
     return (map->valid = MAP_ERR);
+    
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return (map->valid = MAP_ERR);
@@ -252,10 +247,10 @@ simplet_map_render_to_png(simplet_map_t *map, char *path){
   cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
   simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
   simplet_rule_t *rule;
-  cairo_set_line_width(ctx, 0.1);
 
   while((rule = simplet_list_next(iter)))
     process_rule(map, rule, ctx);
+
   cairo_surface_write_to_png(surface, path);
   cairo_destroy(ctx);
   return MAP_OK;

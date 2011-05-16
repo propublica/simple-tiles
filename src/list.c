@@ -65,6 +65,11 @@ simplet_list_free(simplet_list_t *list){
 }
 
 simplet_listiter_t*
+simplet_list_iter_free(simplet_listiter_t* iter){
+  free(iter);
+}
+
+simplet_listiter_t*
 simplet_get_list_iter(simplet_list_t *list){
   simplet_listiter_t* iter;
   if(!(iter = malloc(sizeof(*iter))))
@@ -81,7 +86,7 @@ simplet_list_next(simplet_listiter_t* iter){
     iter->next = current->next;
     return current->value;
   } else {
-    free(iter);
+    simplet_list_iter_free(iter);
   }
   return NULL;
 }

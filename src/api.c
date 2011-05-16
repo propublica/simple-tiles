@@ -12,15 +12,17 @@ main(){
   simplet_map_set_size(map, 600, 300);
   simplet_map_set_bounds(map, -179.231086, 17.831509, -60.859681, 71.441059);
   // Only one layer per map for now
-  simplet_map_add_layer(map, "/Users/jladmin/downloads/tl_2010_us_county10/tl_2010_us_county10.shp");
+  simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
   //simplet_map_add_rule(map,  "SELECT * from tl_2010_us_county10 where STATEFP10 = '05'");
   //simplet_map_add_style(map, "fill",   "#cc0000");
   //simplet_map_add_style(map, "stroke", "#aaaaaa");
   //simplet_map_add_rule(map,  "SELECT * from tl_2010_us_county10 where STATEFP10 = '10'");
-  //simplet_map_add_style(map, "fill",   "#aa0000");
-  //simplet_map_add_style(map, "stroke", "#444444");
-  simplet_map_add_rule(map,  "SELECT * from tl_2010_us_county10");
 
+  simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");
+  simplet_map_add_style(map, "fill",   "#aa0000");
+  simplet_map_add_style(map, "weight", "0.1");
+  simplet_map_add_style(map, "stroke", "#444444");
+  
   if(simplet_map_isvalid(map))
     simplet_map_render_to_png(map, "./out.png");
 

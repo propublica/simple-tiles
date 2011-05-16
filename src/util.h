@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 char*
-copy_string(char *src);
+simplet_copy_string(char *src);
 
 #ifdef __cplusplus
 }
