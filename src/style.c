@@ -21,15 +21,43 @@ simplet_styledef_t styleTable[] = {
 
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
+
+static int
+scan_color(char *str, unsigned int *r, unsigned int *g, unsigned int *b, unsigned int *a){
+  return sscanf(str, "#%2x%2x%2x%2x", r, g, b, a);
+}
+
 void
 simplet_style_fill(cairo_t *ctx, char *arg){
-  cairo_set_source_rgb(ctx, 1, 0, 0);
+  unsigned int r, g, b, a, count;
+  count = scan_color(arg, &r, &g, &b, &a);
+  switch(count){
+  case 3:
+    cairo_set_source_rgb(ctx, r / 255.0, g / 255.0, b / 255.0);
+    break;
+  case 4:
+    cairo_set_source_rgba(ctx, r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+    break;
+  default:
+    return;
+  }
   cairo_fill_preserve(ctx);
 }
 
 void
 simplet_style_stroke(cairo_t *ctx, char *arg){
-  cairo_set_source_rgb(ctx, 0, 0, 0);
+  unsigned int r, g, b, a, count;
+  count = scan_color(arg, &r, &g, &b, &a);
+  switch(count){
+  case 3:
+    cairo_set_source_rgb(ctx, r / 255.0, g / 255.0, b / 255.0);
+    break;
+  case 4:
+    cairo_set_source_rgba(ctx, r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+    break;
+  default:
+    return;
+  }
   cairo_stroke_preserve(ctx);
 }
 

@@ -19,9 +19,9 @@ main(){
   //simplet_map_add_rule(map,  "SELECT * from tl_2010_us_county10 where STATEFP10 = '10'");
 
   simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");
-  simplet_map_add_style(map, "fill",   "#aa0000");
+  simplet_map_add_style(map, "fill",   "#ccffccff");
   simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "stroke", "#444444");
+  simplet_map_add_style(map, "stroke", "#660000ff");
   
   if(simplet_map_isvalid(map))
     simplet_map_render_to_png(map, "./out.png");
