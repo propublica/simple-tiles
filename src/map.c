@@ -38,22 +38,24 @@ draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
     last_y = y;
     cairo_move_to(ctx, x, y);
     cairo_new_path(ctx);
-    for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
+    for(int j = 0; j < OGR_G_GetPointCount(subgeom); j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
       double dx;
       double dy;
       dx = fabs(last_x - x);
       dy = fabs(last_y - y);
       cairo_user_to_device_distance(ctx, &dx, &dy);
-      if(dx > 1 || dy > 1){
+      if(dx >= 0.5 || dy >= 0.5){
         cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
         last_x = x;
         last_y = y;
       }
     }
     cairo_close_path(ctx);
+    cairo_set_source_rgb(ctx, 1, 0, 0);
+    cairo_fill_preserve(ctx);
+    cairo_set_source_rgb(ctx, 0, 0, 0);
     cairo_stroke(ctx);
-
   }
 }
 
@@ -244,7 +246,8 @@ simplet_map_render_to_png(simplet_map_t *map, char *path){
   cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
   simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
   simplet_rule_t *rule;
-  cairo_set_line_width(ctx, 0.05);
+  cairo_set_line_width(ctx, 0.0);
+
   while((rule = simplet_list_next(iter)))
     process_rule(map, rule, ctx);
   cairo_surface_write_to_png(surface, path);
