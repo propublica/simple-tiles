@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
+
 #include <gdal/cpl_port.h>
 #include <gdal/cpl_error.h>
 #include "map.h"
@@ -20,6 +22,8 @@ static int
 draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
   double x;
   double y;
+  double last_x;
+  double last_y;
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
@@ -28,15 +32,28 @@ draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
       draw_polygon(map, subgeom, ctx);
       continue;
     }
+
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
+    last_x = x;
+    last_y = y;
     cairo_move_to(ctx, x, y);
     cairo_new_path(ctx);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
-      cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
+      double dx;
+      double dy;
+      dx = fabs(last_x - x);
+      dy = fabs(last_y - y);
+      cairo_user_to_device_distance(ctx, &dx, &dy);
+      if(dx > 1 || dy > 1){
+        cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
+        last_x = x;
+        last_y = y;
+      }
     }
     cairo_close_path(ctx);
     cairo_stroke(ctx);
+
   }
 }
 
@@ -220,7 +237,6 @@ int
 simplet_map_render_to_png(simplet_map_t *map, char *path){
   if(simplet_map_isvalid(map) == MAP_ERR)
     return (map->valid = MAP_ERR);
-  printf("projected: %i", OSRIsProjected(map->proj));
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return (map->valid = MAP_ERR);
