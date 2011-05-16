@@ -36,9 +36,10 @@ draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
+    cairo_save(ctx);
     cairo_move_to(ctx, x, y);
     cairo_new_path(ctx);
-    for(int j = 0; j < OGR_G_GetPointCount(subgeom); j++){
+    for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
       double dx;
       double dy;
@@ -51,11 +52,16 @@ draw_polygon(simplet_map_t *map, OGRGeometryH *geom, cairo_t *ctx){
         last_y = y;
       }
     }
+    // ensure something is always drawn
+    OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
+    cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
     cairo_close_path(ctx);
     cairo_set_source_rgb(ctx, 1, 0, 0);
     cairo_fill_preserve(ctx);
     cairo_set_source_rgb(ctx, 0, 0, 0);
-    cairo_stroke(ctx);
+    cairo_stroke_preserve(ctx);
+    cairo_clip(ctx);
+    cairo_restore(ctx);
   }
 }
 
@@ -246,7 +252,7 @@ simplet_map_render_to_png(simplet_map_t *map, char *path){
   cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
   simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
   simplet_rule_t *rule;
-  cairo_set_line_width(ctx, 0.0);
+  cairo_set_line_width(ctx, 0.1);
 
   while((rule = simplet_list_next(iter)))
     process_rule(map, rule, ctx);
