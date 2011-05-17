@@ -24,6 +24,7 @@ typedef struct simplet_map_t {
   simplet_bounds_t     *bounds;
   simplet_list_t       *rules;
   OGRSpatialReferenceH *proj;
+  cairo_t              *_ctx; /* ephemeral, not for outside usage */
   int valid;
   unsigned int width;
   unsigned int height;

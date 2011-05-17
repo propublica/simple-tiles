@@ -6,6 +6,7 @@
 #include "style.h"
 #include "util.h"
 
+#define ST_CCEIL 256.0
 // Refactor candidate.
 // OGR has styles! http://www.gdal.org/ogr/ogr_feature_style.html
 typedef struct simplet_styledef_t {
@@ -21,43 +22,36 @@ simplet_styledef_t styleTable[] = {
 
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
-
 static int
 scan_color(char *str, unsigned int *r, unsigned int *g, unsigned int *b, unsigned int *a){
   return sscanf(str, "#%2x%2x%2x%2x", r, g, b, a);
 }
 
-void
-simplet_style_fill(cairo_t *ctx, char *arg){
+static int
+set_color(cairo_t *ctx, char *arg){
   unsigned int r, g, b, a, count;
   count = scan_color(arg, &r, &g, &b, &a);
   switch(count){
   case 3:
-    cairo_set_source_rgb(ctx, r / 255.0, g / 255.0, b / 255.0);
+    cairo_set_source_rgb(ctx, r / ST_CCEIL, g / ST_CCEIL, b / ST_CCEIL);
     break;
   case 4:
-    cairo_set_source_rgba(ctx, r / 255.0, g / 255.0, b / 255.0, a / 255.0);
+    cairo_set_source_rgba(ctx, r / ST_CCEIL, g / ST_CCEIL, b / ST_CCEIL, a / ST_CCEIL);
     break;
   default:
     return;
   }
+}
+
+void
+simplet_style_fill(cairo_t *ctx, char *arg){
+  set_color(ctx, arg);
   cairo_fill_preserve(ctx);
 }
 
 void
 simplet_style_stroke(cairo_t *ctx, char *arg){
-  unsigned int r, g, b, a, count;
-  count = scan_color(arg, &r, &g, &b, &a);
-  switch(count){
-  case 3:
-    cairo_set_source_rgb(ctx, r / 255.0, g / 255.0, b / 255.0);
-    break;
-  case 4:
-    cairo_set_source_rgba(ctx, r / 255.0, g / 255.0, b / 255.0, a / 255.0);
-    break;
-  default:
-    return;
-  }
+  set_color(ctx, arg);
   cairo_stroke_preserve(ctx);
 }
 

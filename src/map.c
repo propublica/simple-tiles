@@ -3,8 +3,6 @@
 #include <assert.h>
 #include <math.h>
 
-#include <gdal/cpl_port.h>
-#include <gdal/cpl_error.h>
 #include "map.h"
 #include "style.h"
 #include "util.h"
@@ -19,53 +17,100 @@ rule_free(void *rule){
   free(tmp);
 }
 
-static int
-draw_polygon(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule, cairo_t *ctx){
+/* arguments a little longish here */
+static void
+plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule, 
+          void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
   double x;
   double y;
   double last_x;
   double last_y;
+  cairo_save(map->_ctx);
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
       continue;
     if(OGR_G_GetGeometryCount(subgeom) > 0) {
-      draw_polygon(map, subgeom, rule, ctx);
+      plot_path(map, subgeom, rule, cb);
       continue;
     }
 
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
-    cairo_save(ctx);
-    cairo_move_to(ctx, x, y);
-    cairo_new_path(ctx);
+    cairo_move_to(map->_ctx, x, y);
+    cairo_new_path(map->_ctx);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
       double dx;
       double dy;
       dx = fabs(last_x - x);
       dy = fabs(last_y - y);
-      cairo_user_to_device_distance(ctx, &dx, &dy);
+      cairo_user_to_device_distance(map->_ctx, &dx, &dy);
       if(dx >= 0.5 || dy >= 0.5){
-        cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
+        cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
         last_x = x;
         last_y = y;
       }
     }
     // ensure something is always drawn
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
-    cairo_line_to(ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
-    cairo_close_path(ctx);
-    simplet_apply_styles(ctx, rule->styles, 3, "weight", "fill", "stroke");
-    cairo_clip(ctx);
-    cairo_restore(ctx);
+    cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
+    (*cb)(map, rule);
   }
+  cairo_clip(map->_ctx);
+  cairo_restore(map->_ctx);
+}
+
+static void
+plot_point(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule, 
+          void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
+  double x;
+  double y;
+  cairo_save(map->_ctx);
+  for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
+    OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
+    if(subgeom == NULL)
+      continue;
+    if(OGR_G_GetGeometryCount(subgeom) > 0) {
+      plot_point(map, subgeom, rule, cb);
+      continue;
+    }
+     // should only run once, but just to be sure
+    for(int j = 0; j < OGR_G_GetPointCount(subgeom); j++){
+      cairo_move_to(map->_ctx, x, y);
+      simplet_style_t *style;
+      style = simplet_lookup_style(rule->styles, "radius");
+      if(style == NULL)
+        continue;      
+      cairo_arc(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y, strtod(style->arg, NULL), 0., 2 * M_PI);
+    }
+    (*cb)(map, rule);
+  }
+  cairo_clip(map->_ctx);
+  cairo_restore(map->_ctx);
+}
+
+static void
+finish_polygon(simplet_map_t *map, simplet_rule_t *rule){
+  cairo_close_path(map->_ctx);
+  simplet_apply_styles(map->_ctx, rule->styles, 3, "weight", "fill", "stroke");
+}
+
+static void
+finish_linestring(simplet_map_t *map, simplet_rule_t *rule){
+  simplet_apply_styles(map->_ctx, rule->styles, 2, "weight", "fill");
+}
+
+static void
+finish_point(simplet_map_t *map, simplet_rule_t *rule){
+  cairo_close_path(map->_ctx);
+  simplet_apply_styles(map->_ctx, rule->styles, 4, "weight", "fill", "stroke");
 }
 
 // move to rules.c
 static int
-process_rule(simplet_map_t *map, simplet_rule_t *rule, cairo_t *ctx){
+process_rule(simplet_map_t *map, simplet_rule_t *rule){
   OGRGeometryH *bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   assert(bounds != NULL);
   OGRLayerH *layer = OGR_DS_ExecuteSQL(map->source, rule->ogrsql, bounds, "");
@@ -79,10 +124,20 @@ process_rule(simplet_map_t *map, simplet_rule_t *rule, cairo_t *ctx){
     if(geom == NULL)
       continue;
     switch(OGR_G_GetGeometryType(geom)){
-    case wkbPolygon:
-    case wkbMultiPolygon:
-      draw_polygon(map, geom, rule, ctx);
-      break;
+      case wkbPolygon:
+      case wkbMultiPolygon:
+        plot_path(map, geom, rule, finish_polygon);
+        break;
+      case wkbLineString:
+      case wkbMultiLineString:
+        plot_path(map, geom, rule, finish_linestring);
+        break;
+      case wkbPoint:
+      case wkbMultiPoint:
+        plot_point(map, geom, rule, finish_point);
+        break;
+      default:
+        ;
     }
     OGR_F_Destroy(feature);
   }
@@ -103,6 +158,7 @@ simplet_map_new(){
   map->source = NULL;
   map->bounds = NULL;
   map->proj   = NULL;
+  map->_ctx   = NULL;
   map->height = 0;
   map->width  = 0;
   map->valid  = MAP_OK;
@@ -197,7 +253,6 @@ simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
     return (map->valid = MAP_ERR);
   simplet_rule_t *rule = map->rules->tail->value;
   
-  // Fail silently on unknown styles.
   simplet_style_t *style;
   if(!(style = simplet_style_new(key, arg)))
     return (map->valid = MAP_ERR);
@@ -244,14 +299,16 @@ simplet_map_render_to_png(simplet_map_t *map, char *path){
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return (map->valid = MAP_ERR);
   cairo_t *ctx = cairo_create(surface);
-  cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
+  map->_ctx = ctx;
+  cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
   simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
   simplet_rule_t *rule;
 
   while((rule = simplet_list_next(iter)))
-    process_rule(map, rule, ctx);
+    process_rule(map, rule);
 
   cairo_surface_write_to_png(surface, path);
-  cairo_destroy(ctx);
+  cairo_destroy(map->_ctx);
+  map->_ctx = NULL;
   return MAP_OK;
 }
