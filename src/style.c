@@ -65,6 +65,11 @@ simplet_style_new(char *key, char *arg){
   style->key = simplet_copy_string(key);
   style->arg = simplet_copy_string(arg);
   
+  if(!(style->key && style->arg)){
+    free(style);
+    return NULL;
+  }
+  
   return style;
 }
 

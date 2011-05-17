@@ -18,7 +18,6 @@ simplet_rule_new(char *sqlquery){
   }
   
   rule->ogrsql = simplet_copy_string(sqlquery);
-  
   return rule;
 }
 
@@ -94,7 +93,6 @@ plot_point(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
     return;
 
   cairo_save(map->_ctx);
-
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
     double r = strtod(style->arg, NULL);
