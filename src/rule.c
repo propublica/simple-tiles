@@ -128,6 +128,35 @@ finish_point(simplet_map_t *map, simplet_rule_t *rule){
   simplet_apply_styles(map->_ctx, rule->styles, 4, "weight", "fill", "stroke");
 }
 
+
+static void
+dispatch(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule){
+  switch(OGR_G_GetGeometryType(geom)){
+    case wkbPolygon:
+    case wkbMultiPolygon:
+      plot_path(map, geom, rule, finish_polygon);
+      break;
+    case wkbLineString:
+    case wkbMultiLineString:
+      plot_path(map, geom, rule, finish_linestring);
+      break;
+    case wkbPoint:
+    case wkbMultiPoint:
+      plot_point(map, geom, rule, finish_point);
+      break;
+    case wkbGeometryCollection:
+      for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
+        OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
+        if(subgeom == NULL)
+          continue;
+        dispatch(map, subgeom, rule);
+      }
+      break;
+    default:
+      ;
+  }
+}
+
 // move to rules.c
 int
 simplet_rule_process(simplet_map_t *map, simplet_rule_t *rule){
@@ -143,22 +172,7 @@ simplet_rule_process(simplet_map_t *map, simplet_rule_t *rule){
     OGRGeometryH *geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
-    switch(OGR_G_GetGeometryType(geom)){
-      case wkbPolygon:
-      case wkbMultiPolygon:
-        plot_path(map, geom, rule, finish_polygon);
-        break;
-      case wkbLineString:
-      case wkbMultiLineString:
-        plot_path(map, geom, rule, finish_linestring);
-        break;
-      case wkbPoint:
-      case wkbMultiPoint:
-        plot_point(map, geom, rule, finish_point);
-        break;
-      default:
-        ;
-    }
+    dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }
   OGR_DS_ReleaseResultSet(map->source, layer);
