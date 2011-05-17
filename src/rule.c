@@ -87,13 +87,16 @@ plot_point(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
   double x;
   double y;
+  
+  simplet_style_t *style;
+  style = simplet_lookup_style(rule->styles, "radius");
+  if(style == NULL)
+    return;
+
   cairo_save(map->_ctx);
+
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-    simplet_style_t *style;
-    style = simplet_lookup_style(rule->styles, "radius");
-    if(style == NULL)
-      continue;
     double r = strtod(style->arg, NULL);
     double dy = 0;
     cairo_device_to_user_distance(map->_ctx, &r, &dy);
