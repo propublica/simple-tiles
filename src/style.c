@@ -22,15 +22,10 @@ simplet_styledef_t styleTable[] = {
 
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
-static int
-scan_color(char *str, unsigned int *r, unsigned int *g, unsigned int *b, unsigned int *a){
-  return sscanf(str, "#%2x%2x%2x%2x", r, g, b, a);
-}
-
-static int
+static void
 set_color(cairo_t *ctx, char *arg){
   unsigned int r, g, b, a, count;
-  count = scan_color(arg, &r, &g, &b, &a);
+  count = sscanf(arg, "#%2x%2x%2x%2x", &r, &g, &b, &a);
   switch(count){
   case 3:
     cairo_set_source_rgb(ctx, r / ST_CCEIL, g / ST_CCEIL, b / ST_CCEIL);

@@ -5,17 +5,10 @@
 
 #include "map.h"
 #include "style.h"
+#include "rule.h"
 #include "util.h"
 
-static void
-rule_free(void *rule){
-  simplet_rule_t* tmp = rule;
-  simplet_list_t* styles = tmp->styles;
-  styles->free = simplet_style_vfree;
-  simplet_list_free(styles);
-  free(tmp->ogrsql);
-  free(tmp);
-}
+
 
 /* arguments a little longish here */
 static void
@@ -152,9 +145,12 @@ simplet_map_new(){
   if(!(map = malloc(sizeof(*map))))
     return NULL;
 
-  if(!(map->rules = simplet_list_new()))
+  if(!(map->rules = simplet_list_new())){
+    free(map);
     return NULL;
-  map->rules->free = rule_free;
+  }
+  
+  map->rules->free = simplet_rule_vfree;
   map->source = NULL;
   map->bounds = NULL;
   map->proj   = NULL;
@@ -226,17 +222,8 @@ simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
 
   // move to rules.c
   simplet_rule_t *rule;
-  if(!(rule = malloc(sizeof(*rule))))
+  if(!(rule = simplet_rule_new(sqlquery)))
     return (map->valid = MAP_ERR);
-
-  if(!(rule->styles = simplet_list_new()))
-    return (map->valid = MAP_ERR);
-
-  char *sql;
-  if(!(sql = simplet_copy_string(sqlquery)))
-    return (map->valid = MAP_ERR);
-
-  rule->ogrsql = sql;
 
   if(!simplet_list_push(map->rules, rule))
     return (map->valid = MAP_ERR);

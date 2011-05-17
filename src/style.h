@@ -1,6 +1,8 @@
 #ifndef _SIMPLE_TILES_STYLE_H
 #define _SIMPLE_TILES_STYLE_H
 
+#include <cairo/cairo.h>
+#include "list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,7 +12,6 @@ typedef struct {
   char *key;
   char *arg;
 } simplet_style_t;
-
 
 void
 simplet_style_fill(cairo_t *ctx, char *arg);

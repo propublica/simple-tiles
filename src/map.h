@@ -14,11 +14,6 @@
 extern "C" {
 #endif
 
-typedef struct {
-  char *ogrsql;
-  simplet_list_t *styles;
-} simplet_rule_t;
-
 typedef struct simplet_map_t {
   OGRDataSourceH       *source;
   simplet_bounds_t     *bounds;
