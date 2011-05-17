@@ -58,7 +58,7 @@ plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
-    cairo_move_to(map->_ctx, x, y);
+    cairo_move_to(map->_ctx, x - map->bounds->nw->x,  map->bounds->nw->y - y);
     cairo_new_path(map->_ctx);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
@@ -88,25 +88,18 @@ plot_point(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
   double x;
   double y;
   cairo_save(map->_ctx);
-  for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
-    OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
-    if(subgeom == NULL)
+  for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
+    OGR_G_GetPoint(geom, i, &x, &y, NULL);
+    simplet_style_t *style;
+    style = simplet_lookup_style(rule->styles, "radius");
+    if(style == NULL)
       continue;
-    if(OGR_G_GetGeometryCount(subgeom) > 0) {
-      plot_point(map, subgeom, rule, cb);
-      continue;
-    }
-     // should only run once, but just to be sure
-    for(int j = 0; j < OGR_G_GetPointCount(subgeom); j++){
-      cairo_move_to(map->_ctx, x, y);
-      simplet_style_t *style;
-      style = simplet_lookup_style(rule->styles, "radius");
-      if(style == NULL)
-        continue;      
-      cairo_arc(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y, strtod(style->arg, NULL), 0., 2 * M_PI);
-    }
-    (*cb)(map, rule);
+    double r = strtod(style->arg, NULL);
+    double dy = 0;
+    cairo_device_to_user_distance(map->_ctx, &r, &dy);
+    cairo_arc(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y, r, 0., 2 * M_PI);
   }
+  (*cb)(map, rule);
   cairo_clip(map->_ctx);
   cairo_restore(map->_ctx);
 }
@@ -125,7 +118,7 @@ finish_linestring(simplet_map_t *map, simplet_rule_t *rule){
 static void
 finish_point(simplet_map_t *map, simplet_rule_t *rule){
   cairo_close_path(map->_ctx);
-  simplet_apply_styles(map->_ctx, rule->styles, 4, "weight", "fill", "stroke");
+  simplet_apply_styles(map->_ctx, rule->styles, 3, "weight", "fill", "stroke");
 }
 
 
