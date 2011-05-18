@@ -7,8 +7,7 @@
 #include "util.h"
 
 #define ST_CCEIL 256.0
-// Refactor candidate.
-// OGR has styles! http://www.gdal.org/ogr/ogr_feature_style.html
+
 typedef struct simplet_styledef_t {
   char *key;
   void (*call)(cairo_t *ctx, char *arg);
@@ -19,8 +18,7 @@ simplet_styledef_t styleTable[] = {
   { "stroke",    simplet_style_stroke    },
   { "weight",    simplet_style_weight    },
   { "line-join", simplet_style_line_join },
-  { "line-cap",  simplet_style_line_cap  },
-  
+  { "line-cap",  simplet_style_line_cap  }
   /* radius is a special style */
 };
 

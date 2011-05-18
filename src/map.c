@@ -165,7 +165,6 @@ simplet_map_render_to_png(simplet_map_t *map, char *path){
   cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
   simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
   simplet_rule_t *rule;
-
   while((rule = simplet_list_next(iter)))
     simplet_rule_process(map, rule);
 
