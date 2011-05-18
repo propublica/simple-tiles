@@ -44,36 +44,22 @@ set_color(cairo_t *ctx, char *arg){
 
 void
 simplet_style_line_join(cairo_t *ctx, char *arg){
-  switch(arg){
-    case "miter":
-    cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
-    break;
-    case "round":
+  if(strcmp("miter", arg) == 0)
+  cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
+  if(strcmp("round", arg) == 0)
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
-    break;
-    case "bevel":
+  if(strcmp("bevel", arg) == 0)
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_BEVEL);
-    break;
-    default:
-    return;
-  }
 }
 
 void
 simplet_style_line_cap(cairo_t *ctx, char *arg){
-  switch(arg){
-    case "butt":
+  if(strcmp("butt", arg) == 0)
     cairo_set_line_join(ctx, CAIRO_LINE_CAP_BUTT);
-    break;
-    case "round":
+  if(strcmp("round", arg) == 0)
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
-    break;
-    case "square":
+  if(strcmp("square", arg) == 0)
     cairo_set_line_join(ctx, CAIRO_LINE_CAP_SQUARE);
-    break;
-    default:
-    return;
-  }
 }
 
 void
