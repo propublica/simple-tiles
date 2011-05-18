@@ -64,7 +64,7 @@ simplet_list_free(simplet_list_t *list){
   free(list);
 }
 
-simplet_listiter_t*
+void
 simplet_list_iter_free(simplet_listiter_t* iter){
   free(iter);
 }

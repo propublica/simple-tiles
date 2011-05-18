@@ -37,7 +37,7 @@ simplet_list_free(simplet_list_t* list);
 simplet_listiter_t*
 simplet_get_list_iter(simplet_list_t* list);
 
-simplet_listiter_t*
+void
 simplet_list_iter_free(simplet_listiter_t* iter);
 
 void*
