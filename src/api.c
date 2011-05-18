@@ -11,7 +11,7 @@ main(){
   simplet_map_set_size(map, 600, 300);
   simplet_map_set_bounds(map, -179.231086, 17.831509, -60.859681, 71.441059);
   // Only one layer per map for now
-  simplet_map_add_layer(map, "/Users/jlarson/dev/simple-tiles/data/tl_2010_us_cd108.shp");
+  simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
   simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");
   simplet_map_add_style(map, "radius", "2");
   simplet_map_add_style(map, "fill",   "#CC0000ff");
