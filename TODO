@@ -4,6 +4,8 @@ think about namespacing correctly.
 
 think about status codes and valid tests.
 
+style and rule should have their own constructors / destructors and not be 
+wrapped in map -- wrapping is ok, the map functions should return the newly 
+constructed instance
 
-style and rule should have they're own constructors / destructors and not be 
-wrapped in map
+LAYERS!

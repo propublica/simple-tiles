@@ -15,9 +15,13 @@ typedef struct simplet_styledef_t {
 } simplet_styledef_t;
 
 simplet_styledef_t styleTable[] = {
-  { "fill",   simplet_style_fill   },
-  { "stroke", simplet_style_stroke },
-  { "weight", simplet_style_weight }
+  { "fill",      simplet_style_fill      },
+  { "stroke",    simplet_style_stroke    },
+  { "weight",    simplet_style_weight    },
+  { "line-join", simplet_style_line_join },
+  { "line-cap",  simplet_style_line_cap  },
+  
+  /* radius is a special style */
 };
 
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
@@ -34,6 +38,40 @@ set_color(cairo_t *ctx, char *arg){
     cairo_set_source_rgba(ctx, r / ST_CCEIL, g / ST_CCEIL, b / ST_CCEIL, a / ST_CCEIL);
     break;
   default:
+    return;
+  }
+}
+
+void
+simplet_style_line_join(cairo_t *ctx, char *arg){
+  switch(arg){
+    case "miter":
+    cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
+    break;
+    case "round":
+    cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
+    break;
+    case "bevel":
+    cairo_set_line_join(ctx, CAIRO_LINE_JOIN_BEVEL);
+    break;
+    default:
+    return;
+  }
+}
+
+void
+simplet_style_line_cap(cairo_t *ctx, char *arg){
+  switch(arg){
+    case "butt":
+    cairo_set_line_join(ctx, CAIRO_LINE_CAP_BUTT);
+    break;
+    case "round":
+    cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
+    break;
+    case "square":
+    cairo_set_line_join(ctx, CAIRO_LINE_CAP_SQUARE);
+    break;
+    default:
     return;
   }
 }
