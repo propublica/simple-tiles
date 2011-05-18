@@ -3,18 +3,12 @@
 
 #include <gdal/ogr_api.h>
 #include <gdal/ogr_srs_api.h>
+#include "types.h"
 #include "point.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct {
-  simplet_point_t *nw;
-  simplet_point_t *se;
-  double width;
-  double height;
-} simplet_bounds_t;
 
 simplet_bounds_t*
 simplet_bounds_new();

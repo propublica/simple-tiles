@@ -1,14 +1,11 @@
 #ifndef _SIMPLET_POINT_H
 #define _SIMPLET_POINT_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct {
-  double x;
-  double y;
-} simplet_point_t;
 
 simplet_point_t*
 simplet_point_new(double x, double y);

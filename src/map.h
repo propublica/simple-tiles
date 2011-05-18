@@ -1,11 +1,11 @@
 #ifndef _SIMPLE_TILES_MAP_H
 #define _SIMPLE_TILES_MAP_H
 
-#include <gdal/ogr_api.h>
-#include <gdal/ogr_srs_api.h>
-#include <cairo/cairo.h>
+#include "types.h"
 #include "list.h"
 #include "bounds.h"
+#include "style.h"
+
 
 #define MAP_OK 1
 #define MAP_ERR 0
@@ -14,16 +14,7 @@
 extern "C" {
 #endif
 
-typedef struct simplet_map_t {
-  OGRDataSourceH       *source;
-  simplet_bounds_t     *bounds;
-  simplet_list_t       *rules;
-  OGRSpatialReferenceH *proj;
-  cairo_t              *_ctx; /* ephemeral, not for outside usage */
-  int valid;
-  unsigned int width;
-  unsigned int height;
-} simplet_map_t;
+
 
 simplet_map_t*
 simplet_map_new();
@@ -43,10 +34,10 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
 int
 simplet_map_add_layer(simplet_map_t *map, char *datastring);
 
-int
+simplet_rule_t*
 simplet_map_add_rule(simplet_map_t *map, char *sqlquery);
 
-int
+simplet_style_t*
 simplet_map_add_style(simplet_map_t *map, char *key, char *arg);
 
 int

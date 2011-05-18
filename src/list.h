@@ -1,26 +1,11 @@
 #ifndef _SIMPLE_TILES_LIST_H
 #define _SIMPLE_TILES_LIST_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct simplet_node_t {
-  struct simplet_node_t *next;
-  struct simplet_node_t *prev;
-  void *value;
-} simplet_node_t;
-
-typedef struct simplet_list_t {
-  simplet_node_t *head;
-  simplet_node_t *tail;
-  void (*free)(void *val);
-  unsigned int length;
-} simplet_list_t;
-
-typedef struct simplet_listiter_t {
-  simplet_node_t *next;
-} simplet_listiter_t;
 
 simplet_list_t*
 simplet_list_new();

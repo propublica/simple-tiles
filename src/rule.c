@@ -82,7 +82,6 @@ plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
     cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
     simplet_apply_styles(map->_ctx, rule->styles, 2, "line-join", "line-cap");
-    
     (*cb)(map, rule);
     cairo_clip(map->_ctx);
     cairo_restore(map->_ctx);
@@ -162,7 +161,6 @@ dispatch(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule){
   }
 }
 
-// move to rules.c
 int
 simplet_rule_process(simplet_map_t *map, simplet_rule_t *rule){
   OGRGeometryH *bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
@@ -182,5 +180,14 @@ simplet_rule_process(simplet_map_t *map, simplet_rule_t *rule){
   }
   OGR_DS_ReleaseResultSet(map->source, layer);
   return 1;
+}
+
+simplet_style_t*
+simplet_rule_add_style(simplet_rule_t *rule, char *key, char *arg){
+  simplet_style_t *style;
+  if(!(style = simplet_style_new(key, arg)))
+    return NULL;
+  simplet_list_push(rule->styles, style);
+  return style;
 }
 

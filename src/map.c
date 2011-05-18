@@ -85,37 +85,43 @@ simplet_map_add_layer(simplet_map_t *map, char *datastring){
   return MAP_OK;
 }
 
-int
+simplet_rule_t*
 simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
   assert(map->valid == MAP_OK);
 
-  // move to rules.c
   simplet_rule_t *rule;
-  if(!(rule = simplet_rule_new(sqlquery)))
-    return (map->valid = MAP_ERR);
+  if(!(rule = simplet_rule_new(sqlquery))){
+    map->valid = MAP_ERR;
+    return NULL;
+  }
 
-  if(!simplet_list_push(map->rules, rule))
-    return (map->valid = MAP_ERR);
+  if(!simplet_list_push(map->rules, rule)){
+    map->valid = MAP_ERR;
+    simplet_rule_free(rule);
+    return NULL;
+  }
 
   assert(map->valid == MAP_OK);
-  return MAP_OK;
+  return rule;
 }
 
-int
+simplet_style_t *
 simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
   assert(map->valid == MAP_OK);
 
-  if(!map->rules->tail)
-    return (map->valid = MAP_ERR);
+  if(!map->rules->tail){
+    map->valid = MAP_ERR;
+    return NULL;
+  }
   simplet_rule_t *rule = map->rules->tail->value;
-  
+
   simplet_style_t *style;
-  if(!(style = simplet_style_new(key, arg)))
-    return (map->valid = MAP_ERR);
+  if(!(style = simplet_rule_add_style(rule, key, arg))){
+    map->valid = MAP_ERR;
+    return NULL;
+  }
 
-  simplet_list_push(rule->styles, style);
-
-  return MAP_OK;
+  return style;
 }
 
 int

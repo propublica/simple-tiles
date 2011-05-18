@@ -9,13 +9,14 @@ OBJ = list.o bounds.o point.o style.o map.o util.o rule.o
 
 all: $(OBJ)
 
-api.o: api.c simple_tiles.h map.h list.h bounds.h point.h style.h
-bounds.o: bounds.c bounds.h point.h
-list.o: list.c list.h
-map.o: map.c map.h list.h bounds.h point.h style.h rule.h util.h
-point.o: point.c point.h
-rule.o: rule.c style.h list.h rule.h util.h map.h bounds.h point.h
-style.o: style.c map.h list.h bounds.h point.h style.h util.h
+api.o: api.c simple_tiles.h map.h types.h list.h bounds.h point.h style.h
+bounds.o: bounds.c bounds.h types.h point.h
+list.o: list.c list.h types.h
+map.o: map.c map.h types.h list.h bounds.h point.h style.h rule.h util.h
+point.o: point.c point.h types.h
+rule.o: rule.c style.h types.h list.h rule.h map.h bounds.h point.h \
+  util.h
+style.o: style.c map.h types.h list.h bounds.h point.h style.h util.h
 util.o: util.c util.h
 
 api: api.o $(OBJ)
