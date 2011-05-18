@@ -4,7 +4,6 @@
 int
 main(){
   simplet_map_t *map;
-
   if(!(map = simplet_map_new()))
     exit(1);
 
@@ -12,15 +11,14 @@ main(){
   simplet_map_set_size(map, 600, 300);
   simplet_map_set_bounds(map, -179.231086, 17.831509, -60.859681, 71.441059);
   // Only one layer per map for now
-  simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
+  simplet_map_add_layer(map, "/Users/jlarson/dev/simple-tiles/data/tl_2010_us_cd108.shp");
   simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");
   simplet_map_add_style(map, "radius", "2");
   simplet_map_add_style(map, "fill",   "#CC0000ff");
   simplet_map_add_style(map, "weight", "0.1");
   simplet_map_add_style(map, "stroke", "#660000ff");
-  
+    
   if(simplet_map_isvalid(map))
     simplet_map_render_to_png(map, "./out.png");
-
   simplet_map_free(map);
 }
