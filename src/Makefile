@@ -4,7 +4,7 @@ CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -Wall -W $(ARCH) \
 	$(shell pkg-config --cflags cairo) \
 	$(shell gdal-config --cflags)
 LDFLAGS = $(shell pkg-config --libs cairo) \
-	$(shell gdal-config --libs) -lm
+	$(shell gdal-config --libs)
 OBJ = list.o bounds.o point.o style.o map.o util.o rule.o layer.o
 
 all: $(OBJ)
