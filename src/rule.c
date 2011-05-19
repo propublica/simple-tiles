@@ -47,9 +47,6 @@ plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
   double y;
   double last_x;
   double last_y;
-  
-  
-  
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
@@ -59,7 +56,6 @@ plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
       continue;
     }
     cairo_save(map->_ctx);
-    
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
@@ -83,10 +79,10 @@ plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
     cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
     simplet_apply_styles(map->_ctx, rule->styles, 2, "line-join", "line-cap");
     (*cb)(map, rule);
+    cairo_close_path(map->_ctx);
     cairo_clip(map->_ctx);
     cairo_restore(map->_ctx);
   }
-
 }
 
 static void
@@ -109,7 +105,6 @@ plot_point(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
     cairo_arc(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y, r, 0., 2 * M_PI);
   }
   simplet_apply_styles(map->_ctx, rule->styles, 2, "line-join", "line-cap");
-  
   (*cb)(map, rule);
   cairo_clip(map->_ctx);
   cairo_restore(map->_ctx);
