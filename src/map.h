@@ -5,6 +5,7 @@
 #include "list.h"
 #include "bounds.h"
 #include "style.h"
+#include "layer.h"
 
 
 #define MAP_OK 1
@@ -29,7 +30,7 @@ simplet_map_set_size(simplet_map_t *map, int width, int height);
 int
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny);
 
-int
+simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, char *datastring);
 
 simplet_rule_t*

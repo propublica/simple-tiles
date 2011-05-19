@@ -46,15 +46,20 @@ typedef struct simplet_listiter_t {
 /* map structures */
 
 typedef struct {
-  OGRDataSourceH       *source;
   simplet_bounds_t     *bounds;
-  simplet_list_t       *rules;
+  simplet_list_t       *layers;
   OGRSpatialReferenceH *proj;
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
   int valid;
   unsigned int width;
   unsigned int height;
 } simplet_map_t;
+
+typedef struct {
+  OGRDataSourceH source;
+  simplet_list_t *rules;
+} simplet_layer_t;
+
 
 typedef struct {
   char *ogrsql;

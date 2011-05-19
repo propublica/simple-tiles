@@ -157,23 +157,23 @@ dispatch(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule){
 }
 
 int
-simplet_rule_process(simplet_map_t *map, simplet_rule_t *rule){
+simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
   OGRGeometryH *bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   assert(bounds != NULL);
-  OGRLayerH *layer = OGR_DS_ExecuteSQL(map->source, rule->ogrsql, bounds, "");
+  OGRLayerH *olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
   OGR_G_DestroyGeometry(bounds);
   if(!layer)
     return 0;
 
   OGRFeatureH *feature;
-  while((feature = OGR_L_GetNextFeature(layer))){
+  while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH *geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
     dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }
-  OGR_DS_ReleaseResultSet(map->source, layer);
+  OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;
 }
 
@@ -182,7 +182,12 @@ simplet_rule_add_style(simplet_rule_t *rule, char *key, char *arg){
   simplet_style_t *style;
   if(!(style = simplet_style_new(key, arg)))
     return NULL;
-  simplet_list_push(rule->styles, style);
+
+  if(!simplet_list_push(rule->styles, style)){
+    simplet_style_free(style);
+    return NULL;
+  }
+  
   return style;
 }
 

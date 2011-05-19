@@ -4,8 +4,9 @@
 #include <math.h>
 
 #include "map.h"
-#include "style.h"
+#include "layer.h"
 #include "rule.h"
+#include "style.h"
 #include "util.h"
 
 simplet_map_t*
@@ -13,14 +14,12 @@ simplet_map_new(){
   simplet_map_t *map;
   if(!(map = malloc(sizeof(*map))))
     return NULL;
-
-  if(!(map->rules = simplet_list_new())){
+  
+  if(!(map->layers = simplet_list_new())){
     free(map);
     return NULL;
   }
   
-  map->rules->free = simplet_rule_vfree;
-  map->source = NULL;
   map->bounds = NULL;
   map->proj   = NULL;
   map->_ctx   = NULL;
@@ -34,12 +33,12 @@ void
 simplet_map_free(simplet_map_t *map){
   if(map->bounds)
     simplet_bounds_free(map->bounds);
-  if(map->source)
-    OGR_DS_Destroy(map->source);
+  if(map->layers) {
+    map->layers->free = simplet_layer_vfree;
+    simplet_list_free(map->layers);
+  }
   if(map->proj)
     OSRRelease(map->proj);
-  if(map->rules)
-    simplet_list_free(map->rules);
   free(map);
 }
 
@@ -75,14 +74,23 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
   return MAP_OK;
 }
 
-int
+simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, char *datastring){
   assert(map->valid == MAP_OK);
 
-  OGRRegisterAll();
-  if(!(map->source = OGROpen(datastring, 0, NULL)))
-    return (map->valid = MAP_ERR);
-  return MAP_OK;
+  simplet_layer_t *layer;
+  if(!(layer = simplet_layer_new(datastring))){
+    map->valid = MAP_ERR;
+    return NULL;
+  }
+
+  if(!simplet_list_push(map->layers, layer)){
+    map->valid = MAP_ERR;
+    simplet_layer_free(layer);
+    return NULL;
+  }
+    
+  return layer;
 }
 
 simplet_rule_t*
@@ -94,14 +102,20 @@ simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
     map->valid = MAP_ERR;
     return NULL;
   }
+  
+  simplet_layer_t *layer = map->layers->tail->value;
 
-  if(!simplet_list_push(map->rules, rule)){
+  if(!layer){
+    map->valid = MAP_ERR;
+    return NULL;
+  }
+
+  if(!simplet_list_push(layer->rules, rule)){
     map->valid = MAP_ERR;
     simplet_rule_free(rule);
     return NULL;
   }
 
-  assert(map->valid == MAP_OK);
   return rule;
 }
 
@@ -109,11 +123,23 @@ simplet_style_t *
 simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
   assert(map->valid == MAP_OK);
 
-  if(!map->rules->tail){
+  if(!map->layers->tail){
     map->valid = MAP_ERR;
     return NULL;
   }
-  simplet_rule_t *rule = map->rules->tail->value;
+  simplet_layer_t *layer = map->layers->tail->value;
+  
+  if(!layer){
+    map->valid = MAP_ERR;
+    return NULL;
+  }
+  
+  simplet_rule_t *rule = layer->rules->tail->value;
+  
+  if(!rule){
+    map->valid = MAP_ERR;
+    return NULL;
+  }
 
   simplet_style_t *style;
   if(!(style = simplet_rule_add_style(rule, key, arg))){
@@ -134,9 +160,6 @@ simplet_map_isvalid(simplet_map_t *map){
   if(!map->bounds)
     return MAP_ERR;
 
-  if(!map->source)
-    return MAP_ERR;
-
   if(!map->proj)
     return MAP_ERR;
 
@@ -146,7 +169,7 @@ simplet_map_isvalid(simplet_map_t *map){
   if(!map->width)
     return MAP_ERR;
 
-  if(!map->rules->tail)
+  if(!map->layers->tail)
     return MAP_ERR;
 
   return MAP_OK;
@@ -163,11 +186,11 @@ simplet_map_render_to_png(simplet_map_t *map, char *path){
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
   cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
-  simplet_listiter_t *iter = simplet_get_list_iter(map->rules);
-  simplet_rule_t *rule;
-  while((rule = simplet_list_next(iter)))
-    simplet_rule_process(map, rule);
-
+  simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
+  simplet_layer_t *layer;
+  while((layer = simplet_list_next(iter)))
+    simplet_layer_process(layer, map);
+  /* rewind datasource */
   cairo_surface_write_to_png(surface, path);
   cairo_destroy(map->_ctx);
   map->_ctx = NULL;

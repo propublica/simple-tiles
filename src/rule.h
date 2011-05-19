@@ -23,7 +23,7 @@ simplet_style_t*
 simplet_rule_add_style(simplet_rule_t *rule, char *key, char *arg);
 
 int
-simplet_rule_process(simplet_map_t *map, simplet_rule_t *rule);
+simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map);
 
 #ifdef __cplusplus
 }
