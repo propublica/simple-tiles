@@ -25,8 +25,7 @@ simplet_layer_new(char *datastring){
 
 void
 simplet_layer_vfree(void *layer){
-  simplet_layer_t *tmp = layer;
-  simplet_layer_free(tmp);
+  simplet_layer_free(layer);
 }
 
 void

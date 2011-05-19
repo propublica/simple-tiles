@@ -35,8 +35,7 @@ simplet_rule_free(simplet_rule_t *rule){
 
 void
 simplet_rule_vfree(void *rule){
-  simplet_rule_t *tmp = rule;
-  simplet_rule_free(tmp);
+  simplet_rule_free(rule);
 }
 
 /* arguments a little longish here */

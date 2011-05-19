@@ -97,8 +97,7 @@ simplet_style_new(char *key, char *arg){
 
 void
 simplet_style_vfree(void *style){
-  simplet_style_t *tmp = style;
-  simplet_style_free(tmp);
+  simplet_style_free(style);
 }
 
 void
