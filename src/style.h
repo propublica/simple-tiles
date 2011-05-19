@@ -34,7 +34,7 @@ void
 simplet_style_free(simplet_style_t* style);
 
 void
-simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, int count, ...);
+simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, ...);
 
 simplet_style_t*
 simplet_lookup_style(simplet_list_t* styles, char *key);

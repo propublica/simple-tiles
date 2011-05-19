@@ -116,12 +116,11 @@ lookup_styledef(char *key){
 }
 
 void
-simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, int count, ...){
+simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, ...){
   va_list args;
-  va_start(args, count);
+  va_start(args, styles);
   char* key;
-  for(int i = 0; i < count; i++){
-    key = va_arg(args, char*);
+  while((key = va_arg(args, char*)) != NULL) {
     simplet_styledef_t* def = lookup_styledef(key);
     if(def == NULL)
       continue;
