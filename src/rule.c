@@ -5,10 +5,6 @@
 #include "rule.h"
 #include "util.h"
 
-#ifndef M_PI
-#define M_PI acos (-1.0)
-#endif
-
 simplet_rule_t *
 simplet_rule_new(char *sqlquery){
   simplet_rule_t *rule;
