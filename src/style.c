@@ -9,8 +9,8 @@
 #define ST_CCEIL 256.0
 
 typedef struct simplet_styledef_t {
-  char *key;
-  void (*call)(cairo_t *ctx, char *arg);
+  const char *key;
+  void (*call)(cairo_t *ctx, const char *arg);
 } simplet_styledef_t;
 
 simplet_styledef_t styleTable[] = {
@@ -25,7 +25,7 @@ simplet_styledef_t styleTable[] = {
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
 static void
-set_color(cairo_t *ctx, char *arg){
+set_color(cairo_t *ctx, const char *arg){
   unsigned int r, g, b, a, count;
   count = sscanf(arg, "#%2x%2x%2x%2x", &r, &g, &b, &a);
   switch(count){
@@ -41,7 +41,7 @@ set_color(cairo_t *ctx, char *arg){
 }
 
 void
-simplet_style_line_join(cairo_t *ctx, char *arg){
+simplet_style_line_join(cairo_t *ctx, const char *arg){
   if(strcmp("miter", arg) == 0)
   cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
   if(strcmp("round", arg) == 0)
@@ -51,7 +51,7 @@ simplet_style_line_join(cairo_t *ctx, char *arg){
 }
 
 void
-simplet_style_line_cap(cairo_t *ctx, char *arg){
+simplet_style_line_cap(cairo_t *ctx, const char *arg){
   if(strcmp("butt", arg) == 0)
     cairo_set_line_join(ctx, CAIRO_LINE_CAP_BUTT);
   if(strcmp("round", arg) == 0)
@@ -61,25 +61,25 @@ simplet_style_line_cap(cairo_t *ctx, char *arg){
 }
 
 void
-simplet_style_fill(cairo_t *ctx, char *arg){
+simplet_style_fill(cairo_t *ctx, const char *arg){
   set_color(ctx, arg);
   cairo_fill_preserve(ctx);
 }
 
 void
-simplet_style_stroke(cairo_t *ctx, char *arg){
+simplet_style_stroke(cairo_t *ctx, const char *arg){
   set_color(ctx, arg);
   cairo_stroke_preserve(ctx);
 }
 
 void
-simplet_style_weight(cairo_t *ctx, char *arg){
+simplet_style_weight(cairo_t *ctx, const char *arg){
   cairo_set_line_width(ctx, strtod(arg, NULL));
 }
 
 
 simplet_style_t*
-simplet_style_new(char *key, char *arg){
+simplet_style_new(const char *key, const char *arg){
   simplet_style_t* style;
   if(!(style = malloc(sizeof(*style))))
     return NULL;
@@ -135,7 +135,7 @@ simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, ...){
 }
 
 simplet_style_t*
-simplet_lookup_style(simplet_list_t* styles, char *key){
+simplet_lookup_style(simplet_list_t* styles, const char *key){
   simplet_listiter_t* iter;
   if(!(iter = simplet_get_list_iter(styles)))
     return NULL;

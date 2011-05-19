@@ -43,7 +43,7 @@ simplet_map_free(simplet_map_t *map){
 }
 
 int
-simplet_map_set_srs(simplet_map_t *map, char *proj){
+simplet_map_set_srs(simplet_map_t *map, const char *proj){
   assert(map->valid == MAP_OK);
 
   if(!(map->proj = OSRNewSpatialReference(NULL)))
@@ -75,7 +75,7 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
 }
 
 simplet_layer_t*
-simplet_map_add_layer(simplet_map_t *map, char *datastring){
+simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   assert(map->valid == MAP_OK);
 
   simplet_layer_t *layer;
@@ -94,33 +94,29 @@ simplet_map_add_layer(simplet_map_t *map, char *datastring){
 }
 
 simplet_rule_t*
-simplet_map_add_rule(simplet_map_t *map, char *sqlquery){
+simplet_map_add_rule(simplet_map_t *map, const char *sqlquery){
   assert(map->valid == MAP_OK);
-
-  simplet_rule_t *rule;
-  if(!(rule = simplet_rule_new(sqlquery))){
+  
+  if(!map->layers->tail){
     map->valid = MAP_ERR;
     return NULL;
   }
   
   simplet_layer_t *layer = map->layers->tail->value;
-
   if(!layer){
     map->valid = MAP_ERR;
     return NULL;
   }
-
-  if(!simplet_list_push(layer->rules, rule)){
-    map->valid = MAP_ERR;
-    simplet_rule_free(rule);
+  
+  simplet_rule_t *rule;
+  if(!(rule = simplet_layer_add_rule(layer, sqlquery)))
     return NULL;
-  }
 
   return rule;
 }
 
 simplet_style_t *
-simplet_map_add_style(simplet_map_t *map, char *key, char *arg){
+simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
   assert(map->valid == MAP_OK);
 
   if(!map->layers->tail){
@@ -176,7 +172,7 @@ simplet_map_isvalid(simplet_map_t *map){
 }
 
 int
-simplet_map_render_to_png(simplet_map_t *map, char *path){
+simplet_map_render_to_png(simplet_map_t *map, const char *path){
   if(simplet_map_isvalid(map) == MAP_ERR)
     return (map->valid = MAP_ERR);
     

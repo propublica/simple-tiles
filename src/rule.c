@@ -10,7 +10,7 @@
 #endif
 
 simplet_rule_t *
-simplet_rule_new(char *sqlquery){
+simplet_rule_new(const char *sqlquery){
   simplet_rule_t *rule;
   if(!(rule = malloc(sizeof(*rule))))
     return NULL;
@@ -179,7 +179,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
 }
 
 simplet_style_t*
-simplet_rule_add_style(simplet_rule_t *rule, char *key, char *arg){
+simplet_rule_add_style(simplet_rule_t *rule, const char *key, const char *arg){
   simplet_style_t *style;
   if(!(style = simplet_style_new(key, arg)))
     return NULL;

@@ -22,7 +22,7 @@ void
 simplet_map_free(simplet_map_t *map);
 
 int
-simplet_map_set_srs(simplet_map_t *map, char *proj);
+simplet_map_set_srs(simplet_map_t *map, const char *proj);
 
 int
 simplet_map_set_size(simplet_map_t *map, int width, int height);
@@ -31,19 +31,19 @@ int
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny);
 
 simplet_layer_t*
-simplet_map_add_layer(simplet_map_t *map, char *datastring);
+simplet_map_add_layer(simplet_map_t *map, const char *datastring);
 
 simplet_rule_t*
-simplet_map_add_rule(simplet_map_t *map, char *sqlquery);
+simplet_map_add_rule(simplet_map_t *map, const char *sqlquery);
 
 simplet_style_t*
-simplet_map_add_style(simplet_map_t *map, char *key, char *arg);
+simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg);
 
 int
 simplet_map_isvalid(simplet_map_t *map);
 
 int
-simplet_map_render_to_png(simplet_map_t *map, char *path);
+simplet_map_render_to_png(simplet_map_t *map, const char *path);
 
 #ifdef __cplusplus
 }

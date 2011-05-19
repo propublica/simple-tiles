@@ -2,7 +2,7 @@
 #include "rule.h"
 
 simplet_layer_t*
-simplet_layer_new(char *datastring){
+simplet_layer_new(const char *datastring){
   OGRRegisterAll();
   simplet_layer_t *layer;
 
@@ -37,7 +37,7 @@ simplet_layer_free(simplet_layer_t *layer){
 }
 
 simplet_rule_t*
-simplet_layer_add_rule(simplet_layer_t *layer, char *ogrsql){
+simplet_layer_add_rule(simplet_layer_t *layer, const char *ogrsql){
   simplet_rule_t* rule;
   if(!(rule = simplet_rule_new(ogrsql)))
     return NULL;

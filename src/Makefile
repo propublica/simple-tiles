@@ -1,13 +1,46 @@
 OPTIMIZATION?=-O3
-DEBUG ?= -g -rdynamic -ggdb
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -Wall -W $(ARCH) \
+DEBUG ?= -g -ggdb
+CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -rdynamic -fPIC -Wall -W -Wwrite-strings $(ARCH) \
 	$(shell pkg-config --cflags cairo) \
 	$(shell gdal-config --cflags)
-LDFLAGS = $(shell pkg-config --libs cairo) \
+LDFLAGS = -lm $(shell pkg-config --libs cairo) \
 	$(shell gdal-config --libs)
 OBJ = list.o bounds.o point.o style.o map.o util.o rule.o layer.o
+PKG_CF = simple-tiles.pc
+
+ifeq ($(shell uname -s),Darwin)
+  DYLIBNAME?=libsimple-tiles.dylib
+  DYLIB_MAKE_CMD?=libtool -dynamic -o ${DYLIBNAME} ${LDFLAGS} ${DEBUG} - ${OBJ}
+  STLIBNAME?=libsimple-tiles.a
+  STLIB_MAKE_CMD?=libtool -static -o ${STLIBNAME} - ${OBJ}
+else
+  DYLIBNAME?=libsimple-tiles.so
+  DYLIB_MAKE_CMD?=gcc -shared -Wl,-soname,${DYLIBNAME} -o ${DYLIBNAME} ${LDFLAGS} ${OBJ}
+  STLIBNAME?=libsimple-tiles.a
+  STLIB_MAKE_CMD?=ar rcs ${STLIBNAME} ${OBJ}
+endif
 
 all: $(OBJ)
+
+${DYLIBNAME}: ${OBJ}
+	${DYLIB_MAKE_CMD}
+
+${STLIBNAME}: ${OBJ}
+	${STLIB_MAKE_CMD}
+
+PREFIX?= /usr/local
+INSTALL_INC= $(PREFIX)/include/simple-tiles
+INSTALL_LIB= $(PREFIX)/lib
+INSTALL_PKG= $(INSTALL_LIB)/pkgconfig
+INSTALL= cp -a
+
+dynamic: ${DYLIBNAME}
+static: ${STLIBNAME}
+install: ${DYLIBNAME} ${STLIBNAME}
+	mkdir -p $(INSTALL_INC) $(INSTALL_LIB)
+	$(INSTALL) *.h $(INSTALL_INC)
+	$(INSTALL) ${DYLIBNAME} ${STLIBNAME} $(INSTALL_LIB)
+	$(INSTALL) $(PKG_CF) $(INSTALL_PKG)
 
 api.o: api.c simple_tiles.h map.h types.h list.h bounds.h point.h style.h \
   layer.h
@@ -29,5 +62,5 @@ api: api.o $(OBJ)
 dep:
 	@$(CC) -MM *.c
 
-.PHONY: dep
+.PHONY: dep dynamic static
 
