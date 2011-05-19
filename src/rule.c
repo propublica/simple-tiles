@@ -6,7 +6,7 @@
 #include "util.h"
 
 #ifndef M_PI
-#define M_PI acos (-1.0)
+#define M_PI acos(-1.0)
 #endif
 
 simplet_rule_t *
@@ -40,14 +40,14 @@ simplet_rule_vfree(void *rule){
 
 /* arguments a little longish here */
 static void
-plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule, 
+plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule, 
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
   double x;
   double y;
   double last_x;
   double last_y;
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
-    OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
+    OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
       continue;
     if(OGR_G_GetGeometryCount(subgeom) > 0) {
@@ -85,7 +85,7 @@ plot_path(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule,
 }
 
 static void
-plot_point(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule, 
+plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule, 
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
   double x;
   double y;
@@ -128,7 +128,7 @@ finish_point(simplet_map_t *map, simplet_rule_t *rule){
 
 
 static void
-dispatch(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule){
+dispatch(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule){
   switch(OGR_G_GetGeometryType(geom)){
     case wkbPolygon:
     case wkbMultiPolygon:
@@ -144,7 +144,7 @@ dispatch(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule){
       break;
     case wkbGeometryCollection:
       for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
-        OGRGeometryH *subgeom = OGR_G_GetGeometryRef(geom, i);
+        OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
         if(subgeom == NULL)
           continue;
         dispatch(map, subgeom, rule);
@@ -157,21 +157,23 @@ dispatch(simplet_map_t *map, OGRGeometryH *geom, simplet_rule_t *rule){
 
 int
 simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
-  OGRGeometryH *bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
+  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   assert(bounds != NULL);
-  OGRLayerH *olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
+  
+  OGRLayerH olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
   OGR_G_DestroyGeometry(bounds);
   if(!layer)
     return 0;
 
-  OGRFeatureH *feature;
+  OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
-    OGRGeometryH *geom = OGR_F_GetGeometryRef(feature);
+    OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
     dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }
+  
   OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;
 }

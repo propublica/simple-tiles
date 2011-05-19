@@ -48,7 +48,7 @@ typedef struct simplet_listiter_t {
 typedef struct {
   simplet_bounds_t     *bounds;
   simplet_list_t       *layers;
-  OGRSpatialReferenceH *proj;
+  OGRSpatialReferenceH proj;
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
   int valid;
   unsigned int width;
