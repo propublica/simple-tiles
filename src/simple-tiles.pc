@@ -1,0 +1,10 @@
+prefix=/usr/local
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: simple-tiles
+Description: Map tiles made easy.
+Version: 0.0.1
+
+Libs: -lcairo -lgdal
+Cflags: -I${includedir}/simple-tiles

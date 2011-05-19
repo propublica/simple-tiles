@@ -10,23 +10,23 @@ PKG_CF = simple-tiles.pc
 
 ifeq ($(shell uname -s),Darwin)
   DYLIBNAME?=libsimple-tiles.dylib
-  DYLIB_MAKE_CMD?=libtool -dynamic -o ${DYLIBNAME} ${LDFLAGS} ${DEBUG} - ${OBJ}
+  DYLIB_MAKE?=libtool -dynamic -o ${DYLIBNAME} ${LDFLAGS} ${DEBUG} - ${OBJ}
   STLIBNAME?=libsimple-tiles.a
-  STLIB_MAKE_CMD?=libtool -static -o ${STLIBNAME} - ${OBJ}
+  STLIB_MAKE?=libtool -static -o ${STLIBNAME} - ${OBJ}
 else
   DYLIBNAME?=libsimple-tiles.so
-  DYLIB_MAKE_CMD?=gcc -shared -Wl,-soname,${DYLIBNAME} -o ${DYLIBNAME} ${LDFLAGS} ${OBJ}
+  DYLIB_MAKE?=gcc -shared -Wl,-soname,${DYLIBNAME} -o ${DYLIBNAME} ${LDFLAGS} ${DEBUG} ${OBJ}
   STLIBNAME?=libsimple-tiles.a
-  STLIB_MAKE_CMD?=ar rcs ${STLIBNAME} ${OBJ}
+  STLIB_MAKE?=ar rcs ${STLIBNAME} ${OBJ}
 endif
 
 all: $(OBJ)
 
 ${DYLIBNAME}: ${OBJ}
-	${DYLIB_MAKE_CMD}
+	${DYLIB_MAKE}
 
 ${STLIBNAME}: ${OBJ}
-	${STLIB_MAKE_CMD}
+	${STLIB_MAKE}
 
 PREFIX?= /usr/local
 INSTALL_INC= $(PREFIX)/include/simple-tiles
@@ -34,8 +34,6 @@ INSTALL_LIB= $(PREFIX)/lib
 INSTALL_PKG= $(INSTALL_LIB)/pkgconfig
 INSTALL= cp -a
 
-dynamic: ${DYLIBNAME}
-static: ${STLIBNAME}
 install: ${DYLIBNAME} ${STLIBNAME}
 	mkdir -p $(INSTALL_INC) $(INSTALL_LIB)
 	$(INSTALL) *.h $(INSTALL_INC)

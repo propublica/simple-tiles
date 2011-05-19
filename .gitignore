@@ -2,4 +2,7 @@ bin
 build
 *.o
 *.png
+*.a
+*.dylib
+*.so
 api
