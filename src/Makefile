@@ -40,8 +40,6 @@ install: ${DYLIBNAME} ${STLIBNAME}
 	$(INSTALL) ${DYLIBNAME} ${STLIBNAME} $(INSTALL_LIB)
 	$(INSTALL) $(PKG_CF) $(INSTALL_PKG)
 
-api.o: api.c simple_tiles.h map.h types.h list.h bounds.h point.h style.h \
-  layer.h
 bounds.o: bounds.c bounds.h types.h point.h
 layer.o: layer.c layer.h types.h rule.h list.h map.h bounds.h point.h \
   style.h
@@ -54,8 +52,6 @@ rule.o: rule.c style.h types.h list.h rule.h map.h bounds.h point.h \
 style.o: style.c map.h types.h list.h bounds.h point.h style.h layer.h \
   util.h
 util.o: util.c util.h
-
-api: api.o $(OBJ)
 
 dep:
 	@$(CC) -MM *.c

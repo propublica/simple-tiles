@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "simple_tiles.h"
+#include <simple_tiles.h>
 
 int
 main(){

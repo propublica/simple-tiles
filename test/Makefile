@@ -1,20 +1,22 @@
 OPTIMIZATION?=-O3
-INCLUDES = ../src/
-CFLAGS?= -std=c99 -pedantic $(OPTIMIZATION) -Wall -W $(ARCH) -g -rdynamic -ggdb -I$(INCLUDES)
+CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -rdynamic -Wall -W -Wwrite-strings $(ARCH) \
+	$(shell pkg-config --cflags cairo simple-tiles) \
+	$(shell gdal-config --cflags)
+LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles) \
+	$(shell gdal-config --libs)
 
-api.o: api.c ../src/simple_tiles.h ../src/map.h ../src/list.h \
-  ../src/bounds.h ../src/point.h ../src/style.h
+api: api.o
+api.o: api.c
+
+benchmark: benchmark.o
 benchmark.o: benchmark.c
-test_list.o: test_list.c ../src/list.h
 
-../bin:
-	mkdir -p ../bin
+test_list.o: test_list.c ../src/list.h ../src/types.h
+test_list: test_list.o
 
-test_list: test_list.o ../bin
-	$(CC) $(CFLAGS) test_list.o ../src/list.o -o ../bin/test_list
-
-test: test_list
-	../bin/$<
+test: test_list api
+	./test_list
+	time ./api
 
 dep:
-	@$(CC) -MM *.c -I$(INCLUDES)
+	@$(CC) -MM *.c

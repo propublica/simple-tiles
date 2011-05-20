@@ -6,3 +6,4 @@ build
 *.dylib
 *.so
 api
+test_list

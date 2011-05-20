@@ -6,5 +6,5 @@ Name: simple-tiles
 Description: Map tiles made easy.
 Version: 0.0.1
 
-Libs: -lcairo -lgdal
+Libs: -lcairo -lgdal -lsimple-tiles
 Cflags: -I${includedir}/simple-tiles
