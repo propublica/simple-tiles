@@ -4,10 +4,6 @@ all:
 install:
 	cd src && $(MAKE) $@
 
-api: all
-	$(MAKE) install
-	cd $@ && $(MAKE) $@
-
 test: all
 	$(MAKE) install
 	cd $@ && $(MAKE) $@

@@ -7,4 +7,4 @@ Description: Map tiles made easy.
 Version: 0.0.1
 
 Libs: -lcairo -lgdal -lsimple-tiles
-Cflags: -I${includedir}/simple-tiles
+Cflags: -I${includedir}

@@ -1,14 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
+#include "test.h"
+#include <simple-tiles/list.h>
 
-#include <list.h>
-
-
-#define test(fn) \
-        printf("\x1b[33m" # fn "\x1b[0m "); \
-        test_##fn(); \
-        puts("\x1b[1;32m ✓ \x1b[0m");
 
 int frees = 0;
 
@@ -21,18 +13,29 @@ typedef struct {
   int val;
 } wrap_t;
 
+
+wrap_t*
+wrap_new(int val){
+  wrap_t* wrap;
+  if(!(wrap = malloc(sizeof(*wrap))))
+    return NULL;
+  wrap->val = val;
+  return wrap;
+}
+
 static simplet_list_t*
 build_list(){
   simplet_list_t *list;
   if(!(list = simplet_list_new(list)))
     assert(0);
-  wrap_t test  = { 5 };
-  wrap_t test2 = { 6 };
-  wrap_t test3 = { 7 };
+  
+  wrap_t *test = wrap_new(5);
+  wrap_t *test2 = wrap_new(6);
+  wrap_t *test3 = wrap_new(7);
 
-  simplet_list_push(list, &test);
-  simplet_list_push(list, &test2);
-  simplet_list_push(list, &test3);
+  simplet_list_push(list, test);
+  simplet_list_push(list, test2);
+  simplet_list_push(list, test3);
   return list;
 }
 
@@ -42,9 +45,8 @@ test_push(){
   simplet_list_t *list;
   if(!(list = simplet_list_new(list)))
     assert(0);
-
   assert(list->length == 0);
-  wrap_t test = { 5 };
+  wrap_t *test = wrap_new(5);
   simplet_list_push(list, &test);
   assert(list->head->value == &test);
   assert(list->tail->value == &test);
@@ -55,7 +57,6 @@ test_push(){
 static void
 test_pop(){
   simplet_list_t *list = build_list();
-
   wrap_t *ret;
   ret = simplet_list_pop(list);
   assert(ret->val == 7);
@@ -63,7 +64,6 @@ test_pop(){
   assert(ret->val == 6);
   ret = simplet_list_pop(list);
   assert(ret->val == 5);
-
   simplet_list_free(list);
 }
 
@@ -90,9 +90,8 @@ test_iter(){
   simplet_list_free(list);
 }
 
-
 int
-main(){
+main() {
   test(push);
   test(pop);
   test(destroy);
