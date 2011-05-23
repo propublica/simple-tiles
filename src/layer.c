@@ -56,8 +56,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
   if(!(iter = simplet_get_list_iter(layer->rules)))
     return 0;
   simplet_rule_t *rule;
-  while((rule = simplet_list_next(iter))){
+  while((rule = simplet_list_next(iter)))
     simplet_rule_process(rule, layer, map);
-  }
   return 1;
 }

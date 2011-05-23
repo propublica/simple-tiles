@@ -171,14 +171,13 @@ simplet_map_isvalid(simplet_map_t *map){
   return MAP_OK;
 }
 
-int
-simplet_map_render_to_png(simplet_map_t *map, const char *path){
+cairo_surface_t *
+simplet_map_build_surface(simplet_map_t *map){
   if(simplet_map_isvalid(map) == MAP_ERR)
-    return (map->valid = MAP_ERR);
-    
+    return NULL;
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-    return (map->valid = MAP_ERR);
+    return NULL;
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
   cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
@@ -186,9 +185,37 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
   simplet_layer_t *layer;
   while((layer = simplet_list_next(iter)))
     simplet_layer_process(layer, map);
-  /* rewind datasource */
-  cairo_surface_write_to_png(surface, path);
+  return surface;
+}
+
+void
+simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
   cairo_destroy(map->_ctx);
   map->_ctx = NULL;
+  cairo_surface_destroy(surface);
+}
+  
+
+int
+simplet_map_render_to_stream(simplet_map_t *map, void *stream, 
+  cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
+  cairo_surface_t *surface;
+  if(!(surface = simplet_map_build_surface(map)))
+    return (map->valid = MAP_ERR);
+  if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS)
+    return (map->valid = MAP_ERR);
+  simplet_map_close_surface(map, surface);
+  return MAP_OK;
+}
+
+
+int
+simplet_map_render_to_png(simplet_map_t *map, const char *path){
+  cairo_surface_t *surface;
+  if(!(surface = simplet_map_build_surface(map)))
+    return (map->valid = MAP_ERR);
+  if(cairo_surface_write_to_png(surface, path) != CAIRO_STATUS_SUCCESS)
+    return (map->valid = MAP_ERR);
+  simplet_map_close_surface(map, surface);
   return MAP_OK;
 }

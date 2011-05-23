@@ -42,10 +42,7 @@ simplet_rule_vfree(void *rule){
 static void
 plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
-  double x;
-  double y;
-  double last_x;
-  double last_y;
+  double x, y, last_x, last_y;
 
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
