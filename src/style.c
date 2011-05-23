@@ -42,21 +42,21 @@ set_color(cairo_t *ctx, const char *arg){
 
 void
 simplet_style_line_join(cairo_t *ctx, const char *arg){
-  if(strcmp("miter", arg) == 0)
+  if(!strcmp("miter", arg))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
-  if(strcmp("round", arg) == 0)
+  if(!strcmp("round", arg))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
-  if(strcmp("bevel", arg) == 0)
+  if(!strcmp("bevel", arg))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_BEVEL);
 }
 
 void
 simplet_style_line_cap(cairo_t *ctx, const char *arg){
-  if(strcmp("butt", arg) == 0)
+  if(!strcmp("butt", arg))
     cairo_set_line_join(ctx, CAIRO_LINE_CAP_BUTT);
-  if(strcmp("round", arg) == 0)
+  if(!strcmp("round", arg))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
-  if(strcmp("square", arg) == 0)
+  if(!strcmp("square", arg))
     cairo_set_line_join(ctx, CAIRO_LINE_CAP_SQUARE);
 }
 
@@ -110,7 +110,7 @@ simplet_style_free(simplet_style_t* style){
 static simplet_styledef_t*
 lookup_styledef(char *key){
   for(int i = 0; i < STYLES_LENGTH; i++)
-    if(strcmp(key, styleTable[i].key) == 0)
+    if(!strcmp(key, styleTable[i].key))
       return &styleTable[i];
   return NULL;
 }
@@ -142,7 +142,7 @@ simplet_lookup_style(simplet_list_t* styles, const char *key){
 
   simplet_style_t* style;
   while((style = simplet_list_next(iter))){
-    if(strcmp(key, style->key) == 0) {
+    if(!strcmp(key, style->key)) {
       simplet_list_iter_free(iter);
       return style;
     }
