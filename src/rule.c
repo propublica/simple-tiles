@@ -19,7 +19,7 @@ simplet_rule_new(const char *sqlquery){
     free(rule);
     return NULL;
   }
-  
+
   rule->ogrsql = simplet_copy_string(sqlquery);
   return rule;
 }
@@ -40,7 +40,7 @@ simplet_rule_vfree(void *rule){
 
 /* arguments a little longish here */
 static void
-plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule, 
+plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
   double x;
   double y;
@@ -62,10 +62,8 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
     cairo_new_path(map->_ctx);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
-      double dx;
-      double dy;
-      dx = fabs(last_x - x);
-      dy = fabs(last_y - y);
+      double dx = fabs(last_x - x);
+      double dy = fabs(last_y - y);
       cairo_user_to_device_distance(map->_ctx, &dx, &dy);
       if(dx >= 0.5 || dy >= 0.5){
         cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
@@ -85,11 +83,11 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
 }
 
 static void
-plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule, 
+plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
   double x;
   double y;
-  
+
   simplet_style_t *style;
   style = simplet_lookup_style(rule->styles, "radius");
   if(style == NULL)
@@ -159,7 +157,7 @@ int
 simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   assert(bounds != NULL);
-  
+
   OGRLayerH olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
   OGR_G_DestroyGeometry(bounds);
   if(!layer)
@@ -173,7 +171,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }
-  
+
   OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;
 }
@@ -188,7 +186,7 @@ simplet_rule_add_style(simplet_rule_t *rule, const char *key, const char *arg){
     simplet_style_free(style);
     return NULL;
   }
-  
+
   return style;
 }
 

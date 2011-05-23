@@ -19,13 +19,7 @@ main(){
   simplet_map_add_style(map, "fill",      "#4c4c3f");
   simplet_map_add_style(map, "weight",    "0.01");
   simplet_map_add_style(map, "stroke",    "#a8a96dff");
-  
-  simplet_map_add_layer(map, "../data/armory2.shp");
-  simplet_map_add_rule(map,  "SELECT * from armory2");
-  simplet_map_add_style(map, "radius",    "4");
-  simplet_map_add_style(map, "fill",      "#cc000099");
-  simplet_map_add_style(map, "weight",    "0.1");
-  simplet_map_add_style(map, "stroke",    "#a8a96dff");
+
 
   if(simplet_map_isvalid(map))
     simplet_map_render_to_png(map, "./out.png");
