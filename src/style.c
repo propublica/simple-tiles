@@ -43,7 +43,7 @@ set_color(cairo_t *ctx, const char *arg){
 void
 simplet_style_line_join(cairo_t *ctx, const char *arg){
   if(strcmp("miter", arg) == 0)
-  cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
+    cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
   if(strcmp("round", arg) == 0)
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
   if(strcmp("bevel", arg) == 0)
@@ -83,15 +83,15 @@ simplet_style_new(const char *key, const char *arg){
   simplet_style_t* style;
   if(!(style = malloc(sizeof(*style))))
     return NULL;
-  
+
   style->key = simplet_copy_string(key);
   style->arg = simplet_copy_string(arg);
-  
+
   if(!(style->key && style->arg)){
     free(style);
     return NULL;
   }
-  
+
   return style;
 }
 
@@ -124,11 +124,11 @@ simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, ...){
     simplet_styledef_t* def = lookup_styledef(key);
     if(def == NULL)
       continue;
-    
+
     simplet_style_t* style = simplet_lookup_style(styles, key);
     if(style == NULL)
       continue;
-      
+
     def->call(ctx, style->arg);
   }
   va_end(args);
@@ -147,6 +147,6 @@ simplet_lookup_style(simplet_list_t* styles, const char *key){
       return style;
     }
   }
-  
+
   return NULL;
 }

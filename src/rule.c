@@ -114,17 +114,20 @@ plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
 
 static void
 finish_polygon(simplet_map_t *map, simplet_rule_t *rule){
-  simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", "weight", "fill", "stroke", NULL);
+  simplet_apply_styles(map->_ctx, rule->styles,
+                       "line-join", "line-cap", "weight", "fill", "stroke", NULL);
 }
 
 static void
 finish_linestring(simplet_map_t *map, simplet_rule_t *rule){
-  simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", "weight", "fill", NULL);
+  simplet_apply_styles(map->_ctx, rule->styles,
+                       "line-join", "line-cap", "weight", "fill", NULL);
 }
 
 static void
 finish_point(simplet_map_t *map, simplet_rule_t *rule){
-  simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", "weight", "fill", "stroke", NULL);
+  simplet_apply_styles(map->_ctx, rule->styles,
+                       "line-join", "line-cap", "weight", "fill", "stroke", NULL);
 }
 
 
