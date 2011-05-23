@@ -46,6 +46,7 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
   double y;
   double last_x;
   double last_y;
+
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
@@ -54,12 +55,10 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
       plot_path(map, subgeom, rule, cb);
       continue;
     }
-    cairo_save(map->_ctx);
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
     cairo_move_to(map->_ctx, x - map->bounds->nw->x,  map->bounds->nw->y - y);
-    cairo_new_path(map->_ctx);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
       double dx = fabs(last_x - x);
@@ -74,12 +73,19 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
     // ensure something is always drawn
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
     cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
-    simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", NULL);
-    (*cb)(map, rule);
-    cairo_close_path(map->_ctx);
-    cairo_clip(map->_ctx);
-    cairo_restore(map->_ctx);
   }
+  (*cb)(map, rule);
+}
+
+static void
+prepare_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
+            void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
+  cairo_save(map->_ctx);
+  cairo_new_path(map->_ctx);
+  plot_path(map, geom, rule, cb);
+  cairo_close_path(map->_ctx);
+  cairo_clip(map->_ctx);
+  cairo_restore(map->_ctx);
 }
 
 static void
@@ -92,36 +98,33 @@ plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
   style = simplet_lookup_style(rule->styles, "radius");
   if(style == NULL)
     return;
-
+  double r = strtod(style->arg, NULL);
+  double dy = 0;
+  cairo_device_to_user_distance(map->_ctx, &r, &dy);
   cairo_save(map->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-    double r = strtod(style->arg, NULL);
-    double dy = 0;
-    cairo_device_to_user_distance(map->_ctx, &r, &dy);
     cairo_arc(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y, r, 0., 2 * M_PI);
   }
-  simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", NULL);
   (*cb)(map, rule);
+  cairo_close_path(map->_ctx);
   cairo_clip(map->_ctx);
   cairo_restore(map->_ctx);
 }
 
 static void
 finish_polygon(simplet_map_t *map, simplet_rule_t *rule){
-  cairo_close_path(map->_ctx);
-  simplet_apply_styles(map->_ctx, rule->styles, "weight", "fill", "stroke", NULL);
+  simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", "weight", "fill", "stroke", NULL);
 }
 
 static void
 finish_linestring(simplet_map_t *map, simplet_rule_t *rule){
-  simplet_apply_styles(map->_ctx, rule->styles, "weight", "fill", NULL);
+  simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", "weight", "fill", NULL);
 }
 
 static void
 finish_point(simplet_map_t *map, simplet_rule_t *rule){
-  cairo_close_path(map->_ctx);
-  simplet_apply_styles(map->_ctx, rule->styles, "weight", "fill", "stroke", NULL);
+  simplet_apply_styles(map->_ctx, rule->styles, "line-join", "line-cap", "weight", "fill", "stroke", NULL);
 }
 
 
@@ -130,11 +133,11 @@ dispatch(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule){
   switch(OGR_G_GetGeometryType(geom)){
     case wkbPolygon:
     case wkbMultiPolygon:
-      plot_path(map, geom, rule, finish_polygon);
+      prepare_path(map, geom, rule, finish_polygon);
       break;
     case wkbLineString:
     case wkbMultiLineString:
-      plot_path(map, geom, rule, finish_linestring);
+      prepare_path(map, geom, rule, finish_linestring);
       break;
     case wkbPoint:
     case wkbMultiPoint:
