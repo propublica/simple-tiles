@@ -18,5 +18,6 @@ TASK(list);
 TASK(layer);
 TASK(rule);
 TASK(style);
+TASK(map);
 
 #endif

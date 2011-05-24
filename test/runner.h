@@ -16,6 +16,7 @@ task_wrap_t tasks[] = {
   TASK_ENTRY(layer)
   TASK_ENTRY(rule)
   TASK_ENTRY(style)
+  TASK_ENTRY(map)
   { NULL, NULL }
 };
 
