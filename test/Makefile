@@ -1,5 +1,5 @@
 OPTIMIZATION?=-O0
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -rdynamic -Wall -W -Wwrite-strings $(ARCH) \
+CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -rdynamic -Wall -W -Wwrite-strings -fprofile-arcs -ftest-coverage $(ARCH) \
 	$(shell pkg-config --cflags cairo simple-tiles) \
 	$(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles) \

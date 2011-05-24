@@ -14,8 +14,6 @@
 #define TASK(name) \
   void run_task_##name()
 
-
-
 TASK(list);
 TASK(layer);
 TASK(rule);
