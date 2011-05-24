@@ -14,8 +14,7 @@
 #define TASK(name) \
   void run_task_##name()
 
-#define TASK_ENTRY(name) \
-  { &run_task_##name, #name },
+
 
 TASK(list);
 TASK(layer);
