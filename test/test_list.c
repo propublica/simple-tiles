@@ -90,8 +90,7 @@ test_iter(){
   simplet_list_free(list);
 }
 
-int
-main() {
+TASK(list) {
   test(push);
   test(pop);
   test(destroy);

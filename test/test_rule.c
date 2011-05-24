@@ -26,8 +26,8 @@ test_lookup(){
   simplet_rule_add_style(rule, "line-cap", "round");
   assert(rule->styles->length == 3);
 }
-int
-main(){
+
+TASK(rule) {
   test(rule);
   test(lookup);
 }

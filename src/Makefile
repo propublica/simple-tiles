@@ -56,5 +56,5 @@ util.o: util.c util.h
 dep:
 	@$(CC) -MM *.c
 
-.PHONY: dep dynamic static
+.PHONY: all dep dynamic static
 

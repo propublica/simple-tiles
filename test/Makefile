@@ -5,22 +5,23 @@ CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -rdynamic -Wall -W -Wwrite-strings 
 LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles) \
 	$(shell gdal-config --libs)
 
+
+OBJ = test_list.o test_style.o test_rule.o test_layer.o
+
 api.o: api.c
 benchmark.o: benchmark.c
+runner.o: runner.c runner.h test.h
+test_layer.o: test_layer.c test.h
 test_list.o: test_list.c test.h
 test_rule.o: test_rule.c test.h
 test_style.o: test_style.c test.h
 
 api: api.o
 benchmark: benchmark.o
-test_list: test_list.o
-test_style: test_style.o
-test_rule: test_rule.o
+runner: runner.o $(OBJ)
 
-test: test_list test_style test_rule api
-	./test_list
-	./test_style
-	./test_rule
+test: runner api
+	./runner
 	time ./api
 
 dep:

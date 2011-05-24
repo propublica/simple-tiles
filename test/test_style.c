@@ -35,8 +35,7 @@ test_lookup(){
   simplet_rule_free(rule);
 }
 
-int
-main(){
+TASK(style) {
   test(style);
   test(lookup);
 }
