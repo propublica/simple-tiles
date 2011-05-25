@@ -17,7 +17,7 @@ test_map(){
 }
 
 void
-test_building(){
+test_creation(){
   simplet_map_t *map;
   if(!(map = simplet_map_new()))
     assert(0);
@@ -35,5 +35,5 @@ test_building(){
 
 TASK(map){
   test(map);
-  test(building);
+  test(creation);
 }

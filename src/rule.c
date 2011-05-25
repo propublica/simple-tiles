@@ -162,15 +162,31 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
   assert(bounds != NULL);
 
   OGRLayerH olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
+
   OGR_G_DestroyGeometry(bounds);
+
   if(!layer)
     return 0;
+
+  OGRSpatialReferenceH srs;
+  if(!(srs = OGR_L_GetSpatialRef(olayer)))
+    return 0;
+  
+  OGRCoordinateTransformationH transform;
+  if(!OSRIsSame(map->proj, srs)){
+    if(!(transform = OCTNewCoordinateTransformation(map->proj, srs)))
+      return 0;
+  } else {
+    transform = NULL;
+  }
 
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
+    if(transform)
+      OGR_G_Transform(geom, transform);
     dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }

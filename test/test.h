@@ -19,5 +19,6 @@ TASK(layer);
 TASK(rule);
 TASK(style);
 TASK(map);
+TASK(integration);
 
 #endif

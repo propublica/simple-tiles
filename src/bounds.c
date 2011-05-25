@@ -15,9 +15,9 @@ simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
   bounds->height = fabs(bounds->nw->y - bounds->se->y);
 }
 
-OGRGeometryH *
+OGRGeometryH
 simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj) {
-  OGRGeometryH *tmpLine;
+  OGRGeometryH tmpLine;
   if(!(tmpLine = OGR_G_CreateGeometry(wkbLineString)))
     return NULL;
   OGR_G_TransformTo(tmpLine, proj);
@@ -26,7 +26,7 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj) {
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->nw->y);
 
-  OGRGeometryH *ogrBounds;
+  OGRGeometryH ogrBounds;
   if(!(ogrBounds = OGR_G_ConvexHull(tmpLine)))
     return NULL;
   OGR_G_DestroyGeometry(tmpLine);
