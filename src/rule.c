@@ -86,15 +86,15 @@ prepare_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
 static void
 plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
-  double x;
-  double y;
+  double x, y;
 
   simplet_style_t *style;
   style = simplet_lookup_style(rule->styles, "radius");
   if(style == NULL)
     return;
-  double r = strtod(style->arg, NULL);
-  double dy = 0;
+
+  double r = strtod(style->arg, NULL), dy = 0;
+
   cairo_device_to_user_distance(map->_ctx, &r, &dy);
   cairo_save(map->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
@@ -102,6 +102,7 @@ plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
     cairo_arc(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y, r, 0., 2 * M_PI);
   }
   (*cb)(map, rule);
+
   cairo_close_path(map->_ctx);
   cairo_clip(map->_ctx);
   cairo_restore(map->_ctx);
@@ -195,6 +196,16 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     transform = NULL;
   }
 
+  cairo_t *tmp = map->_ctx;
+  cairo_surface_t *surface;
+  surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
+                    CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
+  if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+    return 0;
+  map->_ctx = cairo_create(surface);
+  cairo_set_operator(map->_ctx, CAIRO_OPERATOR_ADD);
+  cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
+
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
@@ -206,6 +217,11 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     OGR_F_Destroy(feature);
   }
 
+  cairo_set_source_surface(tmp, surface, 0, 0);
+  cairo_paint(tmp);
+  cairo_destroy(map->_ctx);
+  map->_ctx = tmp;
+  cairo_surface_destroy(surface);
   OCTDestroyCoordinateTransformation(transform);
   OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;

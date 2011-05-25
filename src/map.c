@@ -183,8 +183,6 @@ simplet_map_build_surface(simplet_map_t *map){
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
 
-  cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
-
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
   while((layer = simplet_list_next(iter)))

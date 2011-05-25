@@ -26,7 +26,7 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
     return NULL;
   }
 
-  //OGR_G_AssignSpatialReference(tmpLine, bproj);
+  OGR_G_AssignSpatialReference(tmpLine, bproj);
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->nw->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->se->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
