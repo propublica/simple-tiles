@@ -155,6 +155,7 @@ dispatch(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule){
   }
 }
 
+
 int
 simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
@@ -196,14 +197,20 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     transform = NULL;
   }
 
-  cairo_t *tmp = map->_ctx;
+  simplet_style_t *has_stroke = simplet_lookup_style(rule->styles, "stroke");
+  cairo_t *tmp;
   cairo_surface_t *surface;
-  surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
+  if(!has_stroke){
+    tmp = map->_ctx;
+    surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
                     CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
-  if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-    return 0;
-  map->_ctx = cairo_create(surface);
-  cairo_set_operator(map->_ctx, CAIRO_OPERATOR_ADD);
+    if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+      return 0;
+    map->_ctx = cairo_create(surface);
+    cairo_set_operator(map->_ctx, CAIRO_OPERATOR_ADD);
+  }
+
+
   cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
 
   OGRFeatureH feature;
@@ -217,11 +224,17 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     OGR_F_Destroy(feature);
   }
 
-  cairo_set_source_surface(tmp, surface, 0, 0);
-  cairo_paint(tmp);
-  cairo_destroy(map->_ctx);
-  map->_ctx = tmp;
-  cairo_surface_destroy(surface);
+  cairo_scale(map->_ctx, map->bounds->width / map->width, map->bounds->width / map->width);
+
+
+  if(!has_stroke){
+    cairo_set_source_surface(tmp, surface, 0, 0);
+    cairo_paint(tmp);
+    cairo_destroy(map->_ctx);
+    map->_ctx = tmp;
+    cairo_surface_destroy(surface);
+  }
+
   OCTDestroyCoordinateTransformation(transform);
   OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;
