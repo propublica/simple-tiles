@@ -180,14 +180,11 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     OGR_G_Transform(bounds, transform);
   }
   OCTDestroyCoordinateTransformation(transform);
-  
   olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
-
   OGR_G_DestroyGeometry(bounds);
-
   if(!olayer)
     return 0;
-
+  
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
     return 0;
   
@@ -210,7 +207,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     OGR_F_Destroy(feature);
   }
   
-  OCTDestroyCoordinateTransformation(transform);
+  //OCTDestroyCoordinateTransformation(transform);
   OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;
 }

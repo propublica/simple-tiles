@@ -1,4 +1,4 @@
-OPTIMIZATION?=-O0
+OPTIMIZATION?=-O3
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -rdynamic -Wall -W -Wwrite-strings $(ARCH) \
 	$(shell pkg-config --cflags cairo simple-tiles) \
 	$(shell gdal-config --cflags)
