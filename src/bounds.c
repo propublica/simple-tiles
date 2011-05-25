@@ -25,8 +25,8 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
     OGR_G_DestroyGeometry(tmpLine);
     return NULL;
   }
-  
-  OGR_G_AssignSpatialReference(tmpLine, bproj);
+
+  //OGR_G_AssignSpatialReference(tmpLine, bproj);
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->nw->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->se->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
@@ -38,7 +38,9 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
     OSRRelease(bproj);
     return NULL;
   }
-  
+  OGR_G_AssignSpatialReference(ogrBounds, bproj);
+
+
   OSRRelease(bproj);
   OGR_G_DestroyGeometry(tmpLine);
   return ogrBounds;

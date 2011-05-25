@@ -25,7 +25,7 @@ benchmark: benchmark.o
 runner: runner.o $(OBJ)
 
 test: runner api
-	cd ../data && make && cd ../test
+	#cd ../data && make && cd ../test
 	./runner
 	time ./api
 

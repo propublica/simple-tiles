@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <unistd.h>
 #include <simple-tiles/simple_tiles.h>
 
@@ -12,14 +13,14 @@ main(){
   //simplet_map_set_size(map, 600, 300);
   //simplet_map_set_bounds(map, -5554023.64468267, 6500142.36220488, 5198986.57554026, 12407191.9541633);
   //simplet_map_set_bounds(map, -179.231086, 17.831509, -100.859681, 71.441059);
-  
+
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
-  simplet_map_set_size(map, 256, 256);
-  simplet_map_set_bounds(map, -179.231086, 17.831509, -100.859681, 71.441059);
+  simplet_map_set_size(map, 2000, 2000);
+  simplet_map_set_bounds(map, -179.231086, 17.831509, 0.859681, 71.441059);
   // Only one layer per map for now
   char *dir = getwd(NULL);
-  simplet_map_add_layer(map, strcat(dir, "/../data/test.shp"));
-  simplet_map_add_rule(map,  "SELECT * from test");
+  simplet_map_add_layer(map, strcat(dir, "/../data/tl_2010_us_cd108.shp"));
+  simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "fill",      "#ffffffff");
@@ -28,7 +29,7 @@ main(){
 
 
   if(simplet_map_isvalid(map))
-    simplet_map_render_to_png(map, "./out.png");
+    assert(simplet_map_render_to_png(map, "./out.png"));
   simplet_map_free(map);
   free(dir);
 }

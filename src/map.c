@@ -16,12 +16,12 @@ simplet_map_new(){
   simplet_map_t *map;
   if(!(map = malloc(sizeof(*map))))
     return NULL;
-  
+
   if(!(map->layers = simplet_list_new())){
     free(map);
     return NULL;
   }
-  
+
   map->bounds = NULL;
   map->proj   = NULL;
   map->_ctx   = NULL;
@@ -85,31 +85,31 @@ simplet_map_add_layer(simplet_map_t *map, const char *datastring){
     map->valid = MAP_ERR;
     return NULL;
   }
-  
+
   if(!simplet_list_push(map->layers, layer)){
     map->valid = MAP_ERR;
     simplet_layer_free(layer);
     return NULL;
   }
-  
+
   return layer;
 }
 
 simplet_rule_t*
 simplet_map_add_rule(simplet_map_t *map, const char *sqlquery){
   assert(map->valid == MAP_OK);
-  
+
   if(!map->layers->tail){
     map->valid = MAP_ERR;
     return NULL;
   }
-  
+
   simplet_layer_t *layer = map->layers->tail->value;
   if(!layer){
     map->valid = MAP_ERR;
     return NULL;
   }
-  
+
   simplet_rule_t *rule;
   if(!(rule = simplet_layer_add_rule(layer, sqlquery)))
     return NULL;
@@ -126,14 +126,14 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
     return NULL;
   }
   simplet_layer_t *layer = map->layers->tail->value;
-  
+
   if(!layer){
     map->valid = MAP_ERR;
     return NULL;
   }
-  
+
   simplet_rule_t *rule = layer->rules->tail->value;
-  
+
   if(!rule){
     map->valid = MAP_ERR;
     return NULL;
@@ -182,14 +182,11 @@ simplet_map_build_surface(simplet_map_t *map){
     return NULL;
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
-  
+
   cairo_matrix_t matrix;
-  cairo_matrix_init(&matrix, 1, 0, 0, -1, 0, 0);
-  cairo_set_matrix(ctx, &matrix);
-  cairo_translate(ctx, 0, map->height * -1.0);
   cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
-  cairo_translate(ctx, -map->bounds->nw->x, -map->bounds->se->y);
-  
+  cairo_translate(ctx, map->bounds->nw->x * -1.0, 0);
+
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
   while((layer = simplet_list_next(iter)))
@@ -203,10 +200,10 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
   map->_ctx = NULL;
   cairo_surface_destroy(surface);
 }
-  
+
 
 int
-simplet_map_render_to_stream(simplet_map_t *map, void *stream, 
+simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
   cairo_surface_t *surface;
   if(!(surface = simplet_map_build_surface(map)))
