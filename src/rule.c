@@ -197,10 +197,10 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     transform = NULL;
   }
 
-  simplet_style_t *has_stroke = simplet_lookup_style(rule->styles, "stroke");
+  simplet_style_t *seemless = simplet_lookup_style(rule->styles, "seemless");
   cairo_t *tmp;
   cairo_surface_t *surface;
-  if(!has_stroke){
+  if(seemless){
     tmp = map->_ctx;
     surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
                     CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
@@ -226,8 +226,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
 
   cairo_scale(map->_ctx, map->bounds->width / map->width, map->bounds->width / map->width);
 
-
-  if(!has_stroke){
+  if(seemless){
     cairo_set_source_surface(tmp, surface, 0, 0);
     cairo_paint(tmp);
     cairo_destroy(map->_ctx);

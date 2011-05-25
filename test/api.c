@@ -24,15 +24,9 @@ main(){
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "fill",      "#ffffffff");
-  //simplet_map_add_style(map, "weight",    "0.1");
-  //simplet_map_add_style(map, "stroke",    "#666666ff");
-
-  simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108 where STATEFP00 = '36'");
-  simplet_map_add_style(map, "line-cap",  "square");
-  simplet_map_add_style(map, "line-join", "round");
-  simplet_map_add_style(map, "fill",      "#ffffffff");
-  simplet_map_add_style(map, "weight",    "0.05");
+  simplet_map_add_style(map, "weight",    "0.01");
   simplet_map_add_style(map, "stroke",    "#666666ff");
+  //simplet_map_add_style(map, "seemless",  "true");
 
 
   if(simplet_map_isvalid(map))

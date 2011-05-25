@@ -19,7 +19,7 @@ simplet_styledef_t styleTable[] = {
   { "weight",    simplet_style_weight    },
   { "line-join", simplet_style_line_join },
   { "line-cap",  simplet_style_line_cap  }
-  /* radius is a special style */
+  /* radius and seemless are special styles */
 };
 
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
