@@ -16,7 +16,7 @@ main(){
 
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 2000, 2000);
-  simplet_map_set_bounds(map, -179.231086, 17.831509, 0.859681, 71.441059);
+  simplet_map_set_bounds(map, -179.231086, 17.831509, -60.859681, 71.441059);
   // Only one layer per map for now
   char *dir = getwd(NULL);
   simplet_map_add_layer(map, strcat(dir, "/../data/tl_2010_us_cd108.shp"));

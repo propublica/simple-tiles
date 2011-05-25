@@ -53,22 +53,21 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
-    cairo_move_to(map->_ctx, x, map->bounds->nw->y - y);
+    cairo_move_to(map->_ctx, x - map->bounds->nw->x,  map->bounds->nw->y - y);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
       double dx = fabs(last_x - x);
       double dy = fabs(last_y - y);
-
       cairo_user_to_device_distance(map->_ctx, &dx, &dy);
       if(dx >= 0.5 || dy >= 0.5){
-        cairo_line_to(map->_ctx, x, map->bounds->nw->y - y);
+        cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
         last_x = x;
         last_y = y;
       }
     }
     // ensure something is always drawn
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
-    cairo_line_to(map->_ctx, x, map->bounds->nw->y - y);
+    cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
   }
   (*cb)(map, rule);
 }
@@ -100,7 +99,7 @@ plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
   cairo_save(map->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-    cairo_arc(map->_ctx, x, y, r, 0., 2 * M_PI);
+    cairo_arc(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y, r, 0., 2 * M_PI);
   }
   (*cb)(map, rule);
   cairo_close_path(map->_ctx);
