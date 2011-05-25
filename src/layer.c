@@ -8,7 +8,7 @@ simplet_layer_new(const char *datastring){
 
   if(!(layer = malloc(sizeof(*layer))))
     return NULL;
-
+    
   if(!(layer->source = OGROpen(datastring, 0, NULL))){
     free(layer);
     return NULL;

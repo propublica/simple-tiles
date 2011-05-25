@@ -9,6 +9,8 @@
 #include "style.h"
 #include "util.h"
 
+
+
 simplet_map_t*
 simplet_map_new(){
   simplet_map_t *map;
@@ -83,13 +85,13 @@ simplet_map_add_layer(simplet_map_t *map, const char *datastring){
     map->valid = MAP_ERR;
     return NULL;
   }
-
+  
   if(!simplet_list_push(map->layers, layer)){
     map->valid = MAP_ERR;
     simplet_layer_free(layer);
     return NULL;
   }
-    
+  
   return layer;
 }
 
@@ -180,7 +182,14 @@ simplet_map_build_surface(simplet_map_t *map){
     return NULL;
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
-  cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
+  
+  cairo_matrix_t matrix;
+  cairo_matrix_init(&matrix, 1, 0, 0, -1, 0, 0);
+  cairo_set_matrix(ctx, &matrix);
+  cairo_translate(ctx, 0, map->height * -1.0);
+  cairo_scale(ctx, map->width / map->bounds->width, map->width / map->bounds->width);
+  cairo_translate(ctx, -map->bounds->nw->x, -map->bounds->se->y);
+  
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
   while((layer = simplet_list_next(iter)))
