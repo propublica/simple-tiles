@@ -36,30 +36,6 @@ simplet_rule_vfree(void *rule){
   simplet_rule_free(rule);
 }
 
-
-static void
-project_point(simplet_map_t *map, OGRGeometryH geom, int idx, double *x, double *y){
-  OGR_G_GetPoint(geom, idx, x, y, NULL);
-  OGRSpatialReferenceH srs;
-  //puts("get srs");
-  
-  if(!(srs = OGR_G_GetSpatialReference(geom)))
-    return;
-  puts("srs");
-  OGRCoordinateTransformationH transform;
-  if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
-    return;
-  puts("trs");
-
-  OGRGeometryH point;
-  if(!(point = OGR_G_CreateGeometry(wkbPoint)))
-    return;
-  puts("pt");
-  OGR_G_Transform(point, transform);
-  OGR_G_GetPoint(point, idx, x, y, NULL);
-  OGR_G_DestroyGeometry(point);
-}
-
 /* arguments a little longish here */
 static void
 plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
@@ -74,20 +50,17 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
       plot_path(map, subgeom, rule, cb);
       continue;
     }
-    project_point(map, subgeom, 0, &x, &y);
+    OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
+    
     last_x = x;
     last_y = y;
     cairo_move_to(map->_ctx, x - map->bounds->nw->x,  map->bounds->nw->y - y);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
-      project_point(map, subgeom, j, &x, &y);
-      
+      OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
       // transform here. 
       double dx = fabs(last_x - x);
       double dy = fabs(last_y - y);
       cairo_user_to_device_distance(map->_ctx, &dx, &dy);
-      //double tx = x, ty = y;
-      //cairo_user_to_device(map->_ctx, &tx, &ty);
-      //printf("%f, %f\n", tx, ty);
       if(dx >= 0.25 || dy >= 0.25){
         cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
         last_x = x;
@@ -95,7 +68,7 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
       }
     }
     // ensure something is always drawn
-    project_point(map, subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y);
+    OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
     cairo_line_to(map->_ctx, x - map->bounds->nw->x, map->bounds->nw->y - y);
   }
   (*cb)(map, rule);
@@ -187,12 +160,24 @@ dispatch(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule){
 
 int
 simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
-  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
-  assert(bounds != NULL);
-
+  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds);
   OGRLayerH olayer;
+  if(!(olayer = OGR_DS_GetLayer(layer->source, 0)))
+    return 0;
+  
+  OGRSpatialReferenceH srs;
+  if(!(srs = OGR_L_GetSpatialRef(olayer)))
+    return 0;
+
+  OGR_G_TransformTo(bounds, srs);
   olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
   if(!olayer)
+    return 0;
+  
+  bounds = simplet_bounds_to_ogr(map->bounds);
+  OGR_G_TransformTo(bounds, map->proj);
+  simplet_bounds_t* tmpb = map->bounds;
+  if(!(map->bounds = simplet_bounds_from_ogr(bounds)))
     return 0;
 
   simplet_style_t *seemless = simplet_lookup_style(rule->styles, "seemless");
@@ -208,7 +193,6 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     cairo_set_operator(map->_ctx, CAIRO_OPERATOR_SATURATE);
   }
 
-
   cairo_scale(map->_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
 
   OGRFeatureH feature;
@@ -216,6 +200,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
+    OGR_G_TransformTo(geom, map->proj);
     dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }
@@ -229,7 +214,9 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     map->_ctx = tmp;
     cairo_surface_destroy(surface);
   }
-
+  
+  simplet_bounds_free(map->bounds);
+  map->bounds = tmpb;
   OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;
 }
