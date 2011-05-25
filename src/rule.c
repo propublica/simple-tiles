@@ -159,27 +159,48 @@ int
 simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   assert(bounds != NULL);
-
-  OGRLayerH olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
-
-  OGR_G_DestroyGeometry(bounds);
-
-  if(!layer)
+  
+  OGRLayerH olayer;
+  olayer = OGR_DS_GetLayer(layer->source, 0);
+  if(!olayer)
     return 0;
-
+    
   OGRSpatialReferenceH srs;
-  if(!(srs = OGR_L_GetSpatialRef(olayer)))
+  if(!(srs = OGR_G_GetSpatialReference(bounds)))
+    return 0;
+    
+  OGRSpatialReferenceH lsrs;
+  if(!(lsrs = OGR_L_GetSpatialRef(olayer)))
     return 0;
   
   OGRCoordinateTransformationH transform;
+  if(!OSRIsSame(lsrs, srs)){
+    if(!(transform = OCTNewCoordinateTransformation(srs, lsrs)))
+      return 0;
+    OGR_G_Transform(bounds, transform);
+  }
+  OCTDestroyCoordinateTransformation(transform);
+  
+  olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
+
+  OGR_G_DestroyGeometry(bounds);
+
+  if(!olayer)
+    return 0;
+
+  if(!(srs = OGR_L_GetSpatialRef(olayer)))
+    return 0;
+  
   if(!OSRIsSame(map->proj, srs)){
     if(!(transform = OCTNewCoordinateTransformation(map->proj, srs)))
       return 0;
   } else {
     transform = NULL;
   }
+  
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
+    printf("feature!");
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
@@ -188,7 +209,8 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }
-
+  
+  OCTDestroyCoordinateTransformation(transform);
   OGR_DS_ReleaseResultSet(layer->source, olayer);
   return 1;
 }

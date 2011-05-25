@@ -17,7 +17,7 @@ void
 simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y);
 
 OGRGeometryH
-simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj);
+simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj);
 
 void
 simplet_bounds_free(simplet_bounds_t *bounds);

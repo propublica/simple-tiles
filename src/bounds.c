@@ -16,21 +16,32 @@ simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
 }
 
 OGRGeometryH
-simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH *proj) {
+simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   OGRGeometryH tmpLine;
   if(!(tmpLine = OGR_G_CreateGeometry(wkbLineString)))
     return NULL;
-  OGR_G_AssignSpatialReference(tmpLine, proj);
+
+  OGRSpatialReferenceH bproj;
+  if(!(bproj = OSRClone(proj))){
+    OGR_G_DestroyGeometry(tmpLine);
+    return NULL;
+  }
+  
+    
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->nw->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->se->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
   OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->nw->y);
 
   OGRGeometryH ogrBounds;
-  if(!(ogrBounds = OGR_G_ConvexHull(tmpLine)))
+  if(!(ogrBounds = OGR_G_ConvexHull(tmpLine))){
+    OGR_G_DestroyGeometry(tmpLine);
+    OSRRelease(bproj);
     return NULL;
-  OGR_G_DestroyGeometry(tmpLine);
+  }
   
+  OGR_G_AssignSpatialReference(bounds, bproj);
+  OGR_G_DestroyGeometry(tmpLine);
   return ogrBounds;
 }
 
