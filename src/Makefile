@@ -1,4 +1,4 @@
-OPTIMIZATION?=-O3
+OPTIMIZATION?=-O0
 DEBUG ?= -g -ggdb
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -rdynamic -fPIC -Wall -W -Wwrite-strings $(ARCH) \
 	$(shell pkg-config --cflags cairo) \
@@ -29,9 +29,9 @@ ${STLIBNAME}: ${OBJ}
 	${STLIB_MAKE}
 
 PREFIX?= /usr/local
-INSTALL_INC= $(PREFIX)/include/simple-tiles
-INSTALL_LIB= $(PREFIX)/lib
-INSTALL_PKG= $(INSTALL_LIB)/pkgconfig
+INSTALL_INC= $(PREFIX)/include/simple-tiles/
+INSTALL_LIB= $(PREFIX)/lib/
+INSTALL_PKG= $(INSTALL_LIB)/pkgconfig/
 INSTALL= cp -a
 
 install: ${DYLIBNAME} ${STLIBNAME}

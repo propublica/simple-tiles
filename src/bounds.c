@@ -38,9 +38,8 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
     OSRRelease(bproj);
     return NULL;
   }
+  
   OGR_G_AssignSpatialReference(ogrBounds, bproj);
-
-
   OSRRelease(bproj);
   OGR_G_DestroyGeometry(tmpLine);
   return ogrBounds;

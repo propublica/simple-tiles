@@ -25,8 +25,8 @@ main(){
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "fill",      "#ffffffff");
   simplet_map_add_style(map, "weight",    "0.01");
-  simplet_map_add_style(map, "stroke",    "#666666ff");
-  //simplet_map_add_style(map, "seemless",  "true");
+  //simplet_map_add_style(map, "stroke",    "#666666ff");
+  simplet_map_add_style(map, "seemless",  "true");
 
 
   if(simplet_map_isvalid(map))

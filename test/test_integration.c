@@ -47,7 +47,7 @@ test_projection(){
 }
 
 TASK(integration){
-  //test(projection);
+  test(projection);
   puts("check projection.png");
   test(many_rules);
   test(many_layers);
