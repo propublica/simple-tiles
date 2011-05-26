@@ -160,7 +160,7 @@ dispatch(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule){
 
 int
 simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
-  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
+  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds);
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_GetLayer(layer->source, 0)))
     return 0;
@@ -174,7 +174,10 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
   if(!olayer)
     return 0;
 
-  bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
+  bounds = simplet_bounds_to_ogr(map->bounds);
+  OGR_G_TransformTo(bounds, map->proj);
+  char *s = NULL;
+  OGR_G_ExportToWkt(bounds, &s);
   simplet_bounds_t* tmpb = map->bounds;
   if(!(map->bounds = simplet_bounds_from_ogr(bounds)))
     return 0;
