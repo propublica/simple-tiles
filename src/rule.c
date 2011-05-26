@@ -51,13 +51,13 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
       continue;
     }
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
-    
+
     last_x = x;
     last_y = y;
     cairo_move_to(map->_ctx, x - map->bounds->nw->x,  map->bounds->nw->y - y);
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
-      // transform here. 
+      // transform here.
       double dx = fabs(last_x - x);
       double dy = fabs(last_y - y);
       cairo_user_to_device_distance(map->_ctx, &dx, &dy);
@@ -160,11 +160,11 @@ dispatch(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule){
 
 int
 simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t *map){
-  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds);
+  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_GetLayer(layer->source, 0)))
     return 0;
-  
+
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
     return 0;
@@ -173,9 +173,8 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
   olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
   if(!olayer)
     return 0;
-  
-  bounds = simplet_bounds_to_ogr(map->bounds);
-  OGR_G_TransformTo(bounds, map->proj);
+
+  bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   simplet_bounds_t* tmpb = map->bounds;
   if(!(map->bounds = simplet_bounds_from_ogr(bounds)))
     return 0;
@@ -214,7 +213,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     map->_ctx = tmp;
     cairo_surface_destroy(surface);
   }
-  
+
   simplet_bounds_free(map->bounds);
   map->bounds = tmpb;
   OGR_DS_ReleaseResultSet(layer->source, olayer);
