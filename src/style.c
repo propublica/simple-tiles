@@ -74,7 +74,9 @@ simplet_style_stroke(cairo_t *ctx, const char *arg){
 
 void
 simplet_style_weight(cairo_t *ctx, const char *arg){
-  cairo_set_line_width(ctx, strtod(arg, NULL));
+  double w = strtod(arg, NULL), y = 0;
+  cairo_device_to_user_distance(ctx, &w, &y);
+  cairo_set_line_width(ctx, w);
 }
 
 
