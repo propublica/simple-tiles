@@ -41,7 +41,6 @@ static void
 plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
           void (*cb)(simplet_map_t *map, simplet_rule_t *rule)){
   double x, y, last_x, last_y;
-
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
@@ -51,7 +50,6 @@ plot_path(simplet_map_t *map, OGRGeometryH geom, simplet_rule_t *rule,
       continue;
     }
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
-
     last_x = x;
     last_y = y;
     cairo_move_to(map->_ctx, x - map->bounds->nw->x,  map->bounds->nw->y - y);
@@ -166,6 +164,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     return 0;
 
   OGRSpatialReferenceH srs;
+  
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
     return 0;
 
@@ -173,14 +172,17 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
   olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
   if(!olayer)
     return 0;
+  
+  OGRCoordinateTransformationH transform;
+  if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
+    return 0;
 
   bounds = simplet_bounds_to_ogr(map->bounds);
   OGR_G_TransformTo(bounds, map->proj);
-  char *s = NULL;
-  OGR_G_ExportToWkt(bounds, &s);
   simplet_bounds_t* tmpb = map->bounds;
   if(!(map->bounds = simplet_bounds_from_ogr(bounds)))
     return 0;
+  OGR_G_DestroyGeometry(bounds);
 
   simplet_style_t *seemless = simplet_lookup_style(rule->styles, "seemless");
   cairo_t *tmp;
@@ -202,7 +204,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
-    OGR_G_TransformTo(geom, map->proj);
+    OGR_G_Transform(geom, transform);
     dispatch(map, geom, rule);
     OGR_F_Destroy(feature);
   }

@@ -42,12 +42,12 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds) {
 
   if(OSRSetFromUserInput(proj, wgs84) != OGRERR_NONE){
     OGR_G_DestroyGeometry(tmpLine);
-    OGR_G_DestroyGeometry(ogrBounds);
     OSRDestroySpatialReference(proj);
+    OGR_G_DestroyGeometry(ogrBounds);
     return NULL;
   }
 
-  OGR_G_AssignSpatialReference(ogrBounds, proj);
+  OGR_G_AssignSpatialReference(ogrBounds, proj);  
   OGR_G_DestroyGeometry(tmpLine);
   return ogrBounds;
 }

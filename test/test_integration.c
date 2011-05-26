@@ -17,8 +17,7 @@ build_map(){
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "fill",      "#061F37ff");
-  //simplet_map_add_style(map, "weight",    "0.03");
-  //simplet_map_add_style(map, "stroke",    "#666666ff");
+
   return map;
 }
 
@@ -26,11 +25,27 @@ build_map(){
 
 void
 test_many_layers(){
-
+  simplet_map_t *map;
+  assert((map = build_map()));
+  assert(simplet_map_isvalid(map));
+  simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
+  simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108 where STATEFP00 = '02'");
+  simplet_map_add_style(map, "fill", "#cc0000dd");
+  simplet_map_render_to_png(map, "./layers.png");
+  simplet_map_free(map);
 }
 void
 test_many_rules(){
-
+  simplet_map_t *map;
+  assert((map = build_map()));
+  assert(simplet_map_isvalid(map));
+  simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
+  simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108 where STATEFP00 = '02'");
+  simplet_map_add_style(map, "weight", "1");
+  simplet_map_add_style(map, "stroke", "#00cc00dd");
+  simplet_map_add_style(map, "fill",   "#cc000033");
+  simplet_map_render_to_png(map, "./rules.png");
+  simplet_map_free(map);
 }
 
 
@@ -49,5 +64,7 @@ TASK(integration){
   test(projection);
   puts("check projection.png");
   test(many_rules);
+  puts("check rules.png");
   test(many_layers);
+  puts("check layers.png");
 }
