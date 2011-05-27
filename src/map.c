@@ -39,6 +39,10 @@ simplet_map_free(simplet_map_t *map){
     map->layers->free = simplet_layer_vfree;
     simplet_list_free(map->layers);
   }
+  
+  if(map->_ctx)
+    cairo_destroy(map->_ctx);
+
   if(map->proj)
     OSRRelease(map->proj);
   free(map);

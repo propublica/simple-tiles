@@ -161,7 +161,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds);
 
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_GetLayer(layer->source, 0)))
+  if(!(olayer = OGR_DS_GetLayer(layer->_source, 0)))
     return 0;
 
   OGRSpatialReferenceH srs;
@@ -169,7 +169,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     return 0;
 
   OGR_G_TransformTo(bounds, srs);
-  olayer = OGR_DS_ExecuteSQL(layer->source, rule->ogrsql, bounds, "");
+  olayer = OGR_DS_ExecuteSQL(layer->_source, rule->ogrsql, bounds, "");
   if(!olayer)
     return 0;
   
@@ -221,7 +221,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
 
   simplet_bounds_free(map->bounds);
   map->bounds = tmpb;
-  OGR_DS_ReleaseResultSet(layer->source, olayer);
+  OGR_DS_ReleaseResultSet(layer->_source, olayer);
   return 1;
 }
 

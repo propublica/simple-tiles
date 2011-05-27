@@ -22,6 +22,7 @@ test_creation(){
   if(!(map = simplet_map_new()))
     assert(0);
   simplet_layer_t *layer = simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
+  assert(layer);
   assert(map->layers->length == 1);
   assert(map->layers->head->value == layer);
   simplet_rule_t *rule = simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");

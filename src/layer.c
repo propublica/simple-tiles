@@ -1,21 +1,17 @@
 #include "layer.h"
 #include "rule.h"
+#include "util.h"
 
 simplet_layer_t*
 simplet_layer_new(const char *datastring){
-  OGRRegisterAll();
   simplet_layer_t *layer;
-
   if(!(layer = malloc(sizeof(*layer))))
     return NULL;
-    
-  if(!(layer->source = OGROpen(datastring, 0, NULL))){
-    free(layer);
-    return NULL;
-  }
+  
+  layer->_source = NULL;
+  layer->source = simplet_copy_string(datastring);
   
   if(!(layer->rules = simplet_list_new())){
-    OGR_DS_Destroy(layer->source);
     free(layer);
     return NULL;
   }
@@ -30,9 +26,9 @@ simplet_layer_vfree(void *layer){
 
 void
 simplet_layer_free(simplet_layer_t *layer){
-  OGR_DS_Destroy(layer->source);
   layer->rules->free = simplet_rule_vfree;
   simplet_list_free(layer->rules);
+  free(layer->source);
   free(layer);
 }
 
@@ -52,11 +48,19 @@ simplet_layer_add_rule(simplet_layer_t *layer, const char *ogrsql){
 
 int
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
+  OGRRegisterAll();
   simplet_listiter_t *iter;
+  if(!(layer->_source = OGROpen(layer->source, 0, NULL)))
+    return 0;
+  
   if(!(iter = simplet_get_list_iter(layer->rules)))
     return 0;
+
   simplet_rule_t *rule;
   while((rule = simplet_list_next(iter)))
     simplet_rule_process(rule, layer, map);
+  
+  OGR_DS_Destroy(layer->_source);
+  
   return 1;
 }
