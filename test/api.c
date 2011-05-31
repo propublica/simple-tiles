@@ -16,7 +16,7 @@ main(){
 
   simplet_map_add_layer(map, "../data/tl_2010_us_state10.shp");
   simplet_map_add_rule(map,  "SELECT * from tl_2010_us_state10");
-  simplet_map_add_style(map, "weight", "0.1");
+  simplet_map_add_style(map, "weight", "0.3");
   simplet_map_add_style(map, "fill",   "#061F37ff");
   simplet_map_add_style(map, "stroke", "#ffffff");
 
