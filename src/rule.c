@@ -172,7 +172,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
   olayer = OGR_DS_ExecuteSQL(layer->_source, rule->ogrsql, bounds, "");
   if(!olayer)
     return 0;
-  
+
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
     return 0;
@@ -184,10 +184,10 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
     return 0;
   OGR_G_DestroyGeometry(bounds);
 
-  simplet_style_t *seemless = simplet_lookup_style(rule->styles, "seemless");
+  simplet_style_t *seamless = simplet_lookup_style(rule->styles, "seamless");
   cairo_t *tmp;
   cairo_surface_t *surface;
-  if(seemless){
+  if(seamless){
     tmp = map->_ctx;
     surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
                     CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
@@ -211,7 +211,7 @@ simplet_rule_process(simplet_rule_t *rule, simplet_layer_t *layer, simplet_map_t
 
   cairo_scale(map->_ctx, map->bounds->width / map->width, map->bounds->width / map->width);
 
-  if(seemless){
+  if(seamless){
     cairo_set_source_surface(tmp, surface, 0, 0);
     cairo_paint(tmp);
     cairo_destroy(map->_ctx);
