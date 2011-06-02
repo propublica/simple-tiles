@@ -50,8 +50,6 @@ simplet_map_free(simplet_map_t *map){
 
 int
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
-  assert(map->valid == MAP_OK);
-
   if(!(map->proj = OSRNewSpatialReference(NULL)))
     return (map->valid = MAP_ERR);
 
@@ -63,8 +61,6 @@ simplet_map_set_srs(simplet_map_t *map, const char *proj){
 
 int
 simplet_map_set_size(simplet_map_t *map, int width, int height){
-  assert(map->valid == MAP_OK);
-
   map->height = height;
   map->width  = width;
   return MAP_OK;
@@ -72,7 +68,6 @@ simplet_map_set_size(simplet_map_t *map, int width, int height){
 
 int
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny){
-  assert(map->valid == MAP_OK);
   if(!(map->bounds = simplet_bounds_new()))
     return (map->valid = MAP_ERR);
   simplet_bounds_extend(map->bounds, maxx, maxy);
@@ -82,8 +77,6 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
 
 simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring){
-  assert(map->valid == MAP_OK);
-
   simplet_layer_t *layer;
   if(!(layer = simplet_layer_new(datastring))){
     map->valid = MAP_ERR;
@@ -101,8 +94,6 @@ simplet_map_add_layer(simplet_map_t *map, const char *datastring){
 
 simplet_filter_t*
 simplet_map_add_filter(simplet_map_t *map, const char *sqlquery){
-  assert(map->valid == MAP_OK);
-
   if(!map->layers->tail){
     map->valid = MAP_ERR;
     return NULL;
@@ -123,8 +114,6 @@ simplet_map_add_filter(simplet_map_t *map, const char *sqlquery){
 
 simplet_style_t *
 simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
-  assert(map->valid == MAP_OK);
-
   if(!map->layers->tail){
     map->valid = MAP_ERR;
     return NULL;
@@ -154,8 +143,6 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
 
 int
 simplet_map_isvalid(simplet_map_t *map){
-  assert(map->valid == MAP_OK);
-
   if(map->valid == MAP_ERR)
     return MAP_ERR;
 

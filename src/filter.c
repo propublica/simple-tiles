@@ -86,8 +86,7 @@ plot_point(simplet_map_t *map, OGRGeometryH geom, simplet_filter_t *filter,
           void (*cb)(simplet_map_t *map, simplet_filter_t *filter)){
   double x, y;
 
-  simplet_style_t *style;
-  style = simplet_lookup_style(filter->styles, "radius");
+  simplet_style_t *style = simplet_lookup_style(filter->styles, "radius");
   if(style == NULL)
     return;
 
