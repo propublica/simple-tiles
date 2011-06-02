@@ -1,6 +1,5 @@
 #include <stdarg.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "map.h"
 #include "style.h"
