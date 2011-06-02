@@ -5,7 +5,7 @@
 
 #include "map.h"
 #include "layer.h"
-#include "rule.h"
+#include "filter.h"
 #include "style.h"
 #include "util.h"
 
@@ -99,8 +99,8 @@ simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   return layer;
 }
 
-simplet_rule_t*
-simplet_map_add_rule(simplet_map_t *map, const char *sqlquery){
+simplet_filter_t*
+simplet_map_add_filter(simplet_map_t *map, const char *sqlquery){
   assert(map->valid == MAP_OK);
 
   if(!map->layers->tail){
@@ -114,11 +114,11 @@ simplet_map_add_rule(simplet_map_t *map, const char *sqlquery){
     return NULL;
   }
 
-  simplet_rule_t *rule;
-  if(!(rule = simplet_layer_add_rule(layer, sqlquery)))
+  simplet_filter_t *filter;
+  if(!(filter = simplet_layer_add_filter(layer, sqlquery)))
     return NULL;
 
-  return rule;
+  return filter;
 }
 
 simplet_style_t *
@@ -136,15 +136,15 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
     return NULL;
   }
 
-  simplet_rule_t *rule = layer->rules->tail->value;
+  simplet_filter_t *filter = layer->filters->tail->value;
 
-  if(!rule){
+  if(!filter){
     map->valid = MAP_ERR;
     return NULL;
   }
 
   simplet_style_t *style;
-  if(!(style = simplet_rule_add_style(rule, key, arg))){
+  if(!(style = simplet_filter_add_style(filter, key, arg))){
     map->valid = MAP_ERR;
     return NULL;
   }

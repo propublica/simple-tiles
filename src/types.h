@@ -58,14 +58,14 @@ typedef struct {
 typedef struct {
   OGRDataSourceH _source; /* ephemeral, not for outside usage */
   char           *source;
-  simplet_list_t *rules;
+  simplet_list_t *filters;
 } simplet_layer_t;
 
 
 typedef struct {
   char *ogrsql;
   simplet_list_t *styles;
-} simplet_rule_t;
+} simplet_filter_t;
 
 typedef struct {
   char *key;

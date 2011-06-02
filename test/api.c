@@ -15,7 +15,7 @@ main(){
   simplet_map_set_bounds(map, -179.231086, 17.831509, -60.859681, 71.441059);
 
   simplet_map_add_layer(map, "../data/tl_2010_us_state10.shp");
-  simplet_map_add_rule(map,  "SELECT * from tl_2010_us_state10");
+  simplet_map_add_filter(map,  "SELECT * from tl_2010_us_state10");
   simplet_map_add_style(map, "weight", "0.3");
   simplet_map_add_style(map, "fill",   "#061F37ff");
   simplet_map_add_style(map, "stroke", "#ffffff");

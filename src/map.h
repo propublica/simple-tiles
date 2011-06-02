@@ -33,8 +33,8 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
 simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring);
 
-simplet_rule_t*
-simplet_map_add_rule(simplet_map_t *map, const char *sqlquery);
+simplet_filter_t*
+simplet_map_add_filter(simplet_map_t *map, const char *sqlquery);
 
 simplet_style_t*
 simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg);

@@ -14,7 +14,7 @@ typedef struct {
 task_wrap_t tasks[] = {
   TASK_ENTRY(list)
   TASK_ENTRY(layer)
-  TASK_ENTRY(rule)
+  TASK_ENTRY(filter)
   TASK_ENTRY(style)
   TASK_ENTRY(map)
   TASK_ENTRY(integration)

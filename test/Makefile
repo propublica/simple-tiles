@@ -6,7 +6,7 @@ LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles) \
 	$(shell gdal-config --libs)
 
 
-OBJ = test_list.o test_style.o test_rule.o test_layer.o test_map.o test_integration.o
+OBJ = test_list.o test_style.o test_filter.o test_layer.o test_map.o test_integration.o
 
 api.o: api.c
 benchmark.o: benchmark.c
@@ -15,7 +15,7 @@ test_integration.o: test_integration.c test.h
 test_layer.o: test_layer.c test.h
 test_list.o: test_list.c test.h
 test_map.o: test_map.c test.h
-test_rule.o: test_rule.c test.h
+test_filter.o: test_filter.c test.h
 test_style.o: test_style.c test.h
 
 

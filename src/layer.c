@@ -1,5 +1,5 @@
 #include "layer.h"
-#include "rule.h"
+#include "filter.h"
 #include "util.h"
 
 simplet_layer_t*
@@ -11,7 +11,7 @@ simplet_layer_new(const char *datastring){
   layer->_source = NULL;
   layer->source = simplet_copy_string(datastring);
   
-  if(!(layer->rules = simplet_list_new())){
+  if(!(layer->filters = simplet_list_new())){
     free(layer);
     return NULL;
   }
@@ -26,24 +26,24 @@ simplet_layer_vfree(void *layer){
 
 void
 simplet_layer_free(simplet_layer_t *layer){
-  layer->rules->free = simplet_rule_vfree;
-  simplet_list_free(layer->rules);
+  layer->filters->free = simplet_filter_vfree;
+  simplet_list_free(layer->filters);
   free(layer->source);
   free(layer);
 }
 
-simplet_rule_t*
-simplet_layer_add_rule(simplet_layer_t *layer, const char *ogrsql){
-  simplet_rule_t* rule;
-  if(!(rule = simplet_rule_new(ogrsql)))
+simplet_filter_t*
+simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
+  simplet_filter_t* filter;
+  if(!(filter = simplet_filter_new(ogrsql)))
     return NULL;
   
-  if(!simplet_list_push(layer->rules, rule)){
-    simplet_rule_free(rule);
+  if(!simplet_list_push(layer->filters, filter)){
+    simplet_filter_free(filter);
     return NULL;
   }
   
-  return rule;
+  return filter;
 }
 
 int
@@ -53,12 +53,12 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
   if(!(layer->_source = OGROpen(layer->source, 0, NULL)))
     return 0;
   
-  if(!(iter = simplet_get_list_iter(layer->rules)))
+  if(!(iter = simplet_get_list_iter(layer->filters)))
     return 0;
 
-  simplet_rule_t *rule;
-  while((rule = simplet_list_next(iter)))
-    simplet_rule_process(rule, layer, map);
+  simplet_filter_t *filter;
+  while((filter = simplet_list_next(iter)))
+    simplet_filter_process(filter, layer, map);
   
   OGR_DS_Destroy(layer->_source);
   

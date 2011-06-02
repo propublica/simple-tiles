@@ -5,7 +5,7 @@ CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -rdynamic -fPIC -Wall -W -
 	$(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo) \
 	$(shell gdal-config --libs)
-OBJ = list.o bounds.o point.o style.o map.o util.o rule.o layer.o
+OBJ = list.o bounds.o point.o style.o map.o util.o filter.o layer.o
 PKG_CF = simple-tiles.pc
 
 ifeq ($(shell uname -s),Darwin)
@@ -41,13 +41,13 @@ install: ${DYLIBNAME} ${STLIBNAME}
 	$(INSTALL) $(PKG_CF) $(INSTALL_PKG)
 
 bounds.o: bounds.c bounds.h types.h point.h
-layer.o: layer.c layer.h types.h rule.h list.h map.h bounds.h point.h \
+layer.o: layer.c layer.h types.h filter.h list.h map.h bounds.h point.h \
   style.h
 list.o: list.c list.h types.h
-map.o: map.c map.h types.h list.h bounds.h point.h style.h layer.h rule.h \
+map.o: map.c map.h types.h list.h bounds.h point.h style.h layer.h filter.h \
   util.h
 point.o: point.c point.h types.h
-rule.o: rule.c style.h types.h list.h rule.h map.h bounds.h point.h \
+filter.o: filter.c style.h types.h list.h filter.h map.h bounds.h point.h \
   layer.h util.h
 style.o: style.c map.h types.h list.h bounds.h point.h style.h layer.h \
   util.h

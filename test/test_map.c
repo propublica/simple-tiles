@@ -25,12 +25,12 @@ test_creation(){
   assert(layer);
   assert(map->layers->length == 1);
   assert(map->layers->head->value == layer);
-  simplet_rule_t *rule = simplet_map_add_rule(map,  "SELECT * from tl_2010_us_cd108");
-  assert(rule == layer->rules->head->value);
-  assert(layer->rules->length == 1);
+  simplet_filter_t *filter = simplet_map_add_filter(map,  "SELECT * from tl_2010_us_cd108");
+  assert(filter == layer->filters->head->value);
+  assert(layer->filters->length == 1);
   simplet_style_t *style = simplet_map_add_style(map, "line-cap",  "square");
-  assert(rule->styles->length == 1);
-  assert(style == rule->styles->head->value);
+  assert(filter->styles->length == 1);
+  assert(style == filter->styles->head->value);
   simplet_map_free(map);
 }
 
