@@ -17,6 +17,18 @@ test_map(){
 }
 
 void
+test_srs(){
+  char *srs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs ";
+  simplet_map_t *map;
+  if(!(map = simplet_map_new()))
+    assert(0);
+  simplet_map_set_srs(map, srs);
+  char *test = NULL;
+  simplet_map_get_srs(map, &test);
+  assert(!strcmp(srs, test));
+}
+
+void
 test_creation(){
   simplet_map_t *map;
   if(!(map = simplet_map_new()))
@@ -37,4 +49,5 @@ test_creation(){
 TASK(map){
   test(map);
   test(creation);
+  test(srs);
 }

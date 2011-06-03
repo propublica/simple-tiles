@@ -40,7 +40,7 @@ simplet_style_t*
 simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg);
 
 int
-simplet_map_isvalid(simplet_map_t *map);
+simplet_map_is_valid(simplet_map_t *map);
 
 int
 simplet_map_render_to_png(simplet_map_t *map, const char *path);
@@ -57,6 +57,9 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface);
 
 void
 simplet_map_scale(simplet_map_t *map);
+
+void
+simplet_map_get_srs(simplet_map_t *map, char **srs);
 
 #ifdef __cplusplus
 }

@@ -20,7 +20,7 @@ main(){
   simplet_map_add_style(map, "fill",   "#061F37ff");
   simplet_map_add_style(map, "stroke", "#ffffff");
 
-  if(simplet_map_isvalid(map))
+  if(simplet_map_is_valid(map))
     simplet_map_render_to_png(map, "./out.png");
   simplet_map_free(map);
 }

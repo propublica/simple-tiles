@@ -8,8 +8,8 @@ test_style(){
   simplet_style_t *style;
   if(!(style = simplet_style_new("fill", "#CCCCCC")))
     assert(0);
-  assert(strcmp(style->key, "fill") == 0);
-  assert(strcmp(style->arg, "#CCCCCC") == 0);
+  assert(!strcmp(style->key, "fill"));
+  assert(!strcmp(style->arg, "#CCCCCC"));
   simplet_style_free(style);
 }
 
@@ -24,14 +24,14 @@ test_lookup(){
   assert(filter->styles->length == 3);
   simplet_style_t *style;
   style = simplet_lookup_style(filter->styles, "fill");
-  assert(strcmp(style->key, "fill") == 0);
-  assert(strcmp(style->arg, "#CCCCCC") == 0);
+  assert(!strcmp(style->key, "fill"));
+  assert(!strcmp(style->arg, "#CCCCCC"));
   style = simplet_lookup_style(filter->styles, "stroke");
-  assert(strcmp(style->key, "stroke") == 0);
-  assert(strcmp(style->arg, "#CCCCAA") == 0);
+  assert(!strcmp(style->key, "stroke"));
+  assert(!strcmp(style->arg, "#CCCCAA"));
   style = simplet_lookup_style(filter->styles, "line-cap");
-  assert(strcmp(style->key, "line-cap") == 0);
-  assert(strcmp(style->arg, "round") == 0);
+  assert(!strcmp(style->key, "line-cap"));
+  assert(!strcmp(style->arg, "round"));
   simplet_filter_free(filter);
 }
 

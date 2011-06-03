@@ -8,12 +8,12 @@ test_filter(){
   const char *query = "SELECT * FROM TEST";
   if(!(filter = simplet_filter_new(query)))
     assert(0);
-  assert(strcmp(query, filter->ogrsql) == 0);
+  assert(!strcmp(query, filter->ogrsql));
   simplet_filter_add_style(filter, "fill", "#CCCCCC");
   simplet_style_t *style;
   style = filter->styles->tail->value;
-  assert(strcmp(style->key, "fill") == 0);
-  assert(strcmp(style->arg, "#CCCCCC") == 0);
+  assert(!strcmp(style->key, "fill"));
+  assert(!strcmp(style->arg, "#CCCCCC"));
 }
 
 static void

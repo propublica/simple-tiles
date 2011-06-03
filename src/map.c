@@ -58,6 +58,11 @@ simplet_map_set_srs(simplet_map_t *map, const char *proj){
   return MAP_OK;
 }
 
+void
+simplet_map_get_srs(simplet_map_t *map, char **srs){
+  OSRExportToProj4(map->proj, srs);
+}
+
 int
 simplet_map_set_size(simplet_map_t *map, int width, int height){
   map->height = height;
@@ -141,7 +146,7 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
 }
 
 int
-simplet_map_isvalid(simplet_map_t *map){
+simplet_map_is_valid(simplet_map_t *map){
   if(map->valid == MAP_ERR)
     return MAP_ERR;
 
@@ -166,7 +171,7 @@ simplet_map_isvalid(simplet_map_t *map){
 
 cairo_surface_t *
 simplet_map_build_surface(simplet_map_t *map){
-  if(simplet_map_isvalid(map) == MAP_ERR)
+  if(simplet_map_is_valid(map) == MAP_ERR)
     return NULL;
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
