@@ -47,7 +47,7 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds) {
     return NULL;
   }
 
-  OGR_G_AssignSpatialReference(ogrBounds, proj);  
+  OGR_G_AssignSpatialReference(ogrBounds, proj);
   OGR_G_DestroyGeometry(tmpLine);
   return ogrBounds;
 }
