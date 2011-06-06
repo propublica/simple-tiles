@@ -1,6 +1,25 @@
 #include "test.h"
 #include <simple-tiles/map.h>
 
+
+void
+test_resetting(){
+  simplet_map_t *map;
+  if(!(map = simplet_map_new()))
+    assert(0);
+  simplet_map_set_bounds(map, 10, 10, 0, 0);
+  assert(map->bounds->se->x == 10);
+  assert(map->bounds->nw->y == 10);
+  assert(map->bounds->nw->x == 0);
+  assert(map->bounds->se->y == 0);
+  simplet_map_set_bounds(map, 0, 0, -10, -10);
+  assert(map->bounds->se->x == 0);
+  assert(map->bounds->nw->y == 0);
+  assert(map->bounds->nw->x == -10);
+  assert(map->bounds->se->y == -10);
+}
+
+
 void
 test_map(){
   simplet_map_t *map;
@@ -47,6 +66,7 @@ test_creation(){
 }
 
 TASK(map){
+  test(resetting);
   test(map);
   test(creation);
   test(srs);

@@ -34,21 +34,26 @@ void
 simplet_map_free(simplet_map_t *map){
   if(map->bounds)
     simplet_bounds_free(map->bounds);
+
   if(map->layers) {
     map->layers->free = simplet_layer_vfree;
     simplet_list_free(map->layers);
   }
-  
+
   if(map->_ctx)
     cairo_destroy(map->_ctx);
 
   if(map->proj)
     OSRRelease(map->proj);
+
   free(map);
 }
 
 int
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
+  if(map->proj)
+    OSRRelease(map->proj);
+
   if(!(map->proj = OSRNewSpatialReference(NULL)))
     return (map->valid = MAP_ERR);
 
@@ -72,8 +77,12 @@ simplet_map_set_size(simplet_map_t *map, int width, int height){
 
 int
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny){
+  if(map->bounds)
+    simplet_bounds_free(map->bounds);
+
   if(!(map->bounds = simplet_bounds_new()))
     return (map->valid = MAP_ERR);
+
   simplet_bounds_extend(map->bounds, maxx, maxy);
   simplet_bounds_extend(map->bounds, minx, miny);
   return MAP_OK;
