@@ -1,5 +1,6 @@
-#include "test.h"
+#include <string.h>
 #include <simple-tiles/map.h>
+#include "test.h"
 
 simplet_map_t*
 build_map(){
@@ -11,15 +12,13 @@ build_map(){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -179.231086, 17.831509, -100.859681, 71.441059);
   simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
-  simplet_map_add_filter(map,  "SELECT * from tl_2010_us_cd108");
+  simplet_map_add_filter(map, "SELECT * from tl_2010_us_cd108");
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "fill",      "#061F37ff");
 
   return map;
 }
-
-
 
 void
 test_many_layers(){
@@ -57,6 +56,23 @@ test_projection(){
   simplet_map_free(map);
 }
 
+
+
+cairo_status_t
+stream(void *closure, const unsigned char *data, unsigned int length){
+  return CAIRO_STATUS_SUCCESS;
+  data = NULL, length = 0, closure = NULL; /* suppress warnings */
+}
+
+void
+test_stream(){
+  simplet_map_t *map;
+  assert((map = build_map()));
+  char *data;
+  assert(simplet_map_render_to_stream(map, data, stream));
+  simplet_map_free(map);
+}
+
 TASK(integration){
   test(projection);
   puts("check projection.png");
@@ -64,4 +80,5 @@ TASK(integration){
   puts("check filters.png");
   test(many_layers);
   puts("check layers.png");
+  test(stream);
 }
