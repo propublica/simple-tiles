@@ -61,10 +61,11 @@ typedef struct {
   simplet_list_t *filters;
 } simplet_layer_t;
 
-
 typedef struct {
   char *ogrsql;
-  simplet_list_t *styles;
+  simplet_list_t   *styles;
+  cairo_t          *_ctx;    /* ephemeral, not for outside usage */
+  simplet_bounds_t *_bounds; /* ephemeral, not for outside usage */
 } simplet_filter_t;
 
 typedef struct {
