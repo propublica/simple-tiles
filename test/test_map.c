@@ -37,7 +37,7 @@ test_map(){
 
 void
 test_srs(){
-  char *srs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs ";
+  const char *srs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs ";
   simplet_map_t *map;
   if(!(map = simplet_map_new()))
     assert(0);

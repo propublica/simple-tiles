@@ -26,7 +26,7 @@ wrap_new(int val){
 static simplet_list_t*
 build_list(){
   simplet_list_t *list;
-  if(!(list = simplet_list_new(list)))
+  if(!(list = simplet_list_new()))
     assert(0);
   
   wrap_t *test = wrap_new(5);
@@ -43,7 +43,7 @@ build_list(){
 static void
 test_push(){
   simplet_list_t *list;
-  if(!(list = simplet_list_new(list)))
+  if(!(list = simplet_list_new()))
     assert(0);
   assert(list->length == 0);
   wrap_t *test = wrap_new(5);
