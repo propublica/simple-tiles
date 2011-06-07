@@ -59,7 +59,7 @@ plot_path(OGRGeometryH geom, simplet_filter_t *filter,
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
-    cairo_move_to(filter->_ctx, x - filter->_bounds->nw->x,  filter->_bounds->nw->y - y);
+    cairo_move_to(filter->_ctx, x - filter->_bounds->nw->x, filter->_bounds->nw->y - y);
 
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
@@ -74,7 +74,8 @@ plot_path(OGRGeometryH geom, simplet_filter_t *filter,
     }
     // ensure something is always drawn
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
-    cairo_line_to(filter->_ctx, x - filter->_bounds->nw->x, filter->_bounds->nw->y - y);
+    cairo_line_to(filter->_ctx, x - filter->_bounds->nw->x,
+                                filter->_bounds->nw->y - y);
   }
   (*cb)(filter);
 }
@@ -105,7 +106,8 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter,
   cairo_save(filter->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-    cairo_arc(filter->_ctx, x - filter->_bounds->nw->x, filter->_bounds->nw->y - y, r, 0., 2 * M_PI);
+    cairo_arc(filter->_ctx, x - filter->_bounds->nw->x,
+              filter->_bounds->nw->y - y, r, 0., 2 * M_PI);
   }
   (*cb)(filter);
 
@@ -193,7 +195,8 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
     cairo_set_operator(filter->_ctx, CAIRO_OPERATOR_SATURATE);
 
   filter->_bounds = map->bounds;
-  cairo_scale(filter->_ctx, map->width / filter->_bounds->width, map->width / filter->_bounds->width);
+  cairo_scale(filter->_ctx, map->width / filter->_bounds->width,
+                            map->width / filter->_bounds->width);
 
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
@@ -205,7 +208,8 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
     OGR_F_Destroy(feature);
   }
 
-  cairo_scale(filter->_ctx, filter->_bounds->width / map->width, filter->_bounds->width / map->width);
+  cairo_scale(filter->_ctx, filter->_bounds->width / map->width,
+                            filter->_bounds->width / map->width);
   filter->_bounds = NULL;
 
   cairo_set_source_surface(map->_ctx, surface, 0, 0);
