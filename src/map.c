@@ -201,6 +201,21 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
   cairo_surface_destroy(surface);
 }
 
+int
+simplet_map_slippy_map(simplet_map_t *map, double x, double y, double z){
+  simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
+
+  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
+    return (map->valid = MAP_ERR);
+
+  double two_z = pow(2, z);
+
+  if(!simplet_map_set_bounds(map, x / two_z, y / two_z, (x + 256) / two_z, (y + 256) / two_z))
+    return (map->valid = MAP_ERR);
+
+  return MAP_OK;
+}
+
 
 int
 simplet_map_render_to_stream(simplet_map_t *map, void *stream,

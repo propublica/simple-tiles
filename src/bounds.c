@@ -32,7 +32,6 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds) {
     return NULL;
   }
 
-  const char *wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
   OGRSpatialReferenceH proj;
   if(!(proj = OSRNewSpatialReference(NULL))){
     OGR_G_DestroyGeometry(tmpLine);
@@ -40,7 +39,7 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds) {
     return NULL;
   }
 
-  if(OSRSetFromUserInput(proj, wgs84) != OGRERR_NONE){
+  if(OSRSetFromUserInput(proj, SIMPLET_WGS84) != OGRERR_NONE){
     OGR_G_DestroyGeometry(tmpLine);
     OSRDestroySpatialReference(proj);
     OGR_G_DestroyGeometry(ogrBounds);
