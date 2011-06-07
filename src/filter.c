@@ -46,6 +46,9 @@ static void
 plot_path(OGRGeometryH geom, simplet_filter_t *filter,
           void (*cb)(simplet_filter_t *filter)){
   double x, y, last_x, last_y;
+  
+  cairo_save(filter->_ctx);
+  cairo_new_path(filter->_ctx);
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
@@ -78,14 +81,6 @@ plot_path(OGRGeometryH geom, simplet_filter_t *filter,
                                 filter->_bounds->nw->y - y);
   }
   (*cb)(filter);
-}
-
-static void
-prepare_path(OGRGeometryH geom, simplet_filter_t *filter,
-            void (*cb)(simplet_filter_t *filter)){
-  cairo_save(filter->_ctx);
-  cairo_new_path(filter->_ctx);
-  plot_path(geom, filter, cb);
   cairo_close_path(filter->_ctx);
   cairo_clip(filter->_ctx);
   cairo_restore(filter->_ctx);
@@ -104,6 +99,7 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter,
 
   cairo_device_to_user_distance(filter->_ctx, &r, &dy);
   cairo_save(filter->_ctx);
+  cairo_new_path(filter->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
     cairo_arc(filter->_ctx, x - filter->_bounds->nw->x,
@@ -140,11 +136,11 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
   switch(OGR_G_GetGeometryType(geom)){
     case wkbPolygon:
     case wkbMultiPolygon:
-      prepare_path(geom, filter, finish_polygon);
+      plot_path(geom, filter, finish_polygon);
       break;
     case wkbLineString:
     case wkbMultiLineString:
-      prepare_path(geom, filter, finish_linestring);
+      plot_path(geom, filter, finish_linestring);
       break;
     case wkbPoint:
     case wkbMultiPoint:
@@ -191,6 +187,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   filter->_ctx = cairo_create(surface);
 
   simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
+  
   if(seamless)
     cairo_set_operator(filter->_ctx, CAIRO_OPERATOR_SATURATE);
 

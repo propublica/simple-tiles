@@ -15,8 +15,8 @@ build_map(){
   simplet_map_add_filter(map, "SELECT * from tl_2010_us_state10");
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
-  simplet_map_add_style(map, "fill",      "#061F37ff");
-  simplet_map_add_style(map, "seamless", "true");
+  simplet_map_add_style(map, "fill",      "#061F3711");
+  //simplet_map_add_style(map, "seamless", "true");
 
 
   return map;

@@ -62,7 +62,7 @@ void
 simplet_map_get_srs(simplet_map_t *map, char **srs);
 
 int
-simplet_map_set_slippy(simplet_map_t *map, double x, double y, double z);
+simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z);
 
 #ifdef __cplusplus
 }

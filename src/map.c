@@ -227,7 +227,7 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
 }
 
 int
-simplet_map_set_slippy(simplet_map_t *map, double x, double y, double z){
+simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
   if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
