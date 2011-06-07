@@ -207,7 +207,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   cairo_scale(filter->_ctx, filter->_bounds->width / map->width, filter->_bounds->width / map->width);
   filter->_bounds = NULL;
-  
+
   cairo_set_source_surface(map->_ctx, surface, 0, 0);
   cairo_paint(map->_ctx);
   cairo_destroy(filter->_ctx);

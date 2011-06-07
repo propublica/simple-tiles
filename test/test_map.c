@@ -5,8 +5,7 @@
 void
 test_resetting(){
   simplet_map_t *map;
-  if(!(map = simplet_map_new()))
-    assert(0);
+  assert((map = simplet_map_new()));
   simplet_map_set_bounds(map, 10, 10, 0, 0);
   assert(map->bounds->se->x == 10);
   assert(map->bounds->nw->y == 10);
@@ -23,8 +22,7 @@ test_resetting(){
 void
 test_map(){
   simplet_map_t *map;
-  if(!(map = simplet_map_new()))
-    assert(0);
+  assert((map = simplet_map_new()));
   simplet_map_set_srs(map, "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs");
   assert(map->proj);
   simplet_map_set_size(map, 256, 256);
@@ -39,8 +37,7 @@ void
 test_srs(){
   const char *srs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs ";
   simplet_map_t *map;
-  if(!(map = simplet_map_new()))
-    assert(0);
+  assert((map = simplet_map_new()));
   simplet_map_set_srs(map, srs);
   char *test = NULL;
   simplet_map_get_srs(map, &test);
@@ -50,18 +47,14 @@ test_srs(){
 void
 test_slippy(){
   simplet_map_t *map;
-  if(!(map = simplet_map_new()))
-    assert(0);
-  
-  //simplet_map_set_slippy(map, 0, 0, 18);
-  //printf()
+  assert((map = simplet_map_new()));
+  assert(simplet_map_slippy_map(map, 0, 0, 1));
 }
 
 void
 test_creation(){
   simplet_map_t *map;
-  if(!(map = simplet_map_new()))
-    assert(0);
+  assert((map = simplet_map_new()));
   simplet_layer_t *layer = simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
   assert(layer);
   assert(map->layers->length == 1);

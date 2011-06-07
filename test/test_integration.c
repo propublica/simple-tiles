@@ -57,8 +57,6 @@ test_projection(){
   simplet_map_free(map);
 }
 
-
-
 cairo_status_t
 stream(void *closure, const unsigned char *data, unsigned int length){
   return CAIRO_STATUS_SUCCESS;
@@ -73,6 +71,8 @@ test_stream(){
   assert(simplet_map_render_to_stream(map, data, stream));
   simplet_map_free(map);
 }
+
+
 
 TASK(integration){
   test(projection);

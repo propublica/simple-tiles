@@ -9,6 +9,9 @@
 #include "util.h"
 
 
+#define SIMPLET_SLIPPY_SIZE 256
+#define SIMPLET_MERC_LENGTH 40075016.68
+
 simplet_map_t*
 simplet_map_new(){
   simplet_map_t *map;
@@ -213,21 +216,6 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
 }
 
 int
-simplet_map_slippy_map(simplet_map_t *map, double x, double y, double z){
-  simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
-
-  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
-    return (map->valid = MAP_ERR);
-
-  double two_z = pow(2, z);
-
-  if(!simplet_map_set_bounds(map, x / two_z, y / two_z, (x + 256) / two_z, (y + 256) / two_z))
-    return (map->valid = MAP_ERR);
-
-  return MAP_OK;
-}
-
-int
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
   cairo_surface_t *surface;
   if(!(surface = simplet_map_build_surface(map)))
@@ -235,5 +223,28 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
   if(cairo_surface_write_to_png(surface, path) != CAIRO_STATUS_SUCCESS)
     return (map->valid = MAP_ERR);
   simplet_map_close_surface(map, surface);
+  return MAP_OK;
+}
+
+
+int
+simplet_map_slippy_map(simplet_map_t *map, double x, double y, double z){
+  simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
+
+  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
+    return (map->valid = MAP_ERR);
+
+  double zfactor, length, origin;
+
+  zfactor = pow(2.0, z);
+  length  = SIMPLET_MERC_LENGTH / zfactor;
+  origin  = SIMPLET_MERC_LENGTH / 2;
+
+  if(!simplet_map_set_bounds(map, origin - (x + 1) * length,
+                                  origin - (y + 1) * length,
+                                  x * length - origin,
+                                  y * length - origin))
+    return (map->valid = MAP_ERR);
+
   return MAP_OK;
 }
