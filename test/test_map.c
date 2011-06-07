@@ -16,6 +16,7 @@ test_resetting(){
   assert(map->bounds->nw->y == 0);
   assert(map->bounds->nw->x == -10);
   assert(map->bounds->se->y == -10);
+  simplet_map_free(map);
 }
 
 
@@ -34,7 +35,7 @@ test_map(){
 }
 
 void
-test_srs(){
+test_proj(){
   const char *srs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs ";
   simplet_map_t *map;
   assert((map = simplet_map_new()));
@@ -42,13 +43,20 @@ test_srs(){
   char *test = NULL;
   simplet_map_get_srs(map, &test);
   assert(!strcmp(srs, test));
+  simplet_map_free(map);
 }
+
 
 void
 test_slippy(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
   assert(simplet_map_set_slippy(map, 0, 0, 1));
+  assert(map->bounds->nw->x == -20037508.34);
+  assert(map->bounds->nw->y == 20037508.34);
+  assert(map->bounds->se->y == 0.0);
+  assert(map->bounds->se->x == 0.0);
+  simplet_map_free(map);
 }
 
 void
@@ -72,6 +80,6 @@ TASK(map){
   test(resetting);
   test(map);
   test(creation);
-  test(srs);
+  test(proj);
   test(slippy);
 }
