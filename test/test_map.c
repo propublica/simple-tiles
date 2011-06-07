@@ -48,7 +48,7 @@ void
 test_slippy(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
-  assert(simplet_map_slippy_map(map, 0, 0, 1));
+  assert(simplet_map_set_slippy(map, 0, 0, 1));
 }
 
 void

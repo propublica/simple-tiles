@@ -33,6 +33,7 @@ test_many_layers(){
   simplet_map_render_to_png(map, "./layers.png");
   simplet_map_free(map);
 }
+
 void
 test_many_filters(){
   simplet_map_t *map;
@@ -54,6 +55,15 @@ test_projection(){
   simplet_map_set_bounds(map, -3410023.644683, 12407191.9541633, 5198986.57554026, 6500142.362205);
   assert(simplet_map_is_valid(map));
   simplet_map_render_to_png(map, "./projection.png");
+  simplet_map_free(map);
+}
+
+void
+test_slippy_gen(){
+  simplet_map_t *map;
+  assert((map = build_map()));
+  simplet_map_set_slippy(map, 0, 1, 2);
+  simplet_map_render_to_png(map, "./slippy.png");
   simplet_map_free(map);
 }
 
@@ -82,4 +92,6 @@ TASK(integration){
   test(many_layers);
   puts("check layers.png");
   test(stream);
+  test(slippy_gen);
+  puts("check slippy.png");
 }

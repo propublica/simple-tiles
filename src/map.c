@@ -226,9 +226,8 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
   return MAP_OK;
 }
 
-
 int
-simplet_map_slippy_map(simplet_map_t *map, double x, double y, double z){
+simplet_map_set_slippy(simplet_map_t *map, double x, double y, double z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
   if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
@@ -240,10 +239,10 @@ simplet_map_slippy_map(simplet_map_t *map, double x, double y, double z){
   length  = SIMPLET_MERC_LENGTH / zfactor;
   origin  = SIMPLET_MERC_LENGTH / 2;
 
-  if(!simplet_map_set_bounds(map, origin - (x + 1) * length,
+  if(!simplet_map_set_bounds(map, (x + 1) * length - origin,
                                   origin - (y + 1) * length,
                                   x * length - origin,
-                                  y * length - origin))
+                                  origin - y * length))
     return (map->valid = MAP_ERR);
 
   return MAP_OK;
