@@ -1,3 +1,7 @@
 think about namespacing correctly. MAP_OK and MAP_ERR need to be prefixed.
 
 make filter for test fixtures (tl_2010_us_cd108 and Armories -- http://www.nysgis.state.ny.us/gisdata/fileserver/?DSID=79&file=armories.zip)
+
+sigh, it looks like map projected coordinates are easier big change.
+
+need multiple error messages, for general errors, cairo errors, and gdal errors.
