@@ -73,6 +73,7 @@ typedef struct {
   char *arg;
 } simplet_style_t;
 
+
 #ifndef M_PI
 #define M_PI acos(-1.0)
 #endif

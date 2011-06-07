@@ -48,6 +48,16 @@ test_srs(){
 }
 
 void
+test_slippy(){
+  simplet_map_t *map;
+  if(!(map = simplet_map_new()))
+    assert(0);
+  
+  //simplet_map_set_slippy(map, 0, 0, 18);
+  //printf()
+}
+
+void
 test_creation(){
   simplet_map_t *map;
   if(!(map = simplet_map_new()))
@@ -70,4 +80,5 @@ TASK(map){
   test(map);
   test(creation);
   test(srs);
+  test(slippy);
 }

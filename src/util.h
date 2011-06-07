@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-
 char*
 simplet_copy_string(const char *src);
 

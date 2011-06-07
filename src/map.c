@@ -9,7 +9,6 @@
 #include "util.h"
 
 
-
 simplet_map_t*
 simplet_map_new(){
   simplet_map_t *map;
@@ -202,6 +201,18 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
 }
 
 int
+simplet_map_render_to_stream(simplet_map_t *map, void *stream,
+  cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
+  cairo_surface_t *surface;
+  if(!(surface = simplet_map_build_surface(map)))
+    return (map->valid = MAP_ERR);
+  if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS)
+    return (map->valid = MAP_ERR);
+  simplet_map_close_surface(map, surface);
+  return MAP_OK;
+}
+
+int
 simplet_map_slippy_map(simplet_map_t *map, double x, double y, double z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
@@ -215,20 +226,6 @@ simplet_map_slippy_map(simplet_map_t *map, double x, double y, double z){
 
   return MAP_OK;
 }
-
-
-int
-simplet_map_render_to_stream(simplet_map_t *map, void *stream,
-  cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
-  cairo_surface_t *surface;
-  if(!(surface = simplet_map_build_surface(map)))
-    return (map->valid = MAP_ERR);
-  if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS)
-    return (map->valid = MAP_ERR);
-  simplet_map_close_surface(map, surface);
-  return MAP_OK;
-}
-
 
 int
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
