@@ -44,12 +44,12 @@ test_many_filters(){
   simplet_map_free(map);
 }
 
+
 void
 test_projection(){
   simplet_map_t *map;
   assert((map = build_map()));
-  simplet_map_set_srs(map, "+proj=aea +lat_1=27.5 +lat_2=35 +lat_0=18 +lon_0=-100 +x_0=1500000 +y_0=6000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs +over");
-  simplet_map_set_bounds(map, -3410023.644683, 12407191.9541633, 5198986.57554026, 6500142.362205);
+  simplet_map_set_srs(map, "+proj=aea +lat_1=27.5 +lat_2=35 +lat_0=18 +lon_0=-100 +x_0=1500000 +y_0=6000000 +ellps=GRS80 +datum=NAD83 +units=m +no_defs");
   simplet_map_add_style(map, "seamless", "true");
   assert(simplet_map_is_valid(map));
   simplet_map_render_to_png(map, "./projection.png");
@@ -76,9 +76,9 @@ test_stream(){
 TASK(integration){
   test(projection);
   puts("check projection.png");
-  //test(many_filters);
-  //puts("check filters.png");
-  //test(many_layers);
-  //puts("check layers.png");
-  //test(stream);
+  test(many_filters);
+  puts("check filters.png");
+  test(many_layers);
+  puts("check layers.png");
+  test(stream);
 }

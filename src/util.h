@@ -5,6 +5,10 @@
 extern "C" {
 #endif
 
+#ifndef M_PI
+#define M_PI acos(-1.0)
+#endif
+
 char*
 simplet_copy_string(const char *src);
 

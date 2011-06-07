@@ -164,6 +164,8 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
 /* this function is way too hairy */
 int
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
+  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds);
+
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_GetLayer(layer->_source, 0)))
     return 0;
@@ -172,7 +174,6 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
     return 0;
 
-  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
   olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, "");
   if(!olayer)
@@ -181,6 +182,12 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
     return 0;
+
+  bounds = simplet_bounds_to_ogr(map->bounds);
+  OGR_G_TransformTo(bounds, map->proj);
+  if(!(filter->_bounds = simplet_bounds_from_ogr(bounds)))
+    return 0;
+  OGR_G_DestroyGeometry(bounds);
 
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
                                   CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
@@ -192,7 +199,6 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   if(seamless)
     cairo_set_operator(filter->_ctx, CAIRO_OPERATOR_SATURATE);
 
-  filter->_bounds = map->bounds;
   cairo_scale(filter->_ctx, map->width / filter->_bounds->width, map->width / filter->_bounds->width);
 
   OGRFeatureH feature;
@@ -206,13 +212,15 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   }
 
   cairo_scale(filter->_ctx, filter->_bounds->width / map->width, filter->_bounds->width / map->width);
-  filter->_bounds = NULL;
-  
+
   cairo_set_source_surface(map->_ctx, surface, 0, 0);
   cairo_paint(map->_ctx);
   cairo_destroy(filter->_ctx);
   filter->_ctx = NULL;
   cairo_surface_destroy(surface);
+
+  simplet_bounds_free(filter->_bounds);
+  filter->_bounds = NULL;
   OGR_DS_ReleaseResultSet(layer->_source, olayer);
   return 1;
 }

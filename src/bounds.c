@@ -16,7 +16,7 @@ simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
 }
 
 OGRGeometryH
-simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
+simplet_bounds_to_ogr(simplet_bounds_t *bounds) {
   OGRGeometryH tmpLine;
   if(!(tmpLine = OGR_G_CreateGeometry(wkbLineString)))
     return NULL;
@@ -29,6 +29,21 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   OGRGeometryH ogrBounds;
   if(!(ogrBounds = OGR_G_ConvexHull(tmpLine))){
     OGR_G_DestroyGeometry(tmpLine);
+    return NULL;
+  }
+
+  const char *wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+  OGRSpatialReferenceH proj;
+  if(!(proj = OSRNewSpatialReference(NULL))){
+    OGR_G_DestroyGeometry(tmpLine);
+    OGR_G_DestroyGeometry(ogrBounds);
+    return NULL;
+  }
+
+  if(OSRSetFromUserInput(proj, wgs84) != OGRERR_NONE){
+    OGR_G_DestroyGeometry(tmpLine);
+    OSRDestroySpatialReference(proj);
+    OGR_G_DestroyGeometry(ogrBounds);
     return NULL;
   }
 
