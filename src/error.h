@@ -1,15 +1,19 @@
 #ifndef _SIMPLE_TILES_ERROR_H
 #define _SIMPLE_TILES_ERROR_H
 
+#include "types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void
-simplet_set_error_handle(void (*handle)(simplet_error_t err, char *mess));
+typedef void (*simplet_error_handler)(simplet_status_t err, char *mess);
 
 void
-simplet_error(simplet_error_t err, char *mess);
+simplet_set_error_handle(simplet_error_handler handle);
+
+void
+simplet_error(simplet_status_t err);
 
 simplet_status_t
 simplet_check_cairo(cairo_t *ctx);
@@ -19,10 +23,6 @@ simplet_cairo_error(cairo_t *ctx);
 
 void
 simplet_ogr_error();
-
-void
-simplet_get_last_error();
-
 
 #ifdef __cplusplus
 }
