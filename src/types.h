@@ -82,6 +82,14 @@ typedef struct {
 #define SIMPLET_MERCATOR "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over"
 
 
+typedef enum {
+  SIMPLET_MAP_OK,
+  SIMPLET_MAP_ERR,
+  SIMPLET_MAP_OOM,
+  SIMPLET_CAIRO_ERR,
+  SIMPLET_OGR_ERR
+} simplet_status_t;
+
 #ifdef __cplusplus
 }
 #endif

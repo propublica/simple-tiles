@@ -5,8 +5,7 @@
 simplet_map_t*
 build_map(){
   simplet_map_t *map;
-  if(!(map = simplet_map_new()))
-    exit(1);
+  assert((map = simplet_map_new()));
 
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);

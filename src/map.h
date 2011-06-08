@@ -8,9 +8,6 @@
 #include "layer.h"
 
 
-#define MAP_OK 1
-#define MAP_ERR 0
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,7 +36,7 @@ simplet_map_add_filter(simplet_map_t *map, const char *sqlquery);
 simplet_style_t*
 simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg);
 
-int
+simplet_status_t
 simplet_map_is_valid(simplet_map_t *map);
 
 int
