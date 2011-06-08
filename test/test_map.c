@@ -43,6 +43,7 @@ test_proj(){
   char *test = NULL;
   simplet_map_get_srs(map, &test);
   assert(!strcmp(srs, test));
+  free(test);
   simplet_map_free(map);
 }
 
