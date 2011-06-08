@@ -4,27 +4,26 @@
 
 int frees = 0;
 
+typedef struct {
+  int val;
+} wrap_t;
+
 void
-freed(wrap_t *value){
+freed(void *value){
   frees++;
   free_wrap(value);
 }
 
 void
-free_wrap(wrap_t *value){
-  free(value);
+free_wrap(void *value){
+  wrap_t *val = value;
+  free(val);
 }
-
-typedef struct {
-  int val;
-} wrap_t;
-
 
 wrap_t*
 wrap_new(int val){
   wrap_t* wrap;
-  if(!(wrap = malloc(sizeof(*wrap))))
-    return NULL;
+  assert(wrap = malloc(sizeof(*wrap)));
   wrap->val = val;
   return wrap;
 }
@@ -53,9 +52,9 @@ test_push(){
     assert(0);
   assert(list->length == 0);
   wrap_t *test = wrap_new(5);
-  simplet_list_push(list, &test);
-  assert(list->head->value == &test);
-  assert(list->tail->value == &test);
+  simplet_list_push(list, test);
+  assert(list->head->value == test);
+  assert(list->tail->value == test);
   assert(list->length == 1);
   list->free = free_wrap;
   simplet_list_free(list);

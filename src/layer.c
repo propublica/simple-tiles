@@ -48,7 +48,6 @@ simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
 
 int
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
-  OGRRegisterAll();
   simplet_listiter_t *iter;
   if(!(layer->_source = OGROpen(layer->source, 0, NULL)))
     return 0;

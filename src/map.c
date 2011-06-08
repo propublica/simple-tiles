@@ -202,8 +202,10 @@ simplet_map_build_surface(simplet_map_t *map){
   map->_ctx = ctx;
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
+  OGRRegisterAll();
   while((layer = simplet_list_next(iter)))
     simplet_layer_process(layer, map);
+  OGRCleanupAll();
   return surface;
 }
 
