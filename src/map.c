@@ -246,6 +246,5 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
                                   x * length - origin,
                                   origin - y * length))
     return (map->valid = SIMPLET_MAP_ERR);
-
   return SIMPLET_MAP_OK;
 }

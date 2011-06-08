@@ -53,6 +53,7 @@ test_slippy(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
   assert(simplet_map_set_slippy(map, 0, 0, 1));
+  assert(map->bounds);
   assert(map->bounds->nw->x == -20037508.34);
   assert(map->bounds->nw->y == 20037508.34);
   assert(map->bounds->se->y == 0.0);

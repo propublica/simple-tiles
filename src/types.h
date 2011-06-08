@@ -83,11 +83,11 @@ typedef struct {
 
 
 typedef enum {
-  SIMPLET_MAP_OK,
-  SIMPLET_MAP_ERR,
+  SIMPLET_MAP_ERR = 0,
   SIMPLET_MAP_OOM,
   SIMPLET_CAIRO_ERR,
-  SIMPLET_OGR_ERR
+  SIMPLET_OGR_ERR,
+  SIMPLET_MAP_OK
 } simplet_status_t;
 
 #ifdef __cplusplus
