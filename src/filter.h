@@ -22,7 +22,7 @@ simplet_filter_new(const char *sqlquery);
 simplet_style_t*
 simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *arg);
 
-int
+simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map);
 
 #ifdef __cplusplus

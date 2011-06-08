@@ -8,3 +8,5 @@ build
 *.so
 api
 test_list
+runner
+data/t*

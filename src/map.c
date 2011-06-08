@@ -97,6 +97,27 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
   return SIMPLET_OK;
 }
 
+simplet_status_t
+simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
+  simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
+
+  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
+    return simplet_map_error(map, SIMPLET_OGR_ERR);
+
+  double zfactor, length, origin;
+  zfactor = pow(2.0, z);
+  length  = SIMPLET_MERC_LENGTH / zfactor;
+  origin  = SIMPLET_MERC_LENGTH / 2;
+
+  if(!simplet_map_set_bounds(map, (x + 1) * length - origin,
+                                  origin - (y + 1) * length,
+                                  x * length - origin,
+                                  origin - y * length))
+    return simplet_map_error(map, SIMPLET_OOM);
+
+  return SIMPLET_OK;
+}
+
 simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   simplet_layer_t *layer;
@@ -195,17 +216,27 @@ cairo_surface_t *
 simplet_map_build_surface(simplet_map_t *map){
   if(simplet_map_is_valid(map) == SIMPLET_ERR)
     return NULL;
+  
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return NULL;
+  
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
+  simplet_status_t err;
+  
   OGRRegisterAll();
-  while((layer = simplet_list_next(iter)))
-    simplet_layer_process(layer, map);
+  while((layer = simplet_list_next(iter))){
+    err = simplet_layer_process(layer, map);
+    if(err != SIMPLET_OK) {
+      simplet_error(err);      
+      break;
+    }
+  }
   OGRCleanupAll();
+  
   return surface;
 }
 
@@ -233,6 +264,7 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
 simplet_status_t
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
   cairo_surface_t *surface;
+
   if(!(surface = simplet_map_build_surface(map)))
     return simplet_map_error(map, SIMPLET_ERR);
 
@@ -240,26 +272,5 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
     return simplet_map_error(map, SIMPLET_ERR);
 
   simplet_map_close_surface(map, surface);
-  return SIMPLET_OK;
-}
-
-simplet_status_t
-simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
-  simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
-
-  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
-    return simplet_map_error(map, SIMPLET_OGR_ERR);
-
-  double zfactor, length, origin;
-  zfactor = pow(2.0, z);
-  length  = SIMPLET_MERC_LENGTH / zfactor;
-  origin  = SIMPLET_MERC_LENGTH / 2;
-
-  if(!simplet_map_set_bounds(map, (x + 1) * length - origin,
-                                  origin - (y + 1) * length,
-                                  x * length - origin,
-                                  origin - y * length))
-    return simplet_map_error(map, SIMPLET_OOM);
-
   return SIMPLET_OK;
 }

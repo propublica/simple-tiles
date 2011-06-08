@@ -16,7 +16,7 @@ simplet_layer_vfree(void *layer);
 void
 simplet_layer_free(simplet_layer_t *layer);
 
-int
+simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map);
 
 simplet_filter_t*

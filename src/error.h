@@ -7,22 +7,16 @@
 extern "C" {
 #endif
 
-typedef void (*simplet_error_handler)(simplet_status_t err, char *mess);
+typedef void (*simplet_error_handler)(simplet_status_t err, const char *mess);
 
 void
 simplet_set_error_handle(simplet_error_handler handle);
 
-void
+simplet_status_t
 simplet_error(simplet_status_t err);
 
 simplet_status_t
 simplet_check_cairo(cairo_t *ctx);
-
-void
-simplet_cairo_error(cairo_t *ctx);
-
-void
-simplet_ogr_error();
 
 #ifdef __cplusplus
 }

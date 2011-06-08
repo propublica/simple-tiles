@@ -46,14 +46,16 @@ simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
   return filter;
 }
 
-int
+simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
   simplet_listiter_t *iter;
   if(!(layer->_source = OGROpen(layer->source, 0, NULL)))
-    return 0;
+    return SIMPLET_OGR_ERR;
 
-  if(!(iter = simplet_get_list_iter(layer->filters)))
-    return 0;
+  if(!(iter = simplet_get_list_iter(layer->filters))){
+    OGR_DS_Destroy(layer->_source);
+    return SIMPLET_OOM;
+  }
 
   simplet_filter_t *filter;
   while((filter = simplet_list_next(iter)))
@@ -61,5 +63,5 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
 
   OGR_DS_Destroy(layer->_source);
 
-  return 1;
+  return SIMPLET_OK;
 }

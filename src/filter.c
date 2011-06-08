@@ -160,36 +160,37 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
 }
 
 /* this function is way too hairy */
-int
+simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_GetLayer(layer->_source, 0)))
-    return 0;
+    return SIMPLET_OGR_ERR;
 
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
-    return 0;
-
+    return SIMPLET_OGR_ERR;
+  
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
   olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, "");
   if(!olayer) {
     OGR_G_DestroyGeometry(bounds);
-    return 0;
-    }
+    return SIMPLET_OGR_ERR;
+  }
 
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
-    return 0;
+    return SIMPLET_OGR_ERR;
 
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
                                   CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-    return 0;
+    return SIMPLET_CAIRO_ERR;
+
   filter->_ctx = cairo_create(surface);
 
   simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
-  
+
   if(seamless)
     cairo_set_operator(filter->_ctx, CAIRO_OPERATOR_SATURATE);
 
@@ -220,7 +221,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   cairo_surface_destroy(surface);
   OGR_DS_ReleaseResultSet(layer->_source, olayer);
   OCTDestroyCoordinateTransformation(transform);
-  return 1;
+  return SIMPLET_OK;
 }
 
 simplet_style_t*
@@ -236,4 +237,3 @@ simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *
 
   return style;
 }
-
