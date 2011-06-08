@@ -173,8 +173,10 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
   olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, "");
-  if(!olayer)
+  if(!olayer) {
+    OGR_G_DestroyGeometry(bounds);
     return 0;
+    }
 
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
@@ -207,6 +209,8 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   cairo_scale(filter->_ctx, filter->_bounds->width / map->width,
                             filter->_bounds->width / map->width);
+  
+  OGR_G_DestroyGeometry(bounds);
   filter->_bounds = NULL;
 
   cairo_set_source_surface(map->_ctx, surface, 0, 0);
@@ -215,6 +219,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   filter->_ctx = NULL;
   cairo_surface_destroy(surface);
   OGR_DS_ReleaseResultSet(layer->_source, olayer);
+  OCTDestroyCoordinateTransformation(transform);
   return 1;
 }
 
