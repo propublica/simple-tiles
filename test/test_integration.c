@@ -14,8 +14,8 @@ build_map(){
   simplet_map_add_filter(map, "SELECT * from tl_2010_us_state10");
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
-  simplet_map_add_style(map, "fill",      "#061F3711");
-  //simplet_map_add_style(map, "seamless", "true");
+  simplet_map_add_style(map, "fill",      "#061F3799");
+  simplet_map_add_style(map, "seamless", "true");
 
 
   return map;
@@ -41,7 +41,7 @@ test_many_filters(){
   simplet_map_add_filter(map,  "SELECT * from tl_2010_us_state10 where STATEFP10 = '02'");
   simplet_map_add_style(map, "weight", "1");
   simplet_map_add_style(map, "stroke", "#00cc00dd");
-  simplet_map_add_style(map, "fill",   "#cc000033");
+  simplet_map_add_style(map, "fill",   "#cc000099");
   simplet_map_render_to_png(map, "./filters.png");
   simplet_map_free(map);
 }
