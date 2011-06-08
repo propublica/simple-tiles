@@ -52,11 +52,11 @@ simplet_style_line_join(cairo_t *ctx, const char *arg){
 void
 simplet_style_line_cap(cairo_t *ctx, const char *arg){
   if(!strcmp("butt", arg))
-    cairo_set_line_join(ctx, CAIRO_LINE_CAP_BUTT);
+    cairo_set_line_cap(ctx, CAIRO_LINE_CAP_BUTT);
   if(!strcmp("round", arg))
-    cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
+    cairo_set_line_cap(ctx, CAIRO_LINE_CAP_ROUND);
   if(!strcmp("square", arg))
-    cairo_set_line_join(ctx, CAIRO_LINE_CAP_SQUARE);
+    cairo_set_line_cap(ctx, CAIRO_LINE_CAP_SQUARE);
 }
 
 void
