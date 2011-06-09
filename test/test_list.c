@@ -9,15 +9,15 @@ typedef struct {
 } wrap_t;
 
 void
-freed(void *value){
-  frees++;
-  free_wrap(value);
-}
-
-void
 free_wrap(void *value){
   wrap_t *val = value;
   free(val);
+}
+
+void
+freed(void *value){
+  frees++;
+  free_wrap(value);
 }
 
 wrap_t*
@@ -33,7 +33,7 @@ build_list(){
   simplet_list_t *list;
   if(!(list = simplet_list_new()))
     assert(0);
-  
+
   wrap_t *test = wrap_new(5);
   wrap_t *test2 = wrap_new(6);
   wrap_t *test3 = wrap_new(7);
