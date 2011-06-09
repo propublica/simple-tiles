@@ -65,11 +65,11 @@ void
 test_creation(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
-  simplet_layer_t *layer = simplet_map_add_layer(map, "../data/tl_2010_us_cd108.shp");
+  simplet_layer_t *layer = simplet_map_add_layer(map, "../data/10m_admin_0_countries.shp");
   assert(layer);
   assert(map->layers->length == 1);
   assert(map->layers->head->value == layer);
-  simplet_filter_t *filter = simplet_map_add_filter(map,  "SELECT * from tl_2010_us_cd108");
+  simplet_filter_t *filter = simplet_map_add_filter(map,  "SELECT * from 10m_admin_0_countries");
   assert(filter == layer->filters->head->value);
   assert(layer->filters->length == 1);
   simplet_style_t *style = simplet_map_add_style(map, "line-cap",  "square");

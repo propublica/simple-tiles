@@ -1,7 +1,7 @@
-all: tl_2010_us_state10.shp
+all: 10m_admin_0_countries.shp
 
-tl_2010_us_state10.shp:
-	curl -O ftp://ftp2.census.gov/geo/tiger/TIGER2010/STATE/2010/tl_2010_us_state10.zip
-	unzip tl_2010_us_state10.zip
+10m-admin-0-countries.shp:
+	curl -O http://www.nacis.org/naturalearth/10m/cultural/10m-admin-0-countries.zip
+	unzip 10m_admin_0_countries.zip
 
 .PHONY: all
