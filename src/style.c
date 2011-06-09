@@ -142,12 +142,11 @@ simplet_lookup_style(simplet_list_t* styles, const char *key){
     return NULL;
 
   simplet_style_t* style;
-  while((style = simplet_list_next(iter)))
+  while((style = simplet_list_next(iter))){
     if(!strcmp(key, style->key)) {
       simplet_list_iter_free(iter);
       return style;
     }
-
-
+  }
   return NULL;
 }
