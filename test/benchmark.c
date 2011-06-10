@@ -128,6 +128,6 @@ main(){
       bench->teardown(data);
     }
     printf("\n\x1b[33mmean\x1b[0m: %f\n", mean(runs, bench->times));
-    printf("\x1b[33mstd\x1b[0m: %f\n\n",  stdev(runs, bench->times));
+    printf("\x1b[33mstd\x1b[0m:  %f\n",  stdev(runs, bench->times));
   }
 }
