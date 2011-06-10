@@ -18,16 +18,15 @@ test_map.o: test_map.c test.h
 test_filter.o: test_filter.c test.h
 test_style.o: test_style.c test.h
 
-
-
 api: api.o
 benchmark: benchmark.o
 runner: runner.o $(OBJ)
 
-test: runner api
+test: runner api benchmark
 	cd ../data && make && cd ../test
 	./runner
 	time ./api
+	./benchmark
 
 dep:
 	@$(CC) -MM *.c
