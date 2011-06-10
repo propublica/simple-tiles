@@ -18,7 +18,7 @@ teardown_map(void *ctx){
 }
 
 
-static void
+static void*
 setup_list(){
   simplet_list_t *list;
   assert((list = simplet_list_new()));
@@ -68,8 +68,9 @@ bench_render(void *ctx){
 static void
 bench_list(void *ctx){
   simplet_list_t *list = ctx;
+  int t = 1;
   for(int i = 0; i < ITEMS; i++)
-    simplet_list_push(list, 1);
+    simplet_list_push(list, &t);
 }
 
 typedef struct {
@@ -81,7 +82,7 @@ typedef struct {
 } bench_wrap_t;
 
 #define BENCH(around, name) \
-  { #name, &setup_##around, &bench_##name, &teardown_##around, 30 },
+  { #name, &setup_##around, &bench_##name, &teardown_##around, 10 },
 
 bench_wrap_t benchmarks[] = {
   BENCH(map, render)
