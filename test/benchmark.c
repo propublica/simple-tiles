@@ -82,7 +82,7 @@ typedef struct {
 } bench_wrap_t;
 
 #define BENCH(around, name) \
-  { #name, &setup_##around, &bench_##name, &teardown_##around, 10 },
+  { #name, &setup_##around, &bench_##name, &teardown_##around, 30 },
 
 bench_wrap_t benchmarks[] = {
   BENCH(map, render)
@@ -109,8 +109,8 @@ stdev(double *arr, int count){
   double avg = mean(arr, count);
   double var = 0;
   for(int i = 0; i < count; i++)
-    var += var + pow(arr[i] - avg, 2);
-  return sqrt(var / count);
+    var += pow(arr[i] - avg, 2);
+  return sqrt(var / (count - 1));
 }
 
 int
