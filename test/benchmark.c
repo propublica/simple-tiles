@@ -13,10 +13,9 @@ setup_map(){
 }
 
 static void
-teardown_map(void *ctx){ 
+teardown_map(void *ctx){
   simplet_map_free(ctx);
 }
-
 
 static void*
 setup_list(){
@@ -27,7 +26,7 @@ setup_list(){
 
 static void
 teardown_list(void *ctx){
-  simplet_list_free(ctx);
+  ctx = NULL;
 }
 
 static void
@@ -63,7 +62,7 @@ bench_render(void *ctx){
   assert(simplet_map_render_to_stream(map, data, stream));
 }
 
-#define ITEMS 1000000
+#define ITEMS 100000
 
 static void
 bench_list(void *ctx){
@@ -71,6 +70,7 @@ bench_list(void *ctx){
   int t = 1;
   for(int i = 0; i < ITEMS; i++)
     simplet_list_push(list, &t);
+  simplet_list_free(ctx);
 }
 
 typedef struct {
@@ -82,7 +82,7 @@ typedef struct {
 } bench_wrap_t;
 
 #define BENCH(around, name) \
-  { #name, &setup_##around, &bench_##name, &teardown_##around, 30 },
+  { #name, &setup_##around, &bench_##name, &teardown_##around, 10 },
 
 bench_wrap_t benchmarks[] = {
   BENCH(map, render)
@@ -100,7 +100,7 @@ sum(double *arr, int count){
 }
 
 static double
-mean(double *arr, int count){ 
+mean(double *arr, int count){
   return sum(arr, count) / count;
 }
 
@@ -117,7 +117,7 @@ int
 main(){
   bench_wrap_t *bench = (bench_wrap_t*)&benchmarks;
   for(bench = (bench_wrap_t*)&benchmarks; bench->call; bench++){
-    printf("bench %s:\n", bench->name);
+    printf("\nbench %s:\n", bench->name);
     double runs[bench->times];
     for(int i = 0; i < bench->times; i++){
       void *data = bench->setup();
@@ -128,7 +128,10 @@ main(){
       fflush(stdout);
       bench->teardown(data);
     }
-    printf("\n\x1b[33mmean\x1b[0m: %f\n", mean(runs, bench->times));
+    printf("\nCompleted %i runs in %f seconds (%f r/s)\n",
+                            bench->times, sum(runs, bench->times),
+                            bench->times / sum(runs, bench->times));
+    printf("\x1b[33mmean\x1b[0m: %f\n", mean(runs, bench->times));
     printf("\x1b[33mstd\x1b[0m:  %f\n",  stdev(runs, bench->times));
   }
 }
