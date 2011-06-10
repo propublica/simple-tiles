@@ -9,6 +9,6 @@ test: all
 	cd $@ && $(MAKE) $@
 
 clean:
-	rm -rf bin build test/*.o src/*.o test/runner test/api
+	rm -rf bin build test/*.o src/*.o test/runner test/api test/benchmark
 
 .PHONY: all test clean install
