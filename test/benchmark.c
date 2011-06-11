@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
-
+#include <simple-tiles/error.h>
 
 static void*
 setup_map(){
@@ -39,10 +39,20 @@ initialize_map(simplet_map_t *map){
   simplet_map_add_style(map, "fill",   "#061F37ff");
 }
 
-cairo_status_t
+static cairo_status_t
 stream(void *closure, const unsigned char *data, unsigned int length){
+  (void) closure, (void) data, (void) length;  /* suppress warnings */
   return CAIRO_STATUS_SUCCESS;
-  data = NULL, length = 0, closure = NULL; /* suppress warnings */
+}
+
+static void
+bench_empty(void *ctx){
+  simplet_map_t *map = ctx;
+  simplet_map_set_size(map, 256, 256);
+  simplet_map_set_slippy(map, 0, 1, 2);
+  simplet_map_add_layer(map, "../data/noop");
+  char *data = NULL;
+  assert(simplet_map_render_to_stream(map, data, stream));
 }
 
 static void
@@ -63,7 +73,6 @@ bench_render(void *ctx){
 }
 
 #define ITEMS 100000
-
 static void
 bench_list(void *ctx){
   simplet_list_t *list = ctx;
@@ -87,6 +96,7 @@ typedef struct {
 bench_wrap_t benchmarks[] = {
   BENCH(map, render)
   BENCH(map, seamless)
+  BENCH(map, empty)
   BENCH(list, list)
   { NULL, NULL, NULL, NULL, 0}
 };
@@ -113,8 +123,17 @@ stdev(double *arr, int count){
   return sqrt(var / (count - 1));
 }
 
+static void
+elision(simplet_status_t err, const char *mess){
+  (void) err, (void) mess; /* suppress warnings */
+  return;
+}
+
 int
 main(){
+  simplet_error_handler handle = elision;
+  simplet_set_error_handle(handle);
+
   bench_wrap_t *bench = (bench_wrap_t*)&benchmarks;
   for(bench = (bench_wrap_t*)&benchmarks; bench->call; bench++){
     printf("\nbench %s:\n", bench->name);

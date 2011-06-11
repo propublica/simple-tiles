@@ -3,7 +3,6 @@
 #include <math.h>
 
 #include "map.h"
-#include "error.h"
 #include "layer.h"
 #include "filter.h"
 #include "style.h"
@@ -216,27 +215,27 @@ cairo_surface_t *
 simplet_map_build_surface(simplet_map_t *map){
   if(simplet_map_is_valid(map) == SIMPLET_ERR)
     return NULL;
-  
+
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return NULL;
-  
+
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
   simplet_status_t err;
-  
+
   OGRRegisterAll();
   while((layer = simplet_list_next(iter))){
     err = simplet_layer_process(layer, map);
     if(err != SIMPLET_OK) {
-      simplet_error(err);      
+      simplet_error(err);
       break;
     }
   }
   OGRCleanupAll();
-  
+
   return surface;
 }
 

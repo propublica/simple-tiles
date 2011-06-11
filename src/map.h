@@ -6,6 +6,7 @@
 #include "bounds.h"
 #include "style.h"
 #include "layer.h"
+#include "error.h"
 
 
 #ifdef __cplusplus
