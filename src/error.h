@@ -18,6 +18,9 @@ simplet_error(simplet_status_t err);
 simplet_status_t
 simplet_check_cairo(cairo_t *ctx);
 
+void
+simplet_error_init();
+
 #ifdef __cplusplus
 }
 #endif

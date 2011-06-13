@@ -1,3 +1,5 @@
+#include <gdal/cpl_error.h>
+
 #include "error.h"
 
 static void
@@ -5,7 +7,21 @@ default_error_handler(simplet_status_t err, const char *msg){
   printf("simple tiles error %i: %s\n", err, msg);
 }
 
-static simplet_error_handler error_handler = &default_error_handler; 
+static simplet_error_handler error_handler = &default_error_handler;
+static int error_initialized = 0;
+
+static void
+ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
+  (void)eclass, (void)err_no; // FIXME
+  error_handler(SIMPLET_OGR_ERR, msg);
+}
+
+void
+simplet_error_init(){
+  if(!error_initialized) return;
+  error_initialized = 1; // make threadsafe
+  CPLSetErrorHandler(ogr_error_handler);
+}
 
 simplet_status_t
 simplet_error(simplet_status_t err){
@@ -31,20 +47,13 @@ simplet_error(simplet_status_t err){
 simplet_status_t
 simplet_check_cairo(cairo_t *ctx){
   cairo_status_t status = cairo_status(ctx);
-  
+
   if(status == CAIRO_STATUS_SUCCESS)
     return SIMPLET_OK;
-  
+
   error_handler(SIMPLET_CAIRO_ERR, cairo_status_to_string(status));
   return SIMPLET_ERR;
 }
-
-// doesn't work yet
-//static void
-//ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
-//  error_handler(SIMPLET_OGR_ERROR, msg);
-//}
-//CPLSetErrorHandler((CPLErrorHandler)ogr_error_handler);
 
 void
 simplet_set_error_handle(simplet_error_handler handle){

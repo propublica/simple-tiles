@@ -14,6 +14,7 @@
 
 simplet_map_t*
 simplet_map_new(){
+  simplet_error_init();
   simplet_map_t *map;
   if(!(map = malloc(sizeof(*map))))
     return NULL;
