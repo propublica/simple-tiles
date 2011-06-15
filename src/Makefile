@@ -1,11 +1,11 @@
 OPTIMIZATION?=-O3
 DEBUG ?= -g -ggdb
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -rdynamic -fPIC -Wall -W -Wwrite-strings -pthread $(ARCH) \
+CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -fPIC -Wall -W -Wwrite-strings -pthread $(ARCH) \
   $(shell pkg-config --cflags cairo) \
   $(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo) \
   $(shell gdal-config --libs)
-OBJ = list.o bounds.o point.o style.o map.o util.o filter.o layer.o error.o
+OBJ = list.o bounds.o point.o style.o map.o util.o filter.o layer.o error.o pool.o
 PKG_CF = simple-tiles.pc
 
 ifeq ($(shell uname -s),Darwin)
@@ -43,18 +43,17 @@ install: ${DYLIBNAME} ${STLIBNAME}
 bounds.o: bounds.c bounds.h types.h point.h
 error.o: error.c error.h types.h
 filter.o: filter.c style.h types.h list.h filter.h map.h bounds.h point.h \
-  layer.h util.h
+  layer.h error.h util.h
 layer.o: layer.c layer.h types.h filter.h list.h map.h bounds.h point.h \
-  style.h util.h
+  style.h error.h util.h
 list.o: list.c list.h types.h
 map.o: map.c map.h types.h list.h bounds.h point.h style.h layer.h \
   error.h filter.h util.h
 point.o: point.c point.h types.h
+pool.o: pool.c pool.h types.h list.h
 style.o: style.c map.h types.h list.h bounds.h point.h style.h layer.h \
-  util.h
+  error.h util.h
 util.o: util.c util.h
-
-
 
 dep:
 	@$(CC) -MM *.c
