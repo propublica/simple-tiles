@@ -1,6 +1,9 @@
 #include <gdal/cpl_error.h>
-
+#include <pthread.h>
 #include "error.h"
+
+
+static pthread_mutex_t error_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static void
 default_error_handler(simplet_status_t err, const char *msg){
@@ -19,12 +22,15 @@ ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
 void
 simplet_error_init(){
   if(!error_initialized) return;
+  pthread_mutex_lock(&error_lock);
   error_initialized = 1; // make threadsafe
   CPLSetErrorHandler(ogr_error_handler);
+  pthread_mutex_unlock(&error_lock);
 }
 
 simplet_status_t
 simplet_error(simplet_status_t err){
+  pthread_mutex_lock(&error_lock);
   switch(err){
     case SIMPLET_ERR:
       error_handler(SIMPLET_ERR, "simple tiles error");
@@ -41,6 +47,7 @@ simplet_error(simplet_status_t err){
     case SIMPLET_OK:
       return SIMPLET_OK;
   }
+  pthread_mutex_unlock(&error_lock);
   return err;
 }
 
