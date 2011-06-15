@@ -46,7 +46,7 @@ static void
 plot_path(OGRGeometryH geom, simplet_filter_t *filter,
           void (*cb)(simplet_filter_t *filter)){
   double x, y, last_x, last_y;
-  
+
   cairo_save(filter->_ctx);
   cairo_new_path(filter->_ctx);
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
@@ -169,7 +169,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
     return SIMPLET_OGR_ERR;
-  
+
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
   olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, "");
@@ -210,7 +210,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   cairo_scale(filter->_ctx, filter->_bounds->width / map->width,
                             filter->_bounds->width / map->width);
-  
+
   OGR_G_DestroyGeometry(bounds);
   filter->_bounds = NULL;
 
