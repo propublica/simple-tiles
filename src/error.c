@@ -22,8 +22,8 @@ ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
 void
 simplet_error_init(){
   if(!error_initialized) return;
-  pthread_mutex_lock(&error_lock);
-  error_initialized = 1; // make threadsafe
+  if(pthread_mutex_lock(&error_lock) > 0) return;
+  error_initialized = 1;
   CPLSetErrorHandler(ogr_error_handler);
   pthread_mutex_unlock(&error_lock);
 }

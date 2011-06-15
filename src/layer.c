@@ -26,7 +26,7 @@ simplet_layer_vfree(void *layer){
 
 void
 simplet_layer_free(simplet_layer_t *layer){
-  layer->filters->free = simplet_filter_vfree;
+  simplet_list_set_item_free(layer->filters, simplet_filter_vfree);
   simplet_list_free(layer->filters);
   free(layer->source);
   free(layer);

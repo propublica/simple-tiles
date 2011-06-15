@@ -24,7 +24,7 @@ simplet_filter_new(const char *sqlquery){
 void
 simplet_filter_free(simplet_filter_t *filter){
   simplet_list_t* styles = filter->styles;
-  styles->free = simplet_style_vfree;
+  simplet_list_set_item_free(styles, simplet_style_vfree);
   simplet_list_free(styles);
 
   if(filter->_bounds)
@@ -46,7 +46,7 @@ static void
 plot_path(OGRGeometryH geom, simplet_filter_t *filter,
           void (*cb)(simplet_filter_t *filter)){
   double x, y, last_x, last_y;
-  
+
   cairo_save(filter->_ctx);
   cairo_new_path(filter->_ctx);
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
