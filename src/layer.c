@@ -57,7 +57,8 @@ state_new(simplet_map_t *map, simplet_layer_t *layer, simplet_filter_t *filter){
 	_state *state;
 	if(!(state = malloc(sizeof(*state))))
 		return NULL;
-	state->map    = map;
+
+  state->map    = map;
 	state->layer  = layer;
 	state->filter = filter;
 	return state;
@@ -72,7 +73,7 @@ state_free(void *state){
 static void
 process_filter(void *state){
 	_state *tmp = state;
-	simplet_filter_process(tmp->filter, tmp->layer, tmp->map);
+  simplet_filter_process(tmp->filter, tmp->layer, tmp->map);
 }
 
 simplet_status_t

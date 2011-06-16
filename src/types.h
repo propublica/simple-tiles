@@ -1,10 +1,12 @@
 #ifndef _SIMPLE_TYPES_H
 #define _SIMPLE_TYPES_H
 
+#include <math.h>
+#include <pthread.h>
+
 #include <gdal/ogr_api.h>
 #include <gdal/ogr_srs_api.h>
 #include <cairo/cairo.h>
-#include <math.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,9 +55,10 @@ typedef struct {
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
-  int valid;
-  unsigned int width;
-  unsigned int height;
+  int                  valid;
+  unsigned int         width;
+  unsigned int         height;
+  pthread_mutex_t      lock;
 } simplet_map_t;
 
 typedef struct {

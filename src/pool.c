@@ -12,8 +12,8 @@ simplet_pool_new(){
   if(!(pool = malloc(sizeof(*pool))))
     return NULL;
 
-	if((pthread_mutex_init(&pool->lock, NULL) > 0)){ // maybe consider PTHREAD_MUTEX_RECURSIVE
-		free(pool);
+	if((pthread_mutex_init(&pool->lock, NULL) > 0)){		
+    free(pool);
 		return NULL;
 	}
 

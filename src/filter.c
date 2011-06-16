@@ -186,15 +186,17 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
     return SIMPLET_OGR_ERR;
 
+  pthread_mutex_lock(&map->lock);
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
                                   CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
+  pthread_mutex_unlock(&map->lock);
+
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return SIMPLET_CAIRO_ERR;
 
   filter->_ctx = cairo_create(surface);
 
   simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
-
   if(seamless)
     cairo_set_operator(filter->_ctx, CAIRO_OPERATOR_SATURATE);
 
@@ -218,8 +220,11 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGR_G_DestroyGeometry(bounds);
   filter->_bounds = NULL;
 
+  pthread_mutex_lock(&map->lock);
   cairo_set_source_surface(map->_ctx, surface, 0, 0);
   cairo_paint(map->_ctx);
+  pthread_mutex_unlock(&map->lock);
+
   cairo_destroy(filter->_ctx);
   filter->_ctx = NULL;
   cairo_surface_destroy(surface);

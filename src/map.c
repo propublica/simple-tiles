@@ -19,7 +19,13 @@ simplet_map_new(){
   if(!(map = malloc(sizeof(*map))))
     return NULL;
 
+  if((pthread_mutex_init(&map->lock, NULL) > 0)){		
+    free(map);
+		return NULL;
+	}
+
   if(!(map->layers = simplet_list_new())){
+    pthread_mutex_destroy(&map->lock);
     free(map);
     return NULL;
   }
@@ -49,6 +55,7 @@ simplet_map_free(simplet_map_t *map){
   if(map->proj)
     OSRRelease(map->proj);
 
+  pthread_mutex_destroy(&map->lock);
   free(map);
 }
 
