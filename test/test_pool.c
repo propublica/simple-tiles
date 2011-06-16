@@ -28,7 +28,6 @@ static void
 worker(void *value){
   wrap_t *wrap = value;
   wrap->value = wrap->value * 2;
-  printf("%i",wrap->value);
 }
 
 static void
@@ -41,7 +40,6 @@ test_pool(){
   simplet_pool_start(pool);
 
   wrap_t *it = work->head->value;
-  printf("%i", it->value);
   assert(it->value == 2);
   it = work->tail->value;
   assert(it->value == 10);
