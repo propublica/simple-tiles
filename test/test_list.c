@@ -56,7 +56,7 @@ test_push(){
   assert(list->head->value == test);
   assert(list->tail->value == test);
   assert(list->length == 1);
-  list->free = free_wrap;
+  simplet_list_set_item_free(list, free_wrap);
   simplet_list_free(list);
 }
 
@@ -70,14 +70,14 @@ test_pop(){
   assert(ret->val == 6);
   ret = simplet_list_pop(list);
   assert(ret->val == 5);
-  list->free = free_wrap;
+  simplet_list_set_item_free(list, free_wrap);
   simplet_list_free(list);
 }
 
 static void
 test_destroy(){
   simplet_list_t *list = build_list();
-  list->free = freed;
+  simplet_list_set_item_free(list, freed);
   simplet_list_free(list);
   assert(frees == 3);
 }
@@ -91,7 +91,7 @@ test_iter(){
   assert((ret = simplet_list_next(iter))->val == 6);
   assert((ret = simplet_list_next(iter))->val == 7);
   assert(simplet_list_next(iter) == NULL);
-  list->free = free_wrap;
+  simplet_list_set_item_free(list, free_wrap);
   simplet_list_free(list);
 }
 

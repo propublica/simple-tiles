@@ -32,10 +32,12 @@ typedef struct simplet_node_t {
   void *value;
 } simplet_node_t;
 
+
+typedef void (*simplet_list_item_free)(void *val);
 typedef struct simplet_list_t {
   simplet_node_t *head;
   simplet_node_t *tail;
-  void (*free)(void *val);
+  simplet_list_item_free free;
   unsigned int length;
 } simplet_list_t;
 

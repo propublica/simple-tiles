@@ -24,7 +24,7 @@ simplet_filter_new(const char *sqlquery){
 void
 simplet_filter_free(simplet_filter_t *filter){
   simplet_list_t* styles = filter->styles;
-  styles->free = simplet_style_vfree;
+  simplet_list_set_item_free(styles, simplet_style_vfree);
   simplet_list_free(styles);
 
   if(filter->_bounds)

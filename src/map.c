@@ -39,7 +39,7 @@ simplet_map_free(simplet_map_t *map){
     simplet_bounds_free(map->bounds);
 
   if(map->layers) {
-    map->layers->free = simplet_layer_vfree;
+    simplet_list_set_item_free(map->layers,simplet_layer_vfree);
     simplet_list_free(map->layers);
   }
 
