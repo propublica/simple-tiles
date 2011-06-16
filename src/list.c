@@ -72,6 +72,7 @@ simplet_list_set_item_free(simplet_list_t *list, simplet_list_item_free destroy)
 void
 simplet_list_iter_free(simplet_listiter_t* iter){
   free(iter);
+  iter = NULL;
 }
 
 simplet_listiter_t*

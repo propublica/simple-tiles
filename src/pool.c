@@ -32,7 +32,7 @@ void
 simplet_pool_free(simplet_pool_t *pool, void (*destroy)(void *val)){
 	pthread_mutex_destroy(&pool->lock);
 	if(pool->work){
-		if(destroy) pool->work->free = destroy;
+		if(destroy) simplet_list_set_item_free(pool->work->free, destroy);
 		simplet_list_free(pool->work);
 	}
 	free(pool);

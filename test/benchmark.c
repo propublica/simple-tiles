@@ -3,7 +3,11 @@
 #include <unistd.h>
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
+#include <simple-tiles/pool.h>
 #include <simple-tiles/error.h>
+
+#define ITEMS 100000
+
 
 static void*
 setup_map(){
@@ -28,6 +32,32 @@ static void
 teardown_list(void *ctx){
   ctx = NULL;
 }
+
+static void
+worker(void *val) { (void) val; }
+
+static void*
+setup_pool(){
+	simplet_pool_t *pool;
+	assert((pool = simplet_pool_new()));
+	simplet_list_t *list;
+	assert((list = simplet_list_new()));
+	int t = 1;
+	for(int i = 0; i < ITEMS; i++)
+    simplet_list_push(list, &t);
+	
+	simplet_pool_set_worker(pool, worker);
+	simplet_pool_set_work(pool, list);
+
+	return pool;
+}
+
+
+static void
+teardown_pool(void *pool){
+	simplet_pool_free(pool, worker);
+}
+
 
 static void
 initialize_map(simplet_map_t *map){
@@ -72,7 +102,6 @@ bench_render(void *ctx){
   assert(simplet_map_render_to_stream(map, data, stream));
 }
 
-#define ITEMS 100000
 static void
 bench_list(void *ctx){
   simplet_list_t *list = ctx;
@@ -81,6 +110,12 @@ bench_list(void *ctx){
     simplet_list_push(list, &t);
   simplet_list_free(ctx);
 }
+
+static void
+bench_pool(void *pool){
+	simplet_pool_start(pool);
+}
+
 
 typedef struct {
   const char *name;
@@ -98,6 +133,7 @@ bench_wrap_t benchmarks[] = {
   BENCH(map, seamless)
   BENCH(map, empty)
   BENCH(list, list)
+  BENCH(pool, pool)	
   { NULL, NULL, NULL, NULL, 0}
 };
 
