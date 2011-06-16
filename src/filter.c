@@ -162,9 +162,15 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
 /* this function is way too hairy */
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
+
+  pthread_mutex_lock(&map->lock);
   OGRDataSourceH source;
-  if(!(source = OGROpen(layer->source, 0, NULL)))
+  if(!(source = OGROpen(layer->source, 0, NULL))){
+    pthread_mutex_unlock(&map->lock);
     return SIMPLET_OGR_ERR;
+  }
+  pthread_mutex_unlock(&map->lock);
+
 
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_GetLayer(source, 0)))
@@ -209,7 +215,11 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL)
       continue;
+
+    pthread_mutex_lock(&map->lock);
     OGR_G_Transform(geom, transform);
+    pthread_mutex_unlock(&map->lock);
+
     dispatch(geom, filter);
     OGR_F_Destroy(feature);
   }

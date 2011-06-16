@@ -1,4 +1,4 @@
-OPTIMIZATION?=-O0
+OPTIMIZATION?=-O3
 DEBUG ?= -g -ggdb
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -fPIC -Wall -W -Wwrite-strings -pthread $(ARCH) \
   $(shell pkg-config --cflags cairo) \
