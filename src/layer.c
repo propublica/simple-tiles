@@ -81,7 +81,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
   if(!(iter = simplet_get_list_iter(layer->filters))) goto bail3;
 
 	simplet_pool_t *pool;
-	if(!(pool = simplet_pool_new(pool))) goto bail2;
+	if(!(pool = simplet_pool_new())) goto bail2;
 
 	simplet_pool_set_worker(pool, process_filter);
 	simplet_pool_set_size(pool, layer->filters->length);
