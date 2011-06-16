@@ -32,7 +32,7 @@ void
 simplet_pool_free(simplet_pool_t *pool, void (*destroy)(void *val)){
 	pthread_mutex_destroy(&pool->lock);
 	if(pool->work){
-		if(destroy) simplet_list_set_item_free(pool->work->free, destroy);
+		if(destroy) simplet_list_set_item_free(pool->work, destroy);
 		simplet_list_free(pool->work);
 	}
 	free(pool);
@@ -60,18 +60,24 @@ perform(void *threadpool){ /* needs error handling */
   pthread_mutex_lock(&pool->lock);
   ++pool->live;
   pthread_mutex_unlock(&pool->lock);
-
+  // crazy times please fix
   for(;;){
-    if(pool->status == SIMPLET_EXIT) break;
     pthread_mutex_lock(&pool->lock);
+    if(pool->status == SIMPLET_EXIT) {
+      pthread_mutex_unlock(&pool->lock);
+      break;
+    }
     void *unit = simplet_list_next(pool->iter);
+    if(!unit) {
+      pool->status = SIMPLET_EXIT;
+      pthread_mutex_unlock(&pool->lock);
+      break;
+    }
     pthread_mutex_unlock(&pool->lock);
-    if(!unit) break;
     if(pool->status == SIMPLET_RUN) pool->worker(unit);
   }
 
   pthread_mutex_lock(&pool->lock);
-  pool->status = SIMPLET_EXIT;
   --pool->live;
   pthread_mutex_unlock(&pool->lock);
   pthread_exit(NULL);

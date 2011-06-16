@@ -43,7 +43,7 @@ setup_pool(){
 	simplet_list_t *list;
 	assert((list = simplet_list_new()));
 	int t = 1;
-	for(int i = 0; i < ITEMS; i++)
+	for(int i = 0; i < 1000; i++)
     simplet_list_push(list, &t);
 	
 	simplet_pool_set_worker(pool, worker);
