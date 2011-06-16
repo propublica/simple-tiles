@@ -59,7 +59,6 @@ typedef struct {
 } simplet_map_t;
 
 typedef struct {
-  OGRDataSourceH _source; /* ephemeral, not for outside usage */
   char           *source;
   simplet_list_t *filters;
 } simplet_layer_t;

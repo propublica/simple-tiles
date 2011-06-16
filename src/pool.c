@@ -46,7 +46,8 @@ simplet_pool_set_work(simplet_pool_t *pool, simplet_list_t *work){ // todo: erro
 
 void
 simplet_pool_set_size(simplet_pool_t *pool, int size){
-  pool->size = size;
+  if(!size > SIMPLET_THREADS)
+    pool->size = size;
 }
 
 void

@@ -43,6 +43,9 @@ simplet_pool_set_worker(simplet_pool_t *pool, simplet_pool_worker worker);
 void
 simplet_pool_start(simplet_pool_t *pool);
 
+void
+simplet_pool_set_size(simplet_pool_t *pool, int size);
+
 #ifdef __cplusplus
 }
 #endif

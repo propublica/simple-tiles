@@ -162,17 +162,21 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
 /* this function is way too hairy */
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
+  OGRDataSourceH source;
+  if(!(source = OGROpen(layer->source, 0, NULL)))
+    return SIMPLET_OGR_ERR;
+
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_GetLayer(layer->_source, 0)))
+  if(!(olayer = OGR_DS_GetLayer(source, 0)))
     return SIMPLET_OGR_ERR;
 
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
     return SIMPLET_OGR_ERR;
-  
+
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
-  olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, "");
+  olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, bounds, "");
   if(!olayer) {
     OGR_G_DestroyGeometry(bounds);
     return SIMPLET_OGR_ERR;
@@ -210,7 +214,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   cairo_scale(filter->_ctx, filter->_bounds->width / map->width,
                             filter->_bounds->width / map->width);
-  
+
   OGR_G_DestroyGeometry(bounds);
   filter->_bounds = NULL;
 
@@ -219,8 +223,9 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   cairo_destroy(filter->_ctx);
   filter->_ctx = NULL;
   cairo_surface_destroy(surface);
-  OGR_DS_ReleaseResultSet(layer->_source, olayer);
+  OGR_DS_ReleaseResultSet(source, olayer);
   OCTDestroyCoordinateTransformation(transform);
+  OGR_DS_Destroy(source);
   return SIMPLET_OK;
 }
 
