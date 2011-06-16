@@ -247,6 +247,7 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
   map->_ctx = NULL;
   cairo_surface_destroy(surface);
 }
+
 // combine these 2 functions
 simplet_status_t
 simplet_map_render_to_stream(simplet_map_t *map, void *stream,
