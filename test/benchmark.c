@@ -6,7 +6,7 @@
 #include <simple-tiles/pool.h>
 #include <simple-tiles/error.h>
 
-#define ITEMS 100000
+#define ITEMS 10000
 
 
 static void*
@@ -43,7 +43,7 @@ setup_pool(){
 	simplet_list_t *list;
 	assert((list = simplet_list_new()));
 	int t = 1;
-	for(int i = 0; i < 1000; i++)
+	for(int i = 0; i < ITEMS; i++)
     simplet_list_push(list, &t);
 	
 	simplet_pool_set_worker(pool, worker);
