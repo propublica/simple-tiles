@@ -69,8 +69,9 @@ typedef struct {
 typedef struct {
   char *ogrsql;
   simplet_list_t   *styles;
-  cairo_t          *_ctx;    /* ephemeral, not for outside usage */
-  simplet_bounds_t *_bounds; /* ephemeral, not for outside usage */
+  cairo_t          *_ctx;     /* ephemeral, not for outside usage */
+  cairo_surface_t  *_surface; /* ephemeral, not for outside usage */
+  simplet_bounds_t *_bounds;  /* ephemeral, not for outside usage */
 } simplet_filter_t;
 
 typedef struct {

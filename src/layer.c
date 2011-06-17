@@ -91,6 +91,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
 	if(!(work = simplet_list_new())) goto bail1;
 
 	simplet_filter_t *filter;
+  /* map */
   while((filter = simplet_list_next(iter))){
 		_state *state;
 		if(!(state = state_new(map, layer, filter))) goto bail;
@@ -100,6 +101,17 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
 	simplet_pool_set_work(pool, work);
 	simplet_pool_start(pool);
 	simplet_pool_free(pool, state_free);
+
+  /* reduce */
+  if(!(iter = simplet_get_list_iter(layer->filters))) goto bail;
+  while((filter = simplet_list_next(iter))){
+    cairo_set_source_surface(map->_ctx, filter->_surface, 0, 0);
+    cairo_paint(map->_ctx);
+    cairo_destroy(filter->_ctx);
+    filter->_ctx = NULL;
+    cairo_surface_destroy(filter->_surface);
+    filter->_surface = NULL;
+  }
   return SIMPLET_OK;
 
 bail:

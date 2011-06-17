@@ -15,8 +15,9 @@ simplet_filter_new(const char *sqlquery){
     return NULL;
   }
 
-  filter->_bounds = NULL;
-  filter->_ctx    = NULL;
+  filter->_bounds  = NULL;
+  filter->_ctx     = NULL;
+  filter->_surface = NULL;
   filter->ogrsql  = simplet_copy_string(sqlquery);
   return filter;
 }
@@ -32,6 +33,9 @@ simplet_filter_free(simplet_filter_t *filter){
 
   if(filter->_ctx)
     cairo_destroy(filter->_ctx);
+
+  if(filter->_surface)
+    cairo_surface_destroy(filter->_surface);
 
   free(filter->ogrsql);
   free(filter);
@@ -159,7 +163,7 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
   }
 }
 
-/* this function is way too hairy */
+/* FIXME: this function is way too hairy and needs error handling */
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
 
@@ -173,34 +177,47 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
 
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_GetLayer(source, 0)))
+  if(!(olayer = OGR_DS_GetLayer(source, 0))){
+    OGR_DS_Destroy(source);
     return SIMPLET_OGR_ERR;
+  }
 
   OGRSpatialReferenceH srs;
-  if(!(srs = OGR_L_GetSpatialRef(olayer)))
+  if(!(srs = OGR_L_GetSpatialRef(olayer))){
+    OGR_DS_Destroy(source);
     return SIMPLET_OGR_ERR;
+  }
 
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
   olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, bounds, "");
   if(!olayer) {
     OGR_G_DestroyGeometry(bounds);
+    OGR_DS_Destroy(source);
     return SIMPLET_OGR_ERR;
   }
 
   OGRCoordinateTransformationH transform;
-  if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
+  if(!(transform = OCTNewCoordinateTransformation(srs, map->proj))){
+    OGR_G_DestroyGeometry(bounds);
+    OGR_DS_Destroy(source);
+    OGR_DS_ReleaseResultSet(source, olayer);
     return SIMPLET_OGR_ERR;
+  }
 
   pthread_mutex_lock(&map->lock);
-  cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
+  filter->_surface = cairo_surface_create_similar(cairo_get_target(map->_ctx),
                                   CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
   pthread_mutex_unlock(&map->lock);
 
-  if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+  if(cairo_surface_status(filter->_surface) != CAIRO_STATUS_SUCCESS){
+    OGR_G_DestroyGeometry(bounds);
+    OGR_DS_Destroy(source);
+    OGR_DS_ReleaseResultSet(source, olayer);
     return SIMPLET_CAIRO_ERR;
+  }
 
-  filter->_ctx = cairo_create(surface);
+  filter->_ctx = cairo_create(filter->_surface);
 
   simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
   if(seamless)
@@ -230,14 +247,6 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGR_G_DestroyGeometry(bounds);
   filter->_bounds = NULL;
 
-  pthread_mutex_lock(&map->lock);
-  cairo_set_source_surface(map->_ctx, surface, 0, 0);
-  cairo_paint(map->_ctx);
-  pthread_mutex_unlock(&map->lock);
-
-  cairo_destroy(filter->_ctx);
-  filter->_ctx = NULL;
-  cairo_surface_destroy(surface);
   OGR_DS_ReleaseResultSet(source, olayer);
   OCTDestroyCoordinateTransformation(transform);
   OGR_DS_Destroy(source);
