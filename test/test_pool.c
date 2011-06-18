@@ -8,7 +8,7 @@ typedef struct wrap_t {
 static void
 free_wrap(void *wrap){
   wrap_t* rap = wrap;
-  free(wrap);
+  free(rap);
 }
 
 static simplet_list_t*
