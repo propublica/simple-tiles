@@ -256,16 +256,12 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
 }
 
 simplet_status_t
-simplet_map_render_to_stream(simplet_map_t *map, void *stream,
-  cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
-  cairo_surface_t *surface;
-  if(!(surface = simplet_map_build_surface(map))){
-    simplet_map_close_surface(map, surface);
-    return simplet_map_error(map, SIMPLET_ERR);
-  }
+simplet_map_render_to_stream(simplet_map_t *map, void *stream, cairo_write_func_t cb){
+
+  cairo_surface_t *surface = simplet_map_build_surface(map);
 
   if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS){
-     simplet_map_close_surface(map, surface);
+    simplet_map_close_surface(map, surface);
     return simplet_map_error(map, SIMPLET_ERR);
   }
 
@@ -275,12 +271,7 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
 
 simplet_status_t
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
-  cairo_surface_t *surface;
-
-  if(!(surface = simplet_map_build_surface(map))){
-    simplet_map_close_surface(map, surface);
-    return simplet_map_error(map, SIMPLET_ERR);
-  }
+  cairo_surface_t *surface = simplet_map_build_surface(map);
 
   if(cairo_surface_write_to_png(surface, path) != CAIRO_STATUS_SUCCESS){
     simplet_map_close_surface(map, surface);
