@@ -8,8 +8,3 @@ simplet_point_new(double x, double y) {
   point.y = y;
   return point;
 }
-
-void
-simplet_point_free(simplet_point_t *point){
-  free(point);
-}
