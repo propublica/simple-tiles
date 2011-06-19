@@ -7,7 +7,8 @@ typedef struct wrap_t {
 
 static void
 free_wrap(void *wrap){
-  free((wrap_t*) wrap);
+  wrap_t* rap = wrap;
+  free(rap);
 }
 
 static simplet_list_t*
@@ -43,7 +44,7 @@ test_pool(){
   assert(it->value == 2);
   it = work->tail->value;
   assert(it->value == 10);
-  simplet_list_free(work);
+  simplet_pool_free(pool, free_wrap);
 }
 
 TASK(pool){
