@@ -7,12 +7,12 @@
 
 void
 simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
-  bounds->nw->x = fmin(x, bounds->nw->x);
-  bounds->nw->y = fmax(y, bounds->nw->y);
-  bounds->se->x = fmax(x, bounds->se->x);
-  bounds->se->y = fmin(y, bounds->se->y);
-  bounds->width  = fabs(bounds->nw->x - bounds->se->x);
-  bounds->height = fabs(bounds->nw->y - bounds->se->y);
+  bounds->nw.x = fmin(x, bounds->nw.x);
+  bounds->nw.y = fmax(y, bounds->nw.y);
+  bounds->se.x = fmax(x, bounds->se.x);
+  bounds->se.y = fmin(y, bounds->se.y);
+  bounds->width  = fabs(bounds->nw.x - bounds->se.x);
+  bounds->height = fabs(bounds->nw.y - bounds->se.y);
 }
 
 OGRGeometryH
@@ -21,10 +21,10 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   if(!(tmpLine = OGR_G_CreateGeometry(wkbLineString)))
     return NULL;
 
-  OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->nw->y);
-  OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->se->y);
-  OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
-  OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->nw->y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->nw.x, bounds->nw.y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->se.x, bounds->se.y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->nw.x, bounds->se.y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->se.x, bounds->nw.y);
 
   OGRGeometryH ogrBounds;
   if(!(ogrBounds = OGR_G_ConvexHull(tmpLine))){
@@ -66,8 +66,6 @@ simplet_bounds_from_ogr(OGRGeometryH geom){
 
 void
 simplet_bounds_free(simplet_bounds_t *bounds){
-  simplet_point_free(bounds->nw);
-  simplet_point_free(bounds->se);
   free(bounds);
 }
 

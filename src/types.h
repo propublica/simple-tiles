@@ -20,8 +20,8 @@ typedef struct {
 } simplet_point_t;
 
 typedef struct {
-  simplet_point_t *nw;
-  simplet_point_t *se;
+  simplet_point_t nw;
+  simplet_point_t se;
   double width;
   double height;
 } simplet_bounds_t;
