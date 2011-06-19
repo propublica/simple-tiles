@@ -62,7 +62,8 @@ plot_path(OGRGeometryH geom, simplet_filter_t *filter,
     OGR_G_GetPoint(subgeom, 0, &x, &y, NULL);
     last_x = x;
     last_y = y;
-    cairo_move_to(filter->_ctx, x - filter->_bounds->nw->x, filter->_bounds->nw->y - y);
+    cairo_move_to(filter->_ctx, x - filter->_bounds->nw.x,
+                  filter->_bounds->nw.y - y);
 
     for(int j = 0; j < OGR_G_GetPointCount(subgeom) - 1; j++){
       OGR_G_GetPoint(subgeom, j, &x, &y, NULL);
@@ -70,15 +71,16 @@ plot_path(OGRGeometryH geom, simplet_filter_t *filter,
       double dy = fabs(last_y - y);
       cairo_user_to_device_distance(filter->_ctx, &dx, &dy);
       if(dx >= 0.25 || dy >= 0.25){
-        cairo_line_to(filter->_ctx, x - filter->_bounds->nw->x, filter->_bounds->nw->y - y);
+        cairo_line_to(filter->_ctx, x - filter->_bounds->nw.x,
+                      filter->_bounds->nw.y - y);
         last_x = x;
         last_y = y;
       }
     }
     // ensure something is always drawn
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
-    cairo_line_to(filter->_ctx, x - filter->_bounds->nw->x,
-                                filter->_bounds->nw->y - y);
+    cairo_line_to(filter->_ctx, x - filter->_bounds->nw.x,
+                                filter->_bounds->nw.y - y);
   }
   (*cb)(filter);
   cairo_close_path(filter->_ctx);
@@ -102,8 +104,8 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter,
   cairo_new_path(filter->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-    cairo_arc(filter->_ctx, x - filter->_bounds->nw->x,
-              filter->_bounds->nw->y - y, r, 0., 2 * M_PI);
+    cairo_arc(filter->_ctx, x - filter->_bounds->nw.x,
+              filter->_bounds->nw.y - y, r, 0., 2 * M_PI);
   }
   (*cb)(filter);
 
