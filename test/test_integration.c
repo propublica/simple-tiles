@@ -86,14 +86,14 @@ test_lines(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
-  simplet_map_set_size(map, 2000, 2000);
-	simplet_map_set_bounds(map, -74.043825, 40.570771, -73.855660, 40.739255);
+  simplet_map_set_size(map, 256, 256);
+  simplet_map_set_bounds(map, -74.043825, 40.570771, -73.855660, 40.739255);
   simplet_map_add_layer(map, "../data/tl_2010_36047_roads.shp");
-  simplet_map_add_filter(map, "SELECT * from 'tl_2010_36047_roads'");
+  simplet_map_add_filter(map,  "SELECT * from 'tl_2010_36047_roads'");
   simplet_map_add_style(map, "stroke", "#000000ff");
 	simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
-  simplet_map_add_style(map, "weight", "1");
+  simplet_map_add_style(map, "weight", "0.3");
   simplet_map_render_to_png(map, "./lines.png");
 }
 
@@ -113,7 +113,7 @@ test_stream(){
 }
 
 TASK(integration){
-  test(projection);
+	test(projection);
   puts("check projection.png");
   test(many_filters);
   puts("check filters.png");
@@ -124,6 +124,6 @@ TASK(integration){
   test(stream);
   puts("check holes.png");
   test(holes);
-	puts("check lines.png");
+  puts("check lines.png");
   test(lines);
 }
