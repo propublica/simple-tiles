@@ -81,9 +81,8 @@ plot_path(OGRGeometryH geom, simplet_filter_t *filter,
     OGR_G_GetPoint(subgeom, OGR_G_GetPointCount(subgeom) - 1, &x, &y, NULL);
     cairo_line_to(filter->_ctx, x - filter->_bounds->nw.x,
                                 filter->_bounds->nw.y - y);
+		(*cb)(filter);
   }
-  (*cb)(filter);
-  cairo_close_path(filter->_ctx);
   cairo_clip(filter->_ctx);
   cairo_restore(filter->_ctx);
 }
@@ -109,13 +108,13 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter,
   }
   (*cb)(filter);
 
-  cairo_close_path(filter->_ctx);
   cairo_clip(filter->_ctx);
   cairo_restore(filter->_ctx);
 }
 
 static void
 finish_polygon(simplet_filter_t *filter){
+  cairo_close_path(filter->_ctx);	
   simplet_apply_styles(filter->_ctx, filter->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
 }
@@ -123,11 +122,12 @@ finish_polygon(simplet_filter_t *filter){
 static void
 finish_linestring(simplet_filter_t *filter){
   simplet_apply_styles(filter->_ctx, filter->styles,
-                       "line-join", "line-cap", "weight", "fill", NULL);
+                       "line-join", "line-cap", "weight", "stroke", NULL);
 }
 
 static void
 finish_point(simplet_filter_t *filter){
+  cairo_close_path(filter->_ctx);	
   simplet_apply_styles(filter->_ctx, filter->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
 }
