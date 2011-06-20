@@ -124,6 +124,7 @@ plot_line(OGRGeometryH geom, simplet_filter_t *filter){
   plot_part(geom, filter);
 	simplet_apply_styles(filter->_ctx, filter->styles,
 												"line-join", "line-cap", "weight", "stroke", NULL);
+  cairo_close_path(filter->_ctx);
 	cairo_restore(filter->_ctx);
 }
 
