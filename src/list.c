@@ -97,5 +97,3 @@ simplet_list_next(simplet_listiter_t* iter){
   return NULL;
 }
 
-
-
