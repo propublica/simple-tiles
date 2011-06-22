@@ -130,7 +130,7 @@ plot_line(OGRGeometryH geom, simplet_filter_t *filter){
 
 static void
 dispatch(OGRGeometryH geom, simplet_filter_t *filter){
-  switch(OGR_G_GetGeometryType(geom)){
+  switch(wkbFlatten(OGR_G_GetGeometryType(geom))){
     case wkbPolygon:
 			plot_polygon(geom, filter);
       break;
