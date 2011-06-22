@@ -27,7 +27,7 @@ simplet_error_init(){
   CPLSetErrorHandler(ogr_error_handler);
   pthread_mutex_unlock(&error_lock);
 }
-
+// TODO: pass underlying lib messages too.
 simplet_status_t
 simplet_error(simplet_status_t err){
   pthread_mutex_lock(&error_lock);
