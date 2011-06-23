@@ -19,10 +19,10 @@ simplet_map_new(){
   if(!(map = malloc(sizeof(*map))))
     return NULL;
 
-  if((pthread_mutex_init(&map->lock, NULL) > 0)){		
+  if((pthread_mutex_init(&map->lock, NULL) > 0)){
     free(map);
-		return NULL;
-	}
+    return NULL;
+  }
 
   if(!(map->layers = simplet_list_new())){
     pthread_mutex_destroy(&map->lock);
@@ -238,7 +238,7 @@ simplet_map_build_surface(simplet_map_t *map){
   while((layer = simplet_list_next(iter))){
     err = simplet_layer_process(layer, map);
     if(err != SIMPLET_OK) {
-			simplet_list_iter_free(iter);			
+      simplet_list_iter_free(iter);
       simplet_error(err);
       break;
     }
