@@ -231,7 +231,7 @@ simplet_map_build_surface(simplet_map_t *map){
   while((layer = simplet_list_next(iter))){
     err = simplet_layer_process(layer, map);
     if(err != SIMPLET_OK) {
-			simplet_list_iter_free(iter);
+      simplet_list_iter_free(iter);
       simplet_error(err);
       break;
     }
@@ -257,9 +257,9 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
     return simplet_map_error(map, SIMPLET_ERR);
 
   if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS){
-	  simplet_map_close_surface(map, surface);
+    simplet_map_close_surface(map, surface);
     return simplet_map_error(map, SIMPLET_ERR);
-	}
+  }
 
   simplet_map_close_surface(map, surface);
   return SIMPLET_OK;
@@ -273,9 +273,9 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
     return simplet_map_error(map, SIMPLET_ERR);
 
   if(cairo_surface_write_to_png(surface, path) != CAIRO_STATUS_SUCCESS){
-	  simplet_map_close_surface(map, surface);
+    simplet_map_close_surface(map, surface);
     return simplet_map_error(map, SIMPLET_ERR);
-	}
+  }
 
   simplet_map_close_surface(map, surface);
   return SIMPLET_OK;

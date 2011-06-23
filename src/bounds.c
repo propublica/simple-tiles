@@ -80,3 +80,4 @@ simplet_bounds_new(){
   bounds->height = 0;
   return bounds;
 }
+
