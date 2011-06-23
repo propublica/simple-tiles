@@ -1,4 +1,4 @@
-#include <gdal/cpl_error.h>
+#include <cpl_error.h>
 #include <pthread.h>
 #include "error.h"
 

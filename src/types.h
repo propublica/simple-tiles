@@ -4,8 +4,8 @@
 #include <math.h>
 #include <pthread.h>
 
-#include <gdal/ogr_api.h>
-#include <gdal/ogr_srs_api.h>
+#include <ogr_api.h>
+#include <ogr_srs_api.h>
 #include <cairo/cairo.h>
 
 #ifdef __cplusplus
