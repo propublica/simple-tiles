@@ -8,39 +8,39 @@ static void elision(void *val) { (void) val; }
 
 simplet_pool_t*
 simplet_pool_new(){
-	simplet_pool_t *pool;
+  simplet_pool_t *pool;
   if(!(pool = malloc(sizeof(*pool))))
     return NULL;
 
-	if((pthread_mutex_init(&pool->lock, NULL) > 0)){		
+  if((pthread_mutex_init(&pool->lock, NULL) > 0)){
     free(pool);
-		return NULL;
-	}
+    return NULL;
+  }
 
-	pool->work    = NULL;
+  pool->work    = NULL;
   pool->threads = NULL;
-	pool->worker  = &elision;
-	pool->size    = SIMPLET_THREADS;
-	pool->live    = 0;
+  pool->worker  = &elision;
+  pool->size    = SIMPLET_THREADS;
+  pool->live    = 0;
   pool->status  = SIMPLET_EXIT;
   pool->iter    = NULL;
 
-	return pool;
+  return pool;
 }
 
 void
 simplet_pool_free(simplet_pool_t *pool, void (*destroy)(void *val)){
-	pthread_mutex_destroy(&pool->lock);
-	if(pool->work){
-		if(destroy) simplet_list_set_item_free(pool->work, destroy);
-		simplet_list_free(pool->work);
-	}
-	free(pool);
+  pthread_mutex_destroy(&pool->lock);
+  if(pool->work){
+    if(destroy) simplet_list_set_item_free(pool->work, destroy);
+    simplet_list_free(pool->work);
+  }
+  free(pool);
 }
 
 void
 simplet_pool_set_work(simplet_pool_t *pool, simplet_list_t *work){ // todo: error handling
-	pool->work = work;
+  pool->work = work;
   pool->iter = simplet_get_list_iter(work);
 }
 
@@ -52,7 +52,7 @@ simplet_pool_set_size(simplet_pool_t *pool, int size){
 
 void
 simplet_pool_set_worker(simplet_pool_t *pool, simplet_pool_worker worker){
-	pool->worker = worker;
+  pool->worker = worker;
 }
 
 static void*
@@ -92,13 +92,13 @@ simplet_pool_start(simplet_pool_t *pool){ /* blocks */
     return;
 
   pool->status = SIMPLET_RUN;
-	for(int i = 0; i < pool->size; i++)
-		pthread_create(&pool->threads[i], NULL, perform, (void *) pool);
+  for(int i = 0; i < pool->size; i++)
+    pthread_create(&pool->threads[i], NULL, perform, (void *) pool);
   for(int i = 0; i < pool->size; i++)
     pthread_join(pool->threads[i], NULL);
 
   memset(pool->threads, 0, pool->size * sizeof(pthread_t));
   free(pool->threads);
   pool->threads = NULL;
-	assert(pool->live == 0);
+  assert(pool->live == 0);
 }

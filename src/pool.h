@@ -12,18 +12,18 @@ extern "C" {
 typedef void (*simplet_pool_worker)(void *unit);
 
 typedef enum {
-	SIMPLET_RUN, SIMPLET_EXIT
+  SIMPLET_RUN, SIMPLET_EXIT
 } simplet_pool_state_t;
 
 typedef struct {
-	simplet_list_t			 *work;
+  simplet_list_t       *work;
   simplet_listiter_t   *iter;
-	simplet_pool_worker  worker;
+  simplet_pool_worker  worker;
   simplet_pool_state_t status;
-	pthread_mutex_t			 lock;
-	pthread_t						 *threads;
-	int								 	 live;
-	int									 size;
+  pthread_mutex_t      lock;
+  pthread_t            *threads;
+  int                  live;
+  int                  size;
 } simplet_pool_t;
 
 

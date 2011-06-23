@@ -54,7 +54,7 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter){
   last_y = y;
   cairo_move_to(filter->_ctx, x - filter->_bounds->nw.x,
                 filter->_bounds->nw.y - y);
-	for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
+  for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
     double dx = fabs(last_x - x);
     double dy = fabs(last_y - y);
@@ -66,8 +66,8 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter){
       last_x = x;
       last_y = y;
 
-		}
-	}
+    }
+  }
   // ensure something is always drawn
   OGR_G_GetPoint(geom, OGR_G_GetPointCount(geom) - 1, &x, &y, NULL);
   cairo_line_to(filter->_ctx, x - filter->_bounds->nw.x,
@@ -76,25 +76,25 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter){
 
 static void
 plot_polygon(OGRGeometryH geom, simplet_filter_t *filter){
-	cairo_save(filter->_ctx);
+  cairo_save(filter->_ctx);
   cairo_new_path(filter->_ctx);
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
-	  OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
-		if(subgeom == NULL)
-			continue;
+    OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
+    if(subgeom == NULL)
+      continue;
 
-		if(OGR_G_GetGeometryCount(subgeom) > 0) {
-			plot_polygon(subgeom, filter);
-			continue;
-		}
-		
-		plot_part(subgeom, filter);
-		cairo_close_path(filter->_ctx);
-	}
-  cairo_close_path(filter->_ctx);	
+    if(OGR_G_GetGeometryCount(subgeom) > 0) {
+      plot_polygon(subgeom, filter);
+      continue;
+    }
+
+    plot_part(subgeom, filter);
+    cairo_close_path(filter->_ctx);
+  }
+  cairo_close_path(filter->_ctx);
   simplet_apply_styles(filter->_ctx, filter->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
-	cairo_clip(filter->_ctx);
+  cairo_clip(filter->_ctx);
   cairo_restore(filter->_ctx);
 }
 
@@ -115,7 +115,7 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter){
     cairo_arc(filter->_ctx, x - filter->_bounds->nw.x,
               filter->_bounds->nw.y - y, r, 0., 2 * M_PI);
   }
-  cairo_close_path(filter->_ctx);	
+  cairo_close_path(filter->_ctx);
   simplet_apply_styles(filter->_ctx, filter->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
   cairo_restore(filter->_ctx);
@@ -123,31 +123,30 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter){
 
 static void
 plot_line(OGRGeometryH geom, simplet_filter_t *filter){
-	cairo_save(filter->_ctx);
-  cairo_new_path(filter->_ctx);	
+  cairo_save(filter->_ctx);
+  cairo_new_path(filter->_ctx);
   plot_part(geom, filter);
-	simplet_apply_styles(filter->_ctx, filter->styles,
-												"line-join", "line-cap", "weight", "stroke", NULL);
-  cairo_close_path(filter->_ctx);
-	cairo_restore(filter->_ctx);
+  simplet_apply_styles(filter->_ctx, filter->styles,
+                        "line-join", "line-cap", "weight", "stroke", NULL);
+  cairo_restore(filter->_ctx);
 }
 
 static void
 dispatch(OGRGeometryH geom, simplet_filter_t *filter){
   switch(wkbFlatten(OGR_G_GetGeometryType(geom))){
     case wkbPolygon:
-			plot_polygon(geom, filter);
+      plot_polygon(geom, filter);
       break;
-		case wkbLinearRing:
+    case wkbLinearRing:
     case wkbLineString:
-			plot_line(geom, filter);
+      plot_line(geom, filter);
       break;
     case wkbMultiPoint:
     case wkbPoint:
       plot_point(geom, filter);
       break;
     case wkbMultiPolygon:
-    case wkbMultiLineString:		
+    case wkbMultiLineString:
     case wkbGeometryCollection:
       for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
         OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
