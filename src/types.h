@@ -1,10 +1,9 @@
 #ifndef _SIMPLE_TYPES_H
 #define _SIMPLE_TYPES_H
 
-#include <gdal/ogr_api.h>
-#include <gdal/ogr_srs_api.h>
+#include <ogr_api.h>
+#include <ogr_srs_api.h>
 #include <cairo/cairo.h>
-#include <math.h>
 
 #ifdef __cplusplus
 extern "C" {

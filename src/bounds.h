@@ -1,8 +1,8 @@
 #ifndef _SIMPLET_BOUNDS_H
 #define _SIMPLET_BOUNDS_H
 
-#include <gdal/ogr_api.h>
-#include <gdal/ogr_srs_api.h>
+#include <ogr_api.h>
+#include <ogr_srs_api.h>
 #include "types.h"
 #include "point.h"
 
