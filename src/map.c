@@ -243,7 +243,6 @@ simplet_map_build_surface(simplet_map_t *map){
       break;
     }
   }
-  OGRCleanupAll();
 
   return surface;
 }
