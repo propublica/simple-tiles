@@ -114,7 +114,7 @@ test_bunk(){
   simplet_map_add_layer(map, "../data/tl_2010_36047_roads.shp");
   simplet_map_add_filter(map,  "SELECT * from 'tl_2010_36047_roads_bunk'");
   simplet_map_render_to_png(map, "./bunk.png");
-  //assert(SIMPLET_OK != simplet_map_get_status(map));
+  assert(SIMPLET_OK != simplet_map_get_status(map));
   printf("ERROR AS EXPECTED: %s", simplet_map_status_to_string(map));
   simplet_map_free(map);
 }

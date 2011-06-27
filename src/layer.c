@@ -58,8 +58,15 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
   }
 
   simplet_filter_t *filter;
-  while((filter = simplet_list_next(iter)))
-    simplet_filter_process(filter, layer, map);
+  simplet_status_t status = SIMPLET_OK;
+  while((filter = simplet_list_next(iter))) {
+    status = simplet_filter_process(filter, layer, map);
+    if(status != SIMPLET_OK){
+      OGR_DS_Destroy(layer->_source);
+      simplet_list_iter_free(iter);
+      return status;
+    }
+  }
 
   OGR_DS_Destroy(layer->_source);
 
