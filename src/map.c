@@ -199,6 +199,11 @@ simplet_map_get_status(simplet_map_t *map){
   return map->error.status;
 }
 
+const char*
+simplet_map_status_to_string(simplet_map_t *map){
+  return (const char*) map->error.msg;
+}
+
 simplet_status_t
 simplet_map_is_valid(simplet_map_t *map){
   if(map->valid != SIMPLET_OK)

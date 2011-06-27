@@ -40,6 +40,9 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg);
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map);
 
+const char*
+simplet_map_status_to_string(simplet_map_t *map);
+
 simplet_status_t
 simplet_map_is_valid(simplet_map_t *map);
 
