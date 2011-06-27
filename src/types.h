@@ -47,6 +47,21 @@ typedef struct simplet_listiter_t {
   simplet_node_t *next;
 } simplet_listiter_t;
 
+/* errors */
+typedef enum {
+  SIMPLET_ERR = 0,
+  SIMPLET_OOM,
+  SIMPLET_CAIRO_ERR,
+  SIMPLET_OGR_ERR,
+  SIMPLET_INVALID_MAP,
+  SIMPLET_OK
+} simplet_status_t;
+
+#define SIMPLET_MAX_ERROR 1024
+typedef struct {
+  simplet_status_t status;
+  char msg[SIMPLET_MAX_ERROR];
+} simplet_error_t;
 
 /* map structures */
 
@@ -56,9 +71,10 @@ typedef struct {
   OGRSpatialReferenceH proj;
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
   int                  valid;
+  simplet_error_t      error;
+  pthread_mutex_t      lock;
   unsigned int         width;
   unsigned int         height;
-  pthread_mutex_t      lock;
 } simplet_map_t;
 
 typedef struct {
@@ -86,13 +102,7 @@ typedef struct {
 
 #define SIMPLET_MERCATOR "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over"
 
-typedef enum {
-  SIMPLET_ERR = 0,
-  SIMPLET_OOM,
-  SIMPLET_CAIRO_ERR,
-  SIMPLET_OGR_ERR,
-  SIMPLET_OK
-} simplet_status_t;
+
 
 #ifdef __cplusplus
 }

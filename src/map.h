@@ -38,12 +38,15 @@ simplet_style_t*
 simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg);
 
 simplet_status_t
+simplet_map_get_status(simplet_map_t *map);
+
+simplet_status_t
 simplet_map_is_valid(simplet_map_t *map);
 
-simplet_status_t
+void
 simplet_map_render_to_png(simplet_map_t *map, const char *path);
 
-simplet_status_t
+void
 simplet_map_render_to_stream(simplet_map_t *map, void *stream, cairo_write_func_t write_func);
 
 cairo_surface_t *
