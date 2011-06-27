@@ -52,7 +52,7 @@ bench_empty(void *ctx){
   simplet_map_set_slippy(map, 0, 1, 2);
   simplet_map_add_layer(map, "../data/noop");
   char *data = NULL;
-  assert(simplet_map_render_to_stream(map, data, stream));
+  simplet_map_render_to_stream(map, data, stream);
 }
 
 static void
@@ -61,7 +61,8 @@ bench_seamless(void *ctx){
   initialize_map(map);
   simplet_map_add_style(map, "seamless", "true");
   char *data = NULL;
-  assert(simplet_map_render_to_stream(map, data, stream));
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
 }
 
 static void
@@ -69,7 +70,8 @@ bench_render(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
   char *data = NULL;
-  assert(simplet_map_render_to_stream(map, data, stream));
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
 }
 
 #define ITEMS 100000
@@ -123,17 +125,9 @@ stdev(double *arr, int count){
   return sqrt(var / (count - 1));
 }
 
-static void
-elision(simplet_status_t err, const char *mess){
-  (void) err, (void) mess; /* suppress warnings */
-  return;
-}
 
 int
 main(){
-  simplet_error_handler handle = elision;
-  simplet_set_error_handle(handle);
-
   bench_wrap_t *bench = (bench_wrap_t*)&benchmarks;
   for(bench = (bench_wrap_t*)&benchmarks; bench->call; bench++){
     printf("\nbench %s:\n", bench->name);

@@ -4,19 +4,11 @@
 
 
 static pthread_mutex_t error_lock = PTHREAD_MUTEX_INITIALIZER;
-
-static void
-default_error_handler(simplet_status_t err, const char *msg){
-  printf("simple tiles error %i: %s\n", err, msg);
-}
-
-static simplet_error_handler error_handler = &default_error_handler;
 static int error_initialized = 0;
 
 static void
 ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
-  (void)eclass, (void)err_no; // FIXME
-  error_handler(SIMPLET_OGR_ERR, msg);
+  (void)eclass, (void)err_no, (void)msg; // silence ogr errors
 }
 
 void
@@ -28,41 +20,32 @@ simplet_error_init(){
   pthread_mutex_unlock(&error_lock);
 }
 
-simplet_status_t
-simplet_error(simplet_status_t err){
-  pthread_mutex_lock(&error_lock);
-  switch(err){
+void
+simplet_set_error(simplet_error_t *error, simplet_status_t status, const char *msg){
+  switch(status){
     case SIMPLET_ERR:
-      error_handler(SIMPLET_ERR, "simple tiles error");
+      error->status = SIMPLET_ERR;
+      snprintf(error->msg, SIMPLET_MAX_ERROR, "simple tiles error: %s", msg);
       break;
     case SIMPLET_OOM:
-      error_handler(SIMPLET_OOM, "out of memory for allocation");
+      error->status = SIMPLET_OOM;
+      snprintf(error->msg, SIMPLET_MAX_ERROR, "out of memory for allocation, %s", msg);
       break;
     case SIMPLET_CAIRO_ERR:
-      error_handler(SIMPLET_CAIRO_ERR, "cairo error");
+      error->status = SIMPLET_CAIRO_ERR;
+      snprintf(error->msg, SIMPLET_MAX_ERROR, "cairo error: %s", msg);
       break;
     case SIMPLET_OGR_ERR:
-      error_handler(SIMPLET_OGR_ERR, "OGR error");
+      error->status = SIMPLET_OGR_ERR;
+      snprintf(error->msg, SIMPLET_MAX_ERROR, "OGR error: %s, %s", CPLGetLastErrorMsg(), msg);
+      break;
+    case SIMPLET_INVALID_MAP:
+      error->status =  SIMPLET_INVALID_MAP;
+      snprintf(error->msg, SIMPLET_MAX_ERROR, "Invalid map: %s", msg);
       break;
     case SIMPLET_OK:
-      return SIMPLET_OK;
+      error->status = SIMPLET_OK;
+      snprintf(error->msg, SIMPLET_MAX_ERROR, "%s", msg);
   }
-  pthread_mutex_unlock(&error_lock);
-  return err;
 }
 
-simplet_status_t
-simplet_check_cairo(cairo_t *ctx){
-  cairo_status_t status = cairo_status(ctx);
-
-  if(status == CAIRO_STATUS_SUCCESS)
-    return SIMPLET_OK;
-
-  error_handler(SIMPLET_CAIRO_ERR, cairo_status_to_string(status));
-  return SIMPLET_ERR;
-}
-
-void
-simplet_set_error_handle(simplet_error_handler handle){
-  error_handler = handle;
-}

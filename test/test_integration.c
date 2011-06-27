@@ -27,6 +27,7 @@ test_many_layers(){
   simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries' where SOV_A3 = 'US1'");
   simplet_map_add_style(map, "fill", "#cc0000dd");
   simplet_map_render_to_png(map, "./layers.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
 }
 
@@ -40,6 +41,7 @@ test_many_filters(){
   simplet_map_add_style(map, "stroke", "#00cc00dd");
   simplet_map_add_style(map, "fill",   "#cc000099");
   simplet_map_render_to_png(map, "./filters.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
 }
 
@@ -51,6 +53,7 @@ test_projection(){
   simplet_map_set_bounds(map, -3410023.644683, 12407191.9541633, 5198986.57554026, 6500142.362205);
   assert(simplet_map_is_valid(map));
   simplet_map_render_to_png(map, "./projection.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
 }
 
@@ -60,6 +63,7 @@ test_slippy_gen(){
   assert((map = build_map()));
   simplet_map_set_slippy(map, 0, 1, 2);
   simplet_map_render_to_png(map, "./slippy.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
 }
 
@@ -78,6 +82,7 @@ test_holes(){
   simplet_map_add_style(map, "stroke",    "#ffffff99");
   simplet_map_add_style(map, "weight",    "0.1");
   simplet_map_render_to_png(map, "./holes.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
 }
 
@@ -95,6 +100,8 @@ test_lines(){
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "weight", "0.3");
   simplet_map_render_to_png(map, "./lines.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+  simplet_map_free(map);
 }
 
 cairo_status_t
@@ -108,7 +115,8 @@ test_stream(){
   simplet_map_t *map;
   assert((map = build_map()));
   char *data = NULL;
-  assert(simplet_map_render_to_stream(map, data, stream));
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
 }
 
