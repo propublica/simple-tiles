@@ -104,6 +104,21 @@ test_lines(){
   simplet_map_free(map);
 }
 
+void
+test_bunk(){
+  simplet_map_t *map;
+  assert((map = simplet_map_new()));
+  simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
+  simplet_map_set_size(map, 256, 256);
+  simplet_map_set_bounds(map, -74.043825, 40.570771, -73.855660, 40.739255);
+  simplet_map_add_layer(map, "../data/tl_2010_36047_roads.shp");
+  simplet_map_add_filter(map,  "SELECT * from 'tl_2010_36047_roads_bunk'");
+  simplet_map_render_to_png(map, "./bunk.png");
+  //assert(SIMPLET_OK != simplet_map_get_status(map));
+  printf("ERROR AS EXPECTED: %s", simplet_map_status_to_string(map));
+  simplet_map_free(map);
+}
+
 cairo_status_t
 stream(void *closure, const unsigned char *data, unsigned int length){
   return CAIRO_STATUS_SUCCESS;
@@ -134,4 +149,5 @@ TASK(integration){
   test(holes);
   puts("check lines.png");
   test(lines);
+  test(bunk);
 }
