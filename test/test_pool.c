@@ -25,10 +25,11 @@ build_list(){
   return wraps;
 }
 
-static void
+static int
 worker(void *value){
   wrap_t *wrap = value;
   wrap->value = wrap->value * 2;
+  return SIMPLET_OK;
 }
 
 static void

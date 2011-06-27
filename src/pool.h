@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-typedef void (*simplet_pool_worker)(void *unit);
+typedef int (*simplet_pool_worker)(void *unit);
 
 typedef enum {
   SIMPLET_RUN, SIMPLET_EXIT
@@ -24,6 +24,7 @@ typedef struct {
   pthread_t            *threads;
   int                  live;
   int                  size;
+  int                  error_code;
 } simplet_pool_t;
 
 
@@ -40,7 +41,7 @@ simplet_pool_set_work(simplet_pool_t *pool, simplet_list_t *work);
 void
 simplet_pool_set_worker(simplet_pool_t *pool, simplet_pool_worker worker);
 
-void
+int
 simplet_pool_start(simplet_pool_t *pool);
 
 void

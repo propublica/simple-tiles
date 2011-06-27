@@ -249,7 +249,7 @@ simplet_map_build_surface(simplet_map_t *map){
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
       simplet_map_error(map, err, "error in rendering");
-      break;
+      return NULL;
     }
   }
 
@@ -265,7 +265,6 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
 
 void
 simplet_map_render_to_stream(simplet_map_t *map, void *stream, cairo_write_func_t write_func){
-
   cairo_surface_t *surface;
   if(!(surface = simplet_map_build_surface(map))) return;
 
@@ -277,7 +276,6 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream, cairo_write_func_
 
 void
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
-
   cairo_surface_t *surface;
   if(!(surface = simplet_map_build_surface(map))) return;
 

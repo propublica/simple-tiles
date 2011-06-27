@@ -33,8 +33,8 @@ teardown_list(void *ctx){
   ctx = NULL;
 }
 
-static void
-worker(void *val) { (void) val; }
+static int
+worker(void *val) { (void) val; return 0; }
 
 static void*
 setup_pool(){

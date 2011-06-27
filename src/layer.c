@@ -70,10 +70,10 @@ state_free(void *state){
   free(tmp);
 }
 
-static void
+static int
 process_filter(void *state){
   _state *tmp = state;
-  simplet_filter_process(tmp->filter, tmp->layer, tmp->map);
+  return simplet_filter_process(tmp->filter, tmp->layer, tmp->map);
 }
 
 simplet_status_t
@@ -99,20 +99,26 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
   }
 
   simplet_pool_set_work(pool, work);
-  simplet_pool_start(pool);
+  simplet_status_t status = simplet_pool_start(pool);
   simplet_pool_free(pool, state_free);
 
   /* reduce */
   if(!(iter = simplet_get_list_iter(layer->filters))) goto bail;
   while((filter = simplet_list_next(iter))){
-    cairo_set_source_surface(map->_ctx, filter->_surface, 0, 0);
-    cairo_paint(map->_ctx);
-    cairo_destroy(filter->_ctx);
-    filter->_ctx = NULL;
-    cairo_surface_destroy(filter->_surface);
-    filter->_surface = NULL;
+    if(status == SIMPLET_OK){
+      cairo_set_source_surface(map->_ctx, filter->_surface, 0, 0);
+      cairo_paint(map->_ctx);
+    }
+    if(filter->_ctx){
+      cairo_destroy(filter->_ctx);
+      filter->_ctx = NULL;
+    }
+    if(filter->_surface){
+      cairo_surface_destroy(filter->_surface);
+      filter->_surface = NULL;
+    }
   }
-  return SIMPLET_OK;
+  return status;
 
 bail:
   simplet_list_free(work);
