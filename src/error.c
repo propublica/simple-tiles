@@ -37,8 +37,12 @@ simplet_set_error(simplet_error_t *error, simplet_status_t status, const char *m
       break;
     case SIMPLET_OGR_ERR:
       error->status = SIMPLET_OGR_ERR;
-
+      if(pthread_mutex_lock(&error_lock) > 0) {
+        snprintf(error->msg, SIMPLET_MAX_ERROR, "OGR error");
+        break;
+      }
       snprintf(error->msg, SIMPLET_MAX_ERROR, "OGR error: %s %s", CPLGetLastErrorMsg(), msg);
+      pthread_mutex_unlock(&error_lock);
       break;
     case SIMPLET_INVALID_MAP:
       error->status =  SIMPLET_INVALID_MAP;
