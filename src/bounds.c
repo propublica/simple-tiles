@@ -76,6 +76,7 @@ simplet_bounds_new(){
     return NULL;
   bounds->nw     = simplet_point(INFINITY, -INFINITY);
   bounds->se     = simplet_point(-INFINITY, INFINITY);
+
   bounds->width  = 0;
   bounds->height = 0;
   return bounds;

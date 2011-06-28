@@ -34,6 +34,7 @@ simplet_map_new(){
   map->proj         = NULL;
   map->_ctx         = NULL;
   map->error.status = SIMPLET_OK;
+  snprintf(map->error.msg, SIMPLET_MAX_ERROR, "no error");
   map->height       = 0;
   map->width        = 0;
   map->valid        = SIMPLET_OK;
