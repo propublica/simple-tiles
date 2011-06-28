@@ -202,7 +202,7 @@ simplet_map_get_status(simplet_map_t *map){
 
 const char*
 simplet_map_status_to_string(simplet_map_t *map){
-  return (const char*) map->error.msg;
+  return &map->error.msg;
 }
 
 simplet_status_t
