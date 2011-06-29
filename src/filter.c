@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <cpl_error.h>
 
 #include "style.h"
 #include "filter.h"
@@ -167,17 +168,23 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   pthread_mutex_lock(&map->lock);
   OGRDataSourceH source;
-  if(!(source = OGROpen(layer->source, 0, NULL))){
+  OGRSFDriverH   driver = NULL;
+  if(!(source = OGROpen(layer->source, 0, &driver))){
     pthread_mutex_unlock(&map->lock);
     return SIMPLET_OGR_ERR;
   }
-  pthread_mutex_unlock(&map->lock);
 
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, ""))){
+  if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, NULL))){
+    int err = CPLGetLastErrorNo();
+    pthread_mutex_unlock(&map->lock);
     OGR_DS_Destroy(source);
-    return SIMPLET_OGR_ERR;
+    if(!err)
+      return SIMPLET_OK;
+    else
+      return SIMPLET_OGR_ERR;
   }
+  pthread_mutex_unlock(&map->lock);
 
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer))){
