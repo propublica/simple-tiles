@@ -173,7 +173,6 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   }
   pthread_mutex_unlock(&map->lock);
 
-  // out of order darn.
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, ""))){
     OGR_DS_Destroy(source);
@@ -194,7 +193,6 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   if(!olayer) {
     OGR_G_DestroyGeometry(bounds);
     OGR_DS_Destroy(source);
-    puts("no results");
     return SIMPLET_OGR_ERR;
   }
 
