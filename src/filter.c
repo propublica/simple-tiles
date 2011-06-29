@@ -161,8 +161,9 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
 /* FIXME: this function is way too hairy and needs error handling */
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
+
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_GetLayer(layer->_source, 0)))
+  if(!(olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, NULL, "")))
     return SIMPLET_OGR_ERR;
 
   OGRSpatialReferenceH srs;
@@ -171,11 +172,14 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
+  OGR_DS_ReleaseResultSet(layer->_source, olayer);
+
   olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, "");
   if(!olayer) {
     OGR_G_DestroyGeometry(bounds);
     return SIMPLET_OGR_ERR;
   }
+
 
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
