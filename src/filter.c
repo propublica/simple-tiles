@@ -173,9 +173,9 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   }
   pthread_mutex_unlock(&map->lock);
 
-
+  // out of order darn.
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_GetLayer(source, 0))){
+  if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, ""))){
     OGR_DS_Destroy(source);
     return SIMPLET_OGR_ERR;
   }
@@ -188,12 +188,16 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
+  OGR_DS_ReleaseResultSet(source, olayer);
+
   olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, bounds, "");
   if(!olayer) {
     OGR_G_DestroyGeometry(bounds);
     OGR_DS_Destroy(source);
+    puts("no results");
     return SIMPLET_OGR_ERR;
   }
+
 
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj))){
