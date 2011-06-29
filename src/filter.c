@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <cpl_error.h>
 
 #include "style.h"
 #include "filter.h"
@@ -163,8 +164,13 @@ simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
 
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, NULL, "")))
-    return SIMPLET_OGR_ERR;
+  if(!(olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, NULL, NULL))){
+    int err = CPLGetLastErrorNo();
+    if(!err)
+      return SIMPLET_OK;
+    else
+      return SIMPLET_OGR_ERR;
+  }
 
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer)))
