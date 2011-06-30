@@ -72,7 +72,6 @@ perform(void *threadpool){ /* needs error handling */
   pthread_cleanup_push(cleanup, (void *)pool);
   // crazy times please fix
   for(;;){
-    pthread_testcancel();
     pthread_mutex_lock(&pool->lock);
     if(pool->status == SIMPLET_EXIT) {
       pthread_mutex_unlock(&pool->lock);
@@ -107,16 +106,10 @@ simplet_pool_start(simplet_pool_t *pool){ /* blocks */
     return SIMPLET_OOM;
 
   pool->status = SIMPLET_RUN;
-  int err = SIMPLET_OK;
   for(int i = 0; i < pool->size; i++)
     pthread_create(&pool->threads[i], NULL, perform, (void *) pool);
-  for(int j = 0; j < pool->size; j++){
-    if(err == SIMPLET_OK){
-      pthread_join(pool->threads[j], NULL);
-    } else {
-      pthread_cancel(pool->threads[j]);
-    }
-  }
+  for(int j = 0; j < pool->size; j++)
+    pthread_join(pool->threads[j], NULL);
 
   memset(pool->threads, 0, pool->size * sizeof(pthread_t));
   free(pool->threads);
