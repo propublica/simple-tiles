@@ -175,7 +175,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   }
 
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, NULL))){
+  if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, &driver))){
     int err = CPLGetLastErrorNo();
     pthread_mutex_unlock(&map->lock);
     OGR_DS_Destroy(source);
