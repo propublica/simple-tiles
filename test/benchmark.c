@@ -66,6 +66,24 @@ bench_seamless(void *ctx){
 }
 
 static void
+bench_many_layers(void *ctx){
+  simplet_map_t *map = ctx;
+  initialize_map(map);
+  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_style(map, "weight", "0.1");
+  simplet_map_add_style(map, "stroke",   "#ffffffff");
+  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_style(map, "weight", "0.1");
+  simplet_map_add_style(map, "stroke",   "#ffffffff");
+  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_style(map, "weight", "0.1");
+  simplet_map_add_style(map, "stroke",   "#ffffffff");
+  char *data = NULL;
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+}
+
+static void
 bench_render(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
@@ -99,6 +117,7 @@ bench_wrap_t benchmarks[] = {
   BENCH(map, render)
   BENCH(map, seamless)
   BENCH(map, empty)
+  BENCH(map, many_layers)
   BENCH(list, list)
   { NULL, NULL, NULL, NULL, 0}
 };
