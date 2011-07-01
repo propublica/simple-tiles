@@ -180,7 +180,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGR_G_TransformTo(bounds, srs);
   OGR_DS_ReleaseResultSet(layer->_source, olayer);
 
-  olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, "");
+  olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, bounds, NULL);
   if(!olayer) {
     OGR_G_DestroyGeometry(bounds);
     return SIMPLET_OGR_ERR;

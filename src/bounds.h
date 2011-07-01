@@ -25,6 +25,9 @@ simplet_bounds_from_ogr(OGRGeometryH geom);
 void
 simplet_bounds_free(simplet_bounds_t *bounds);
 
+simplet_status_t
+simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt);
+
 #ifdef __cplusplus
 }
 #endif

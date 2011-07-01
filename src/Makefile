@@ -1,6 +1,6 @@
 OPTIMIZATION ?= -O3
 DEBUG ?= -g -ggdb
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -rdynamic -fPIC -Wall -W -Wwrite-strings -pthread $(ARCH) \
+CFLAGS ?= -std=c99 $(OPTIMIZATION) -g -ggdb -rdynamic -fPIC -Wall -W -Wwrite-strings -pthread $(ARCH) \
   $(shell pkg-config --cflags cairo) \
   $(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo) \

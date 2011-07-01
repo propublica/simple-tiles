@@ -98,6 +98,7 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
   return SIMPLET_OK;
 }
 
+
 simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);

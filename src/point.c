@@ -13,3 +13,4 @@ void
 simplet_point_free(simplet_point_t *point){
   free(point);
 }
+
