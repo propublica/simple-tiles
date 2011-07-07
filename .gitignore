@@ -12,3 +12,4 @@ runner
 data/1*
 data/t*
 test/benchmark
+*.orig
