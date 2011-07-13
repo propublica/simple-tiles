@@ -68,7 +68,6 @@ typedef struct {
   OGRSpatialReferenceH proj;
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
   simplet_error_t      error;
-  char                 *bgcolor;
   unsigned int width;
   unsigned int height;
   int valid;
