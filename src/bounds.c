@@ -86,11 +86,12 @@ simplet_status_t
 simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt){
   int wkt_size = 14 + 75 * 8;
   *wkt = malloc(sizeof(*wkt) * wkt_size);
-  snprintf(*wkt, wkt_size, "POLYGON ((%f %f, %f %f, %f %f, %f %f))",
+  snprintf(*wkt, wkt_size, "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))",
                   bounds->se.x, bounds->nw.y,
                   bounds->se.x, bounds->se.y,
                   bounds->nw.x, bounds->se.y,
-                  bounds->nw.x, bounds->nw.y);
+                  bounds->nw.x, bounds->nw.y,
+                  bounds->se.x, bounds->nw.y);
   return SIMPLET_OK;
 }
 

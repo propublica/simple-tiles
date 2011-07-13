@@ -28,6 +28,7 @@ simplet_map_new(){
   map->proj         = NULL;
   map->_ctx         = NULL;
   map->error.status = SIMPLET_OK;
+  map->bgcolor        = NULL;
   map->height       = 0;
   map->width        = 0;
   map->valid        = SIMPLET_OK;

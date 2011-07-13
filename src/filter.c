@@ -62,7 +62,6 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter){
                     filter->_bounds->nw.y - y);
       last_x = x;
       last_y = y;
-
     }
   }
   // ensure something is always drawn
@@ -159,6 +158,15 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
 }
 
 
+static void
+set_seamless(simplet_list_t *styles, cairo_t *ctx){
+  simplet_style_t *seamless = simplet_lookup_style(styles, "seamless");
+
+  if(seamless)
+    cairo_set_operator(ctx, CAIRO_OPERATOR_SATURATE);
+}
+
+
 /* FIXME: this function is way too hairy and needs error handling */
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
@@ -166,6 +174,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, NULL, NULL))){
     int err = CPLGetLastErrorNo();
+    printf("OGR ERRROORRRR: %i", err);
     if(!err)
       return SIMPLET_OK;
     else
@@ -173,8 +182,13 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   }
 
   OGRSpatialReferenceH srs;
-  if(!(srs = OGR_L_GetSpatialRef(olayer)))
-    return SIMPLET_OGR_ERR;
+  if(!(srs = OGR_L_GetSpatialRef(olayer))){
+    int err = CPLGetLastErrorNo();
+    if(!err)
+      return SIMPLET_OK;
+    else
+      return SIMPLET_OGR_ERR;
+  }
 
   OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   OGR_G_TransformTo(bounds, srs);
@@ -195,11 +209,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
     return SIMPLET_CAIRO_ERR;
 
   filter->_ctx = cairo_create(surface);
-
-  simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
-
-  if(seamless)
-    cairo_set_operator(filter->_ctx, CAIRO_OPERATOR_SATURATE);
+  set_seamless(filter->styles, filter->_ctx);
 
   filter->_bounds = map->bounds;
   cairo_scale(filter->_ctx, map->width / filter->_bounds->width,

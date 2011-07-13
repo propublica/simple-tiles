@@ -67,10 +67,11 @@ typedef struct {
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
-  int valid;
   simplet_error_t      error;
+  char                 *bgcolor;
   unsigned int width;
   unsigned int height;
+  int valid;
 } simplet_map_t;
 
 typedef struct {
