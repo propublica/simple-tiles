@@ -87,6 +87,24 @@ test_holes(){
 }
 
 void
+test_points(){
+	simplet_map_t *map;
+  assert((map = simplet_map_new()));
+	simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
+  simplet_map_set_size(map, 256, 256);
+  simplet_map_set_bounds(map, -92.889433, 42.491912,-86.763988, 47.080772);
+  simplet_map_add_layer(map, "../data/10m_populated_places.shp");
+  simplet_map_add_filter(map,  "SELECT * from '10m_populated_places'");
+	simplet_map_add_style(map, "fill",      "#061F3799");
+  simplet_map_add_style(map, "stroke",    "#ffffff99");
+  simplet_map_add_style(map, "weight",    "0.1");
+  simplet_map_add_style(map, "radius",    "10");
+	simplet_map_render_to_png(map, "./points.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+  simplet_map_free(map);
+}
+
+void
 test_lines(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
@@ -149,5 +167,7 @@ TASK(integration){
   test(holes);
   puts("check lines.png");
   test(lines);
+  puts("check points.png");
+  test(points);
   test(bunk);
 }
