@@ -97,7 +97,6 @@ plot_polygon(OGRGeometryH geom, simplet_filter_t *filter){
 static void
 plot_point(OGRGeometryH geom, simplet_filter_t *filter){
 	cairo_save(filter->_ctx);
-
   double x, y;
 
   simplet_style_t *style = simplet_lookup_style(filter->styles, "radius");
@@ -141,10 +140,10 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter){
     case wkbLineString:
       plot_line(geom, filter);
       break;
-    case wkbMultiPoint:
     case wkbPoint:
       plot_point(geom, filter);
       break;
+    case wkbMultiPoint:
     case wkbMultiPolygon:
     case wkbMultiLineString:
     case wkbGeometryCollection:
