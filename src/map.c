@@ -232,7 +232,6 @@ simplet_map_build_surface(simplet_map_t *map){
     return NULL;
 
   cairo_t *ctx = cairo_create(surface);
-  cairo_set_antialias(ctx, CAIRO_ANTIALIAS_NONE);
   map->_ctx = ctx;
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
