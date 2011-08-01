@@ -220,9 +220,8 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
-    if(geom == NULL)
-      continue;
-    OGR_G_Transform(geom, transform);
+    if(geom == NULL) continue;
+    if(OGR_G_Transform(geom, transform) != OGRERR_NONE) continue;
     dispatch(geom, filter);
     OGR_F_Destroy(feature);
   }
