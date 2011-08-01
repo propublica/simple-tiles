@@ -1,13 +1,9 @@
 all: 10m_admin_0_countries.shp tl_2010_55_cd108.shp tl_2010_36047_roads.shp \
-	10m_populated_places.shp 10m_ocean.shp
+	10m_populated_places.shp
 
 tl_2010_36047_roads.shp:
 	curl -O ftp://ftp2.census.gov/geo/tiger/TIGER2010/ROADS/tl_2010_36047_roads.zip
 	unzip tl_2010_36047_roads.zip
-
-10m_ocean.shp:
-	curl -O http://www.nacis.org/naturalearth/10m/physical/10m-ocean.zip
-	unzip 10m-ocean.zip
 
 10m_admin_0_countries.shp:
 	curl -O http://www.nacis.org/naturalearth/10m/cultural/10m-admin-0-countries.zip

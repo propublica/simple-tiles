@@ -216,6 +216,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   filter->_bounds = map->bounds;
   cairo_scale(filter->_ctx, map->width / filter->_bounds->width,
                             map->width / filter->_bounds->width);
+
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
