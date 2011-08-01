@@ -76,7 +76,9 @@ plot_polygon(OGRGeometryH geom, simplet_filter_t *filter){
   cairo_new_path(filter->_ctx);
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
     OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
-    if(subgeom == NULL) continue;
+    if(subgeom == NULL)
+      continue;
+
     if(OGR_G_GetGeometryCount(subgeom) > 0) {
       plot_polygon(subgeom, filter);
       continue;
