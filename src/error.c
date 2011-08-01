@@ -1,4 +1,5 @@
 #include <cpl_error.h>
+#include <cpl_conv.h>
 #include <pthread.h>
 #include "error.h"
 
@@ -16,6 +17,8 @@ simplet_error_init(){
   if(error_initialized) return;
   if(pthread_mutex_lock(&error_lock) > 0) return;
   error_initialized = 1;
+  // move to initializer;
+  CPLSetConfigOption("OGR_ENABLE_PARTIAL_REPROJECTION", "TRUE");
   CPLSetErrorHandler(ogr_error_handler);
   pthread_mutex_unlock(&error_lock);
 }

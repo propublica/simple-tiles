@@ -128,12 +128,12 @@ test_extremes(){
   assert((map = simplet_map_new()));
   simplet_map_set_slippy(map, 0, 1, 2);
   simplet_map_add_layer(map, "../data/10m_ocean.shp");
-  simplet_map_add_filter(map,  "SELECT * from '10m_ocean'");
+  simplet_map_add_filter(map,  "SELECT * from '10m_ocean' where RecNum = 28");
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "fill",      "#061F3799");
   simplet_map_add_style(map, "stroke",    "#ffffff99");
-  simplet_map_add_style(map, "weight",    "0.1");
+  simplet_map_add_style(map, "weight",    "1");
   simplet_map_render_to_png(map, "./extremes.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
@@ -171,7 +171,7 @@ test_stream(){
 }
 
 TASK(integration){
-	test(projection);
+  test(projection);
   puts("check projection.png");
   test(many_filters);
   puts("check filters.png");
