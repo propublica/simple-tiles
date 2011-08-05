@@ -120,74 +120,6 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
   return SIMPLET_OK;
 }
 
-simplet_layer_t*
-simplet_map_add_layer(simplet_map_t *map, const char *datastring){
-  simplet_layer_t *layer;
-  if(!(layer = simplet_layer_new(datastring))){
-    simplet_map_error(map, SIMPLET_OOM, "couldn't create a layer");
-    return NULL;
-  }
-
-  if(!simplet_list_push(map->layers, layer)){
-    simplet_layer_free(layer);
-    simplet_map_error(map, SIMPLET_OOM, "couldn't add anymore layers");
-    return NULL;
-  }
-
-  return layer;
-}
-
-simplet_filter_t*
-simplet_map_add_filter(simplet_map_t *map, const char *sqlquery){
-  if(!map->layers->tail){
-    simplet_map_error(map, SIMPLET_ERR, "tried to add a filter without any layers defined");
-    return NULL;
-  }
-
-  simplet_layer_t *layer = map->layers->tail->value;
-  if(!layer){
-    simplet_map_error(map, SIMPLET_ERR, "tried to add a filter without any layers defined");
-    return NULL;
-  }
-
-  simplet_filter_t *filter;
-  if(!(filter = simplet_layer_add_filter(layer, sqlquery))){
-    simplet_map_error(map, SIMPLET_OOM, "couldn't add a filter");
-    return NULL;
-  }
-
-  return filter;
-}
-
-simplet_style_t *
-simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
-  if(!map->layers->tail){
-    simplet_map_error(map, SIMPLET_ERR, "couldn't add a style without a layer");
-    return NULL;
-  }
-  simplet_layer_t *layer = map->layers->tail->value;
-
-  if(!layer){
-    simplet_map_error(map, SIMPLET_ERR, "couldn't add a style without a layer");
-    return NULL;
-  }
-
-  simplet_filter_t *filter = layer->filters->tail->value;
-
-  if(!filter){
-    simplet_map_error(map, SIMPLET_ERR, "couldn't add a style without a filter");
-    return NULL;
-  }
-
-  simplet_style_t *style;
-  if(!(style = simplet_filter_add_style(filter, key, arg))){
-    simplet_map_error(map, SIMPLET_OOM, "couldn't add a style");
-    return NULL;
-  }
-
-  return style;
-}
-
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
   return map->error.status;
@@ -220,7 +152,6 @@ simplet_map_is_valid(simplet_map_t *map){
 
   return SIMPLET_OK;
 }
-
 
 cairo_surface_t *
 simplet_map_build_surface(simplet_map_t *map){

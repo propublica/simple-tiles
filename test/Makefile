@@ -22,13 +22,21 @@ api: api.o
 benchmark: benchmark.o
 runner: runner.o $(OBJ)
 
-test: runner api benchmark
+
+data:
 	cd ../data && make && cd ../test
+
+run_tests: runner
 	./runner
-	time ./api
+
+run_benchmark: benchmark
 	./benchmark
 
+run_api: api
+	time ./api
+
+test: data run_tests run_api run_benchmark
 dep:
 	@$(CC) -MM *.c
 
-.PHONY: dep test
+.PHONY: dep test run_benchmark run_tests run_api

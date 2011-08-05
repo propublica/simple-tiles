@@ -9,8 +9,11 @@
 extern "C" {
 #endif
 
-/* bounds and simple points */
+#define SIMPLET_ERROR_FIELDS \
+	simplet_error_t error; \
+	int valid;
 
+/* bounds and simple points */
 typedef struct {
   double x;
   double y;
@@ -61,22 +64,21 @@ typedef struct {
 } simplet_error_t;
 
 /* map structures */
-
 typedef struct {
   simplet_bounds_t     *bounds;
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
-  simplet_error_t      error;
   unsigned int width;
   unsigned int height;
-  int valid;
+	SIMPLET_ERROR_FIELDS
 } simplet_map_t;
 
 typedef struct {
   OGRDataSourceH _source; /* ephemeral, not for outside usage */
   char           *source;
   simplet_list_t *filters;
+	SIMPLET_ERROR_FIELDS
 } simplet_layer_t;
 
 typedef struct {
@@ -84,11 +86,13 @@ typedef struct {
   simplet_list_t   *styles;
   cairo_t          *_ctx;    /* ephemeral, not for outside usage */
   simplet_bounds_t *_bounds; /* ephemeral, not for outside usage */
+	SIMPLET_ERROR_FIELDS
 } simplet_filter_t;
 
 typedef struct {
   char *key;
   char *arg;
+	SIMPLET_ERROR_FIELDS
 } simplet_style_t;
 
 
