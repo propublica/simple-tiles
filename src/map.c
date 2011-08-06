@@ -120,6 +120,24 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
   return SIMPLET_OK;
 }
 
+simplet_layer_t*
+simplet_map_add_layer(simplet_map_t *map, const char *datastring){
+  simplet_layer_t *layer;
+  if(!(layer = simplet_layer_new(datastring))){
+    simplet_map_error(map, SIMPLET_OOM, "couldn't create a layer");
+    return NULL;
+  }
+
+  if(!simplet_list_push(map->layers, layer)){
+    simplet_layer_free(layer);
+    simplet_map_error(map, SIMPLET_OOM, "couldn't add anymore layers");
+    return NULL;
+  }
+
+  return layer;
+}
+
+
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
   return map->error.status;

@@ -29,6 +29,9 @@ simplet_map_set_size(simplet_map_t *map, int width, int height);
 simplet_status_t
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny);
 
+simplet_layer_t*
+simplet_map_add_layer(simplet_map_t *map, const char *datastring);
+
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map);
 
