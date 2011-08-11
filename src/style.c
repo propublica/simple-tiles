@@ -17,15 +17,29 @@ simplet_styledef_t styleTable[] = {
   { "stroke",    simplet_style_stroke    },
   { "weight",    simplet_style_weight    },
   { "line-join", simplet_style_line_join },
-  { "line-cap",  simplet_style_line_cap  }
+  { "line-cap",  simplet_style_line_cap  },
+  { "paint",     simplet_style_paint     },
   /* radius and seamless are special styles */
 };
 
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
+
 static void
 set_color(cairo_t *ctx, const char *arg){
-  SIMPLET_CAIRO_RGBA(cairo_set_source, ctx, arg)
+  unsigned int r, g, b, a, count;
+  count = simplet_parse_color(arg, &r, &g, &b, &a);
+  switch(count){
+  case 3:
+    cairo_set_source_rgb(ctx, r / SIMPLET_CCEIL, g / SIMPLET_CCEIL, b / SIMPLET_CCEIL);
+    break;
+  case 4:
+    cairo_set_source_rgba(ctx, r / SIMPLET_CCEIL, g / SIMPLET_CCEIL, b / SIMPLET_CCEIL,
+        a / SIMPLET_CCEIL);
+    break;
+  default:
+    return;
+  }
 }
 
 void
@@ -46,6 +60,12 @@ simplet_style_line_cap(cairo_t *ctx, const char *arg){
     cairo_set_line_cap(ctx, CAIRO_LINE_CAP_ROUND);
   if(!strcmp("square", arg))
     cairo_set_line_cap(ctx, CAIRO_LINE_CAP_SQUARE);
+}
+
+void
+simplet_style_paint(cairo_t *ctx, const char *arg){
+  set_color(ctx, arg);
+  cairo_paint(ctx);
 }
 
 void

@@ -24,6 +24,9 @@ simplet_style_line_join(cairo_t *ctx, const char *arg);
 void
 simplet_style_line_cap(cairo_t *ctx, const char *arg);
 
+void
+simplet_style_paint(cairo_t *ctx, const char *arg);
+
 simplet_style_t*
 simplet_style_new(const char *key, const char *arg);
 

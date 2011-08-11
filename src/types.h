@@ -70,6 +70,7 @@ typedef struct {
   simplet_error_t      error;
   unsigned int width;
   unsigned int height;
+  char *bgcolor;
   int valid;
 } simplet_map_t;
 

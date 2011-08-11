@@ -26,6 +26,7 @@ simplet_map_new(){
 
   map->bounds       = NULL;
   map->proj         = NULL;
+  map->bgcolor      = NULL;
   map->_ctx         = NULL;
   map->error.status = SIMPLET_OK;
   map->height       = 0;
@@ -83,6 +84,13 @@ simplet_map_set_size(simplet_map_t *map, int width, int height){
   map->height = height;
   map->width  = width;
   return SIMPLET_OK;
+}
+
+simplet_status_t
+simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
+  if((map->bgcolor = simplet_copy_string(str)))
+    return SIMPLET_OK;
+  return simplet_map_error(map, SIMPLET_OOM, "couldn't copy bgcolor");
 }
 
 simplet_status_t
@@ -227,12 +235,17 @@ simplet_map_build_surface(simplet_map_t *map){
   if(simplet_map_is_valid(map) == SIMPLET_ERR)
     return NULL;
 
-  cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, map->width, map->height);
+  cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+      map->width, map->height);
+
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return NULL;
 
   cairo_t *ctx = cairo_create(surface);
   map->_ctx = ctx;
+
+  if(map->bgcolor) simplet_style_paint(ctx, map->bgcolor);
+
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
   simplet_layer_t *layer;
   simplet_status_t err;

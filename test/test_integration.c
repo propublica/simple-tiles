@@ -19,6 +19,16 @@ build_map(){
 }
 
 void
+test_background(){
+  simplet_map_t *map;
+  assert((map = build_map()));
+  simplet_map_set_bgcolor(map, "#CC0000");
+  simplet_map_render_to_png(map, "./background.png");
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+  simplet_map_free(map);
+}
+
+void
 test_many_layers(){
   simplet_map_t *map;
   assert((map = build_map()));
@@ -168,6 +178,8 @@ TASK(integration){
   puts("check lines.png");
   test(lines);
   puts("check points.png");
+  test(background);
+  puts("check background.png");
   test(points);
   test(bunk);
 }
