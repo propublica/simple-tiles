@@ -93,6 +93,14 @@ simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
   return simplet_map_error(map, SIMPLET_OOM, "couldn't copy bgcolor");
 }
 
+void
+simplet_map_get_bgcolor(simplet_map_t *map, char **str){
+  if(map->bgcolor)
+    *str = simplet_copy_string(map->bgcolor);
+  else
+    *str = NULL;
+}
+
 simplet_status_t
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny){
   if(map->bounds)

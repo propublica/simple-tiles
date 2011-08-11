@@ -31,6 +31,9 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
 simplet_status_t
 simplet_map_set_bgcolor(simplet_map_t *map, const char *str);
 
+void
+simplet_map_get_bgcolor(simplet_map_t *map, char **str);
+
 simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring);
 
