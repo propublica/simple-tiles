@@ -25,18 +25,7 @@ const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
 static void
 set_color(cairo_t *ctx, const char *arg){
-  unsigned int r, g, b, a, count;
-  count = sscanf(arg, "#%2x%2x%2x%2x", &r, &g, &b, &a);
-  switch(count){
-  case 3:
-    cairo_set_source_rgb(ctx, r / ST_CCEIL, g / ST_CCEIL, b / ST_CCEIL);
-    break;
-  case 4:
-    cairo_set_source_rgba(ctx, r / ST_CCEIL, g / ST_CCEIL, b / ST_CCEIL, a / ST_CCEIL);
-    break;
-  default:
-    return;
-  }
+  SIMPLET_CAIRO_RGBA(cairo_set_source, ctx, arg)
 }
 
 void
