@@ -112,7 +112,7 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter){
     cairo_new_path(filter->_ctx);
     cairo_arc(filter->_ctx, x - filter->_bounds->nw.x - r / 2,
               filter->_bounds->nw.y - y - r / 2, r, 0., 2 * M_PI);
-		cairo_close_path(filter->_ctx);
+    cairo_close_path(filter->_ctx);
   }
   simplet_apply_styles(filter->_ctx, filter->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
