@@ -109,8 +109,8 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter){
   cairo_save(filter->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-		cairo_new_path(filter->_ctx);
-	  cairo_arc(filter->_ctx, x - filter->_bounds->nw.x - r / 2,
+    cairo_new_path(filter->_ctx);
+    cairo_arc(filter->_ctx, x - filter->_bounds->nw.x - r / 2,
               filter->_bounds->nw.y - y - r / 2, r, 0., 2 * M_PI);
 		cairo_close_path(filter->_ctx);
   }
