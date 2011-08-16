@@ -184,7 +184,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer))){
-		OGR_DS_ReleaseResultSet(layer->_source, olayer);
+    OGR_DS_ReleaseResultSet(layer->_source, olayer);
     int err = CPLGetLastErrorNo();
     if(!err)
       return SIMPLET_OK;
