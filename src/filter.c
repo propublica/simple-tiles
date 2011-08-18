@@ -110,10 +110,10 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter){
   cairo_save(filter->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-		cairo_new_path(filter->_ctx);
-	  cairo_arc(filter->_ctx, x - filter->_bounds->nw.x - r / 2,
+    cairo_new_path(filter->_ctx);
+    cairo_arc(filter->_ctx, x - filter->_bounds->nw.x - r / 2,
               filter->_bounds->nw.y - y - r / 2, r, 0., 2 * M_PI);
-		cairo_close_path(filter->_ctx);
+    cairo_close_path(filter->_ctx);
   }
   simplet_apply_styles(filter->_ctx, filter->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
@@ -185,7 +185,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer))){
-		OGR_DS_ReleaseResultSet(layer->_source, olayer);
+    OGR_DS_ReleaseResultSet(layer->_source, olayer);
     int err = CPLGetLastErrorNo();
     if(!err)
       return SIMPLET_OK;
