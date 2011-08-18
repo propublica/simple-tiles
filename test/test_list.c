@@ -46,6 +46,15 @@ build_list(){
 
 
 static void
+test_get(){
+  simplet_list_t *list = build_list();
+  wrap_t *test = simplet_list_get(list, 0);
+  assert(test->val == 5);
+  test = simplet_list_get(list, list->length);
+  assert(!test);
+}
+
+static void
 test_push(){
   simplet_list_t *list;
   if(!(list = simplet_list_new()))
@@ -98,6 +107,7 @@ test_iter(){
 TASK(list) {
   test(push);
   test(pop);
+  test(get);
   test(destroy);
   test(iter);
 }
