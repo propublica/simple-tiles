@@ -71,7 +71,7 @@ void
 test_slippy_gen(){
   simplet_map_t *map;
   assert((map = build_map()));
-  simplet_map_set_slippy(map, 0, 1, 2);
+  simplet_map_set_slippy(map, 0, 0, 1);
   simplet_map_render_to_png(map, "./slippy.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
