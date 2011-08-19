@@ -18,8 +18,10 @@ main(){
   CHECK(filter)
   simplet_style_t *style   = simplet_filter_add_style(filter, "weight", "0.1");
   CHECK(style);
-  simplet_style_t *style1  = simplet_filter_add_style(filter, "fill",   "#061F3799");
+  simplet_style_t *style1  = simplet_filter_add_style(filter, "fill", "#061F3799");
   CHECK(style1);
+  simplet_style_t *style2  = simplet_filter_add_style(filter, "stroke", "#ffffff99");
+  CHECK(style2);
   if(simplet_map_is_valid(map))
     simplet_map_render_to_png(map, "./out.png");
   simplet_map_free(map);
