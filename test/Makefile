@@ -1,9 +1,11 @@
 OPTIMIZATION?=-O3
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings $(ARCH) \
-	$(shell pkg-config --cflags cairo simple-tiles) \
+CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings
+	$(ARCH) $(shell pkg-config --cflags cairo simple-tiles) \
 	$(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles) \
 	$(shell gdal-config --libs)
+
+MEMCHECK_OPTS = --memcheck:leakcheck=full
 
 
 OBJ = test_list.o test_style.o test_filter.o test_layer.o test_map.o test_integration.o
@@ -22,13 +24,26 @@ api: api.o
 benchmark: benchmark.o
 runner: runner.o $(OBJ)
 
-test: runner api benchmark
+
+data:
 	cd ../data && make && cd ../test
+
+run_tests: runner
 	./runner
-	time ./api
+
+run_benchmark: benchmark
 	./benchmark
+
+run_api: api
+	time ./api
+
+test: data run_tests run_api run_benchmark
+
+memcheck: test
+	valgrind $(MEMCHECK_OPTS) ./runner
+	valgrind $(MEMCHECK_OPTS) ./api
 
 dep:
 	@$(CC) -MM *.c
 
-.PHONY: dep test
+.PHONY: dep test run_benchmark run_tests run_api
