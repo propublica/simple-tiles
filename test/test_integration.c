@@ -103,8 +103,8 @@ test_points(){
 	simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -92.889433, 42.491912,-86.763988, 47.080772);
-  simplet_map_add_layer(map, "../data/10m_populated_places.shp");
-  simplet_map_add_filter(map,  "SELECT * from '10m_populated_places'");
+  simplet_map_add_layer(map, "../data/ne_10m_populated_places.shp");
+  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_populated_places'");
 	simplet_map_add_style(map, "fill",      "#061F3799");
   simplet_map_add_style(map, "stroke",    "#ffffff99");
   simplet_map_add_style(map, "weight",    "0.1");
