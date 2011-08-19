@@ -4,11 +4,14 @@ all:
 install:
 	cd src && $(MAKE) $@
 
-test: all
+test memcheck: all
 	$(MAKE) install
 	cd $@ && $(MAKE) $@
 
 clean:
 	rm -rf bin build test/*.o src/*.o test/runner test/api test/benchmark
 
-.PHONY: all test clean install
+lint:
+	CC=scan-build $(MAKE) $@
+
+.PHONY: all test clean install lint
