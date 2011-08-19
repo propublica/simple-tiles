@@ -51,6 +51,9 @@ simplet_map_free(simplet_map_t *map){
   if(map->proj)
     OSRRelease(map->proj);
 
+  if(map->bgcolor)
+    free(map->bgcolor);
+
   free(map);
 }
 
@@ -88,6 +91,7 @@ simplet_map_set_size(simplet_map_t *map, int width, int height){
 
 simplet_status_t
 simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
+  free(map->bgcolor);
   if((map->bgcolor = simplet_copy_string(str)))
     return SIMPLET_OK;
   return simplet_map_error(map, SIMPLET_OOM, "couldn't copy bgcolor");
