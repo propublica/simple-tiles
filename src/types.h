@@ -9,6 +9,10 @@
 extern "C" {
 #endif
 
+#define SIMPLET_ERROR_FIELDS \
+    simplet_error_t error; \
+    int valid;
+
 /* bounds and simple points */
 typedef struct {
   double x;
