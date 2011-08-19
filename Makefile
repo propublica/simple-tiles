@@ -4,9 +4,9 @@ all:
 install:
 	cd src && $(MAKE) $@
 
-test memcheck: all
+test run-api memcheck test-all: all
 	$(MAKE) install
-	cd $@ && $(MAKE) $@
+	cd test && $(MAKE) $@
 
 clean:
 	rm -rf bin build test/*.o src/*.o test/runner test/api test/benchmark
