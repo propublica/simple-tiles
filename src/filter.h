@@ -19,6 +19,12 @@ simplet_filter_free(simplet_filter_t *filter);
 simplet_filter_t*
 simplet_filter_new(const char *sqlquery);
 
+simplet_status_t
+simplet_filter_set_query(simplet_filter_t *filter, const char *query);
+
+simplet_status_t
+simplet_filter_get_query(simplet_filter_t *filter, char **query);
+
 simplet_style_t*
 simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *arg);
 

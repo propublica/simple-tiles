@@ -38,6 +38,23 @@ simplet_filter_free(simplet_filter_t *filter){
   free(filter);
 }
 
+// TODO: set filter error
+simplet_status_t
+simplet_filter_set_query(simplet_filter_t *filter, const char* query){
+  free(filter->ogrsql);
+  if(!(filter->ogrsql = simplet_copy_string(query)))
+    return SIMPLET_OOM;
+  return SIMPLET_OK;
+}
+
+// TODO: set filter error
+simplet_status_t
+simplet_filter_get_query(simplet_filter_t *filter, char** query){
+  if(!(*query = simplet_copy_string(filter->ogrsql)))
+    return SIMPLET_OOM;
+  return SIMPLET_OK;
+}
+
 void
 simplet_filter_vfree(void *filter){
   simplet_filter_free(filter);
