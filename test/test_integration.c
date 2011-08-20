@@ -9,8 +9,8 @@ build_map(){
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -179.231086, 17.831509, -100.859681, 71.441059);
-  simplet_map_add_layer(map, "../data/10m_admin_0_countries.shp");
-  simplet_map_add_filter(map, "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
+  simplet_map_add_filter(map, "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "line-cap",  "square");
   simplet_map_add_style(map, "line-join", "round");
   simplet_map_add_style(map, "fill",      "#061F3799");
@@ -33,8 +33,8 @@ test_many_layers(){
   simplet_map_t *map;
   assert((map = build_map()));
   assert(simplet_map_is_valid(map));
-  simplet_map_add_layer(map, "../data/10m_admin_0_countries.shp");
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries' where SOV_A3 = 'US1'");
+  simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
+  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries' where SOV_A3 = 'US1'");
   simplet_map_add_style(map, "fill", "#cc0000dd");
   simplet_map_render_to_png(map, "./layers.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));
@@ -46,7 +46,7 @@ test_many_filters(){
   simplet_map_t *map;
   assert((map = build_map()));
   assert(simplet_map_is_valid(map));
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries' where SOV_A3 = 'US1'");
+  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries' where SOV_A3 = 'US1'");
   simplet_map_add_style(map, "weight", "1");
   simplet_map_add_style(map, "stroke", "#00cc00dd");
   simplet_map_add_style(map, "fill",   "#cc000099");

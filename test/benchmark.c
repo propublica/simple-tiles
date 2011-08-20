@@ -33,8 +33,8 @@ static void
 initialize_map(simplet_map_t *map){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 1, 2);
-  simplet_map_add_layer(map, "../data/10m_admin_0_countries.shp");
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
+  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "weight", "0.1");
   simplet_map_add_style(map, "fill",   "#061F37ff");
 }
@@ -69,13 +69,13 @@ static void
 bench_many_layers(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "weight", "0.1");
   simplet_map_add_style(map, "stroke",   "#ffffffff");
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "weight", "0.1");
   simplet_map_add_style(map, "stroke",   "#ffffffff");
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
+  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "weight", "0.1");
   simplet_map_add_style(map, "stroke",   "#ffffffff");
   char *data = NULL;
