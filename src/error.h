@@ -13,6 +13,8 @@ simplet_set_error(simplet_error_t *error, simplet_status_t status, const char *m
 void
 simplet_error_init();
 
+simplet_status_t
+simplet_error(simplet_errorable_t *errr, simplet_status_t err, const char* msg);
 
 #ifdef __cplusplus
 }
