@@ -11,5 +11,6 @@ test_list
 runner
 data/1*
 data/t*
+data/n*
 test/benchmark
 *.orig

@@ -56,6 +56,16 @@ simplet_list_pop(simplet_list_t *list){
   return val;
 }
 
+void*
+simplet_list_get(simplet_list_t* list, unsigned int idx){
+  if(idx > list->length) return NULL;
+  simplet_node_t *n = list->head;
+  if(idx <= 0) return n->value;
+  while(idx-- && n) n = n->next;
+  if(n) return n->value;
+  return NULL;
+}
+
 void
 simplet_list_free(simplet_list_t *list){
   void* val;

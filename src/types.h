@@ -10,8 +10,8 @@ extern "C" {
 #endif
 
 #define SIMPLET_ERROR_FIELDS \
-	simplet_error_t error; \
-	int valid;
+    simplet_error_t error; \
+    int valid;
 
 /* bounds and simple points */
 typedef struct {
@@ -71,14 +71,15 @@ typedef struct {
   cairo_t              *_ctx; /* ephemeral, not for outside usage */
   unsigned int width;
   unsigned int height;
-	SIMPLET_ERROR_FIELDS
+  char *bgcolor;
+  SIMPLET_ERROR_FIELDS
 } simplet_map_t;
 
 typedef struct {
   OGRDataSourceH _source; /* ephemeral, not for outside usage */
   char           *source;
   simplet_list_t *filters;
-	SIMPLET_ERROR_FIELDS
+  SIMPLET_ERROR_FIELDS
 } simplet_layer_t;
 
 typedef struct {
@@ -86,13 +87,13 @@ typedef struct {
   simplet_list_t   *styles;
   cairo_t          *_ctx;    /* ephemeral, not for outside usage */
   simplet_bounds_t *_bounds; /* ephemeral, not for outside usage */
-	SIMPLET_ERROR_FIELDS
+  SIMPLET_ERROR_FIELDS
 } simplet_filter_t;
 
 typedef struct {
   char *key;
   char *arg;
-	SIMPLET_ERROR_FIELDS
+  SIMPLET_ERROR_FIELDS
 } simplet_style_t;
 
 

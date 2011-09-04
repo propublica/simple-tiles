@@ -29,7 +29,29 @@ test_lookup(){
   simplet_filter_free(filter);
 }
 
+static void
+test_query(){
+  const char* test = "SELECT * FROM TEST;";
+  simplet_filter_t *filter;
+  if(!(filter = simplet_filter_new(test)))
+    assert(0);
+
+  char *tmp;
+  simplet_filter_get_query(filter, &tmp);
+  assert(!strcmp(test, tmp));
+  free(tmp);
+
+  const char* t = "SELECT * FROM TEST2;";
+  simplet_filter_set_query(filter, t);
+  simplet_filter_get_query(filter, &tmp);
+  assert(!strcmp(t, tmp));
+  free(tmp);
+
+  simplet_filter_free(filter);
+}
+
 TASK(filter) {
   test(filter);
   test(lookup);
+  test(query);
 }

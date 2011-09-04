@@ -38,6 +38,23 @@ simplet_filter_free(simplet_filter_t *filter){
   free(filter);
 }
 
+// TODO: set filter error
+simplet_status_t
+simplet_filter_set_query(simplet_filter_t *filter, const char* query){
+  free(filter->ogrsql);
+  if(!(filter->ogrsql = simplet_copy_string(query)))
+    return SIMPLET_OOM;
+  return SIMPLET_OK;
+}
+
+// TODO: set filter error
+simplet_status_t
+simplet_filter_get_query(simplet_filter_t *filter, char** query){
+  if(!(*query = simplet_copy_string(filter->ogrsql)))
+    return SIMPLET_OOM;
+  return SIMPLET_OK;
+}
+
 void
 simplet_filter_vfree(void *filter){
   simplet_filter_free(filter);
@@ -45,6 +62,7 @@ simplet_filter_vfree(void *filter){
 
 static void
 plot_part(OGRGeometryH geom, simplet_filter_t *filter){
+  simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
   double x, y, last_x, last_y;
   OGR_G_GetPoint(geom, 0, &x, &y, NULL);
   last_x = x;
@@ -57,7 +75,7 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter){
     double dy = fabs(last_y - y);
     cairo_user_to_device_distance(filter->_ctx, &dx, &dy);
 
-    if(dx >= 0.25 || dy >= 0.25){
+    if(seamless || (dx >= 0.25 || dy >= 0.25)){
       cairo_line_to(filter->_ctx, x - filter->_bounds->nw.x,
                     filter->_bounds->nw.y - y);
       last_x = x;
@@ -109,10 +127,10 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter){
   cairo_save(filter->_ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
-		cairo_new_path(filter->_ctx);
-	  cairo_arc(filter->_ctx, x - filter->_bounds->nw.x - r / 2,
+    cairo_new_path(filter->_ctx);
+    cairo_arc(filter->_ctx, x - filter->_bounds->nw.x - r / 2,
               filter->_bounds->nw.y - y - r / 2, r, 0., 2 * M_PI);
-		cairo_close_path(filter->_ctx);
+    cairo_close_path(filter->_ctx);
   }
   simplet_apply_styles(filter->_ctx, filter->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
@@ -184,7 +202,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
 
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer))){
-		OGR_DS_ReleaseResultSet(layer->_source, olayer);
+    OGR_DS_ReleaseResultSet(layer->_source, olayer);
     int err = CPLGetLastErrorNo();
     if(!err)
       return SIMPLET_OK;

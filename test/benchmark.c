@@ -37,8 +37,8 @@ initialize_map(simplet_map_t *map){
       "../data/10m_admin_0_countries.shp");
   simplet_filter_t *filter = simplet_layer_add_filter(layer,
       "SELECT * from '10m_admin_0_countries'");
-  simplet_map_add_style(filter, "weight", "0.1");
-  simplet_map_add_style(filter, "fill",   "#061F37ff");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "fill",   "#061F37ff");
 }
 
 static cairo_status_t
@@ -61,7 +61,9 @@ static void
 bench_seamless(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_map_add_style(map, "seamless", "true");
+  simplet_layer_t  *layer  = map->layers->tail->value;
+  simplet_filter_t *filter = layer->filters->tail->value;
+  simplet_filter_add_style(filter, "seamless", "true");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
@@ -71,15 +73,21 @@ static void
 bench_many_layers(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
-  simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "stroke",   "#ffffffff");
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
-  simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "stroke",   "#ffffffff");
-  simplet_map_add_filter(map,  "SELECT * from '10m_admin_0_countries'");
-  simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "stroke",   "#ffffffff");
+
+  simplet_layer_t *layer   = map->layers->tail->value;
+  simplet_filter_t *filter = simplet_layer_add_filter(layer,
+                                      "SELECT * from '10m_admin_0_countries'");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+
+  filter = simplet_layer_add_filter(layer,  "SELECT * from '10m_admin_0_countries'");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+
+  filter = simplet_layer_add_filter(layer,  "SELECT * from '10m_admin_0_countries'");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
