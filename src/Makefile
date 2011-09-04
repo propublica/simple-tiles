@@ -56,10 +56,8 @@ style.o: style.c map.h types.h list.h bounds.h point.h style.h layer.h \
   util.h
 util.o: util.c util.h
 
-
-
 dep:
 	@$(CC) -MM *.c
 
-.PHONY: all dep dynamic static
+.PHONY: all dep
 
