@@ -24,14 +24,13 @@ api: api.o
 benchmark: benchmark.o
 runner: runner.o $(OBJ)
 
-
 data:
 	cd ../data && make && cd ../test
 
 test: data runner
 	./runner
 
-run-benchmark: data benchmark
+run_benchmark: data benchmark
 	./benchmark
 
 run_api: api
