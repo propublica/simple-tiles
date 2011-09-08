@@ -214,7 +214,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(ctx),
-                                  CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
+                                CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return set_error(filter, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
 
@@ -233,7 +233,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     OGR_F_Destroy(feature);
   }
 
-  cairo_scale(ctx, mbounds->width / map->width, mbounds->width / map->width);
+  cairo_scale(sub_ctx, mbounds->width / map->width, mbounds->width / map->width);
   cairo_set_source_surface(ctx, surface, 0, 0);
   cairo_paint(ctx);
   cairo_destroy(sub_ctx);
