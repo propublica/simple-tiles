@@ -31,7 +31,6 @@ simplet_map_new(){
   map->error.status = SIMPLET_OK;
   map->height       = 0;
   map->width        = 0;
-  map->valid        = SIMPLET_OK;
   return map;
 }
 
@@ -57,7 +56,7 @@ simplet_map_free(simplet_map_t *map){
   free(map);
 }
 
-
+SIMPLET_ERROR_FUNC(map_t)
 
 simplet_status_t
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
@@ -65,10 +64,10 @@ simplet_map_set_srs(simplet_map_t *map, const char *proj){
     OSRRelease(map->proj);
 
   if(!(map->proj = OSRNewSpatialReference(NULL)))
-    return simplet_error((simplet_errorable_t *) map, SIMPLET_OGR_ERR, "could not assign spatial ref");
+    return set_error(map, SIMPLET_OGR_ERR, "could not assign spatial ref");
 
   if(OSRSetFromUserInput(map->proj, proj) != OGRERR_NONE)
-    return simplet_error((simplet_errorable_t *) map, SIMPLET_OGR_ERR, "bad projection string");
+    return set_error(map, SIMPLET_OGR_ERR, "bad projection string");
 
   return SIMPLET_OK;
 }
@@ -90,7 +89,7 @@ simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
   free(map->bgcolor);
   if((map->bgcolor = simplet_copy_string(str)))
     return SIMPLET_OK;
-  return simplet_error((simplet_errorable_t *) map, SIMPLET_OOM, "couldn't copy bgcolor");
+  return set_error(map, SIMPLET_OOM, "couldn't copy bgcolor");
 }
 
 void
@@ -107,7 +106,7 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
     simplet_bounds_free(map->bounds);
 
   if(!(map->bounds = simplet_bounds_new()))
-    return simplet_error((simplet_errorable_t *) map, SIMPLET_OOM, "couldn't create bounds");
+    return set_error(map, SIMPLET_OOM, "couldn't create bounds");
 
   simplet_bounds_extend(map->bounds, maxx, maxy);
   simplet_bounds_extend(map->bounds, minx, miny);
@@ -120,7 +119,7 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
   if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
-    return simplet_error((simplet_errorable_t *) map, SIMPLET_OGR_ERR, "couldn't set slippy projection");
+    return set_error(map, SIMPLET_OGR_ERR, "couldn't set slippy projection");
 
   double zfactor, length, origin;
   zfactor = pow(2.0, z);
@@ -140,13 +139,13 @@ simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   simplet_layer_t *layer;
   if(!(layer = simplet_layer_new(datastring))){
-    simplet_error((simplet_errorable_t *) map, SIMPLET_OOM, "couldn't create a layer");
+    set_error(map, SIMPLET_OOM, "couldn't create a layer");
     return NULL;
   }
 
   if(!simplet_list_push(map->layers, layer)){
     simplet_layer_free(layer);
-    simplet_error((simplet_errorable_t *) map, SIMPLET_OOM, "couldn't add anymore layers");
+    set_error(map, SIMPLET_OOM, "couldn't add any more layers");
     return NULL;
   }
 
@@ -212,13 +211,15 @@ simplet_map_build_surface(simplet_map_t *map){
     err = simplet_layer_process(layer, map);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
-      simplet_error((simplet_errorable_t *) map, err, "error in rendering");
+      set_error(map, err, "error in rendering");
       break;
     }
   }
 
   return surface;
 }
+
+
 
 void
 simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
@@ -234,7 +235,7 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   if(!(surface = simplet_map_build_surface(map))) return;
 
   if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS)
-    simplet_error((simplet_errorable_t *) map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_status(map->_ctx)));
+    set_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_status(map->_ctx)));
 
   simplet_map_close_surface(map, surface);
 }
@@ -245,7 +246,7 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
   if(!(surface = simplet_map_build_surface(map))) return;
 
   if(cairo_surface_write_to_png(surface, path) != CAIRO_STATUS_SUCCESS)
-    simplet_error((simplet_errorable_t *) map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_status(map->_ctx)));
+    set_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_status(map->_ctx)));
 
   simplet_map_close_surface(map, surface);
 }

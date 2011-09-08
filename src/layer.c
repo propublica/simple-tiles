@@ -1,6 +1,7 @@
 #include "layer.h"
 #include "filter.h"
 #include "util.h"
+#include "error.h"
 
 simplet_layer_t*
 simplet_layer_new(const char *datastring){
@@ -18,6 +19,8 @@ simplet_layer_new(const char *datastring){
 
   return layer;
 }
+
+SIMPLET_ERROR_FUNC(layer_t)
 
 void
 simplet_layer_vfree(void *layer){
@@ -50,11 +53,11 @@ simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map){
   simplet_listiter_t *iter;
   if(!(layer->_source = OGROpen(layer->source, 0, NULL)))
-    return SIMPLET_OGR_ERR;
+    return set_error(layer, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   if(!(iter = simplet_get_list_iter(layer->filters))){
     OGR_DS_Destroy(layer->_source);
-    return SIMPLET_OOM;
+    return set_error(layer, SIMPLET_OOM, "out of memory getting list_iterator");
   }
 
   simplet_filter_t *filter;

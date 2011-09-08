@@ -45,10 +45,6 @@ simplet_set_error(simplet_error_t *error, simplet_status_t status, const char *m
       error->status = SIMPLET_OGR_ERR;
       snprintf(error->msg, SIMPLET_MAX_ERROR, "OGR error: %s, %s", CPLGetLastErrorMsg(), msg);
       break;
-    case SIMPLET_INVALID_MAP:
-      error->status =  SIMPLET_INVALID_MAP;
-      snprintf(error->msg, SIMPLET_MAX_ERROR, "Invalid map: %s", msg);
-      break;
     case SIMPLET_OK:
       error->status = SIMPLET_OK;
       snprintf(error->msg, SIMPLET_MAX_ERROR, "%s", msg);
