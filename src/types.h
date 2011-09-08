@@ -72,7 +72,6 @@ typedef struct {
   simplet_bounds_t     *bounds;
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
-  cairo_t              *_ctx; /* ephemeral, not for outside usage */
   unsigned int width;
   unsigned int height;
   char *bgcolor;
@@ -80,7 +79,6 @@ typedef struct {
 
 typedef struct {
   SIMPLET_ERROR_FIELDS
-  OGRDataSourceH _source; /* ephemeral, not for outside usage */
   char           *source;
   simplet_list_t *filters;
 } simplet_layer_t;
@@ -89,8 +87,6 @@ typedef struct {
   SIMPLET_ERROR_FIELDS
   char *ogrsql;
   simplet_list_t   *styles;
-  cairo_t          *_ctx;    /* ephemeral, not for outside usage */
-  simplet_bounds_t *_bounds; /* ephemeral, not for outside usage */
 } simplet_filter_t;
 
 typedef struct {
