@@ -45,15 +45,16 @@ install: $(DYLIBNAME) $(STLIBNAME)
 bounds.o: bounds.c bounds.h types.h point.h
 error.o: error.c error.h types.h
 filter.o: filter.c style.h types.h list.h filter.h map.h bounds.h point.h \
-  layer.h util.h
+  layer.h error.h util.h
+init.o: init.c error.h types.h
 layer.o: layer.c layer.h types.h filter.h list.h map.h bounds.h point.h \
-  style.h util.h
+  style.h error.h util.h
 list.o: list.c list.h types.h
-map.o: map.c map.h types.h list.h bounds.h point.h style.h layer.h \
-  error.h filter.h util.h
+map.o: map.c init.h map.h types.h list.h bounds.h style.h layer.h error.h \
+  filter.h util.h
 point.o: point.c point.h types.h
 style.o: style.c map.h types.h list.h bounds.h point.h style.h layer.h \
-  util.h
+  error.h util.h
 util.o: util.c util.h
 
 
