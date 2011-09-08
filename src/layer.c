@@ -2,6 +2,8 @@
 #include "filter.h"
 #include "util.h"
 #include "error.h"
+#include <cpl_error.h>
+
 
 simplet_layer_t*
 simplet_layer_new(const char *datastring){
