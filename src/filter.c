@@ -62,25 +62,21 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bou
   OGR_G_GetPoint(geom, 0, &x, &y, NULL);
   last_x = x;
   last_y = y;
-  cairo_move_to(ctx, x - bounds->nw.x,
-                bounds->nw.y - y);
+  cairo_move_to(ctx, x - bounds->nw.x, bounds->nw.y - y);
   for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
-    double dx = fabs(last_x - x);
-    double dy = fabs(last_y - y);
+    double dx = fabs(last_x - x), dy = fabs(last_y - y);
     cairo_user_to_device_distance(ctx, &dx, &dy);
 
     if(seamless || (dx >= 0.25 || dy >= 0.25)){
-      cairo_line_to(ctx, x - bounds->nw.x,
-                    bounds->nw.y - y);
+      cairo_line_to(ctx, x - bounds->nw.x, bounds->nw.y - y);
       last_x = x;
       last_y = y;
     }
   }
   // ensure something is always drawn
   OGR_G_GetPoint(geom, OGR_G_GetPointCount(geom) - 1, &x, &y, NULL);
-  cairo_line_to(ctx, x - bounds->nw.x,
-                              bounds->nw.y - y);
+  cairo_line_to(ctx, x - bounds->nw.x, bounds->nw.y - y);
 }
 
 static void
@@ -236,6 +232,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     dispatch(geom, filter, sub_ctx, mbounds);
     OGR_F_Destroy(feature);
   }
+
   cairo_scale(ctx, mbounds->width / map->width, mbounds->width / map->width);
   cairo_set_source_surface(ctx, surface, 0, 0);
   cairo_paint(ctx);
