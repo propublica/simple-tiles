@@ -173,7 +173,6 @@ set_seamless(simplet_list_t *styles, cairo_t *ctx){
 /* FIXME: this function is way too hairy and needs error handling */
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet_map_t *map){
-  clock_t query = clock();
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_ExecuteSQL(layer->_source, filter->ogrsql, NULL, NULL))){
     int err = CPLGetLastErrorNo();
@@ -218,9 +217,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   cairo_scale(filter->_ctx, map->width / filter->_bounds->width,
                             map->width / filter->_bounds->width);
 
-  time_end("queried in", query);
   OGRFeatureH feature;
-  clock_t render = clock();
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL) continue;
@@ -230,7 +227,6 @@ simplet_filter_process(simplet_filter_t *filter, simplet_layer_t *layer, simplet
   }
   cairo_scale(filter->_ctx, filter->_bounds->width / map->width,
                             filter->_bounds->width / map->width);
-  time_end("rendered in", render);
   filter->_bounds = NULL;
 
   cairo_set_source_surface(map->_ctx, surface, 0, 0);

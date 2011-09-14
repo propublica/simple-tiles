@@ -65,8 +65,17 @@ simplet_map_error(simplet_map_t *map, simplet_status_t err, const char* msg){
 
 simplet_status_t
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
-  if(map->proj)
+  if(map->proj) {
+    if(map->bounds){
+      simplet_bounds_t *tmp = map->bounds;
+      char *s;
+      simplet_map_get_srs(map, &s);
+      map->bounds = simplet_bounds_reproject(map->bounds, (const char *) s, (const char *) proj);
+      free(s);
+      simplet_bounds_free(tmp);
+    }
     OSRRelease(map->proj);
+  }
 
   if(!(map->proj = OSRNewSpatialReference(NULL)))
     return simplet_map_error(map, SIMPLET_OGR_ERR, "could not assign spatial ref");
@@ -285,20 +294,17 @@ simplet_map_close_surface(simplet_map_t *map, cairo_surface_t *surface){
 void
 simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
-  clock_t start = clock();
   cairo_surface_t *surface;
 
   if(!(surface = simplet_map_build_surface(map))) return;
   if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS)
     simplet_map_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_status(map->_ctx)));
 
-  time_end("png in", start);
   simplet_map_close_surface(map, surface);
 }
 
 void
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
-
   cairo_surface_t *surface;
   if(!(surface = simplet_map_build_surface(map))) return;
 

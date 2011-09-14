@@ -95,3 +95,15 @@ simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt){
   return SIMPLET_OK;
 }
 
+simplet_bounds_t*
+simplet_bounds_reproject(simplet_bounds_t* bounds, const char *from, const char *to){
+  OGRSpatialReferenceH proj_from = OSRNewSpatialReference(NULL);
+  if(!(OSRSetFromUserInput(proj_from, from) != OGRERR_NONE)) return NULL;
+  OGRGeometryH geom = simplet_bounds_to_ogr(bounds, proj_from);
+  OSRDestroySpatialReference(proj_from);
+  OGRSpatialReferenceH proj_to = OSRNewSpatialReference(NULL);
+  if(!(OSRSetFromUserInput(proj_to, to) != OGRERR_NONE)) return NULL;
+  OGR_G_Transform(geom, proj_to);
+  OSRDestroySpatialReference(proj_to);
+  return simplet_bounds_from_ogr(geom);
+}

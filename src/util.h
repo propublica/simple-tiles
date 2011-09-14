@@ -14,9 +14,6 @@ simplet_parse_color(const char *src, unsigned int *r, unsigned int *g,
 
 #define SIMPLET_CCEIL 256.0
 
-void
-time_end(const char *prefix, clock_t start);
-
 #ifdef __cplusplus
 }
 #endif
