@@ -20,3 +20,8 @@ simplet_parse_color(const char *src, unsigned int *r, unsigned int *g,
                     unsigned int *b, unsigned int *a){
   return sscanf(src, "#%2x%2x%2x%2x", r, g, b, a);
 }
+
+void
+time_end(const char * prefix, clock_t start){
+  printf("\n\x1b[1;32m%s: %f\x1b[0m\n", prefix, (double) (clock() - start) / CLOCKS_PER_SEC);
+}

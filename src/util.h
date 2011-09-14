@@ -1,6 +1,6 @@
 #ifndef _SIMPLE_TILES_UTIL_H
 #define _SIMPLE_TILES_UTIL_H
-
+#include <time.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +13,9 @@ simplet_parse_color(const char *src, unsigned int *r, unsigned int *g,
                     unsigned int *b, unsigned int *a);
 
 #define SIMPLET_CCEIL 256.0
+
+void
+time_end(const char *prefix, clock_t start);
 
 #ifdef __cplusplus
 }
