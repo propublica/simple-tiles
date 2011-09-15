@@ -4,6 +4,9 @@
 #include "style.h"
 #include "filter.h"
 #include "util.h"
+#include "list.h"
+#include "map.h"
+#include "bounds.h"
 
 simplet_filter_t *
 simplet_filter_new(const char *sqlquery){
@@ -216,7 +219,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     dispatch(geom, filter, sub_ctx, mbounds);
     OGR_F_Destroy(feature);
   }
-  cairo_scale(ctx, mbounds->width / map->width, mbounds->width / map->width);
+  cairo_scale(sub_ctx, mbounds->width / map->width, mbounds->width / map->width);
   cairo_set_source_surface(ctx, surface, 0, 0);
   cairo_paint(ctx);
   cairo_destroy(sub_ctx);

@@ -2,12 +2,6 @@
 #define _SIMPLE_TILES_MAP_H
 
 #include "types.h"
-#include "list.h"
-#include "bounds.h"
-#include "style.h"
-#include "layer.h"
-#include "error.h"
-
 
 #ifdef __cplusplus
 extern "C" {

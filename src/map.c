@@ -2,11 +2,14 @@
 #include <stdio.h>
 #include <math.h>
 #include "init.h"
+#include "error.h"
 #include "map.h"
 #include "layer.h"
 #include "filter.h"
 #include "style.h"
 #include "util.h"
+#include "bounds.h"
+
 
 
 #define SIMPLET_SLIPPY_SIZE 256
@@ -14,7 +17,7 @@
 
 simplet_map_t*
 simplet_map_new(){
-  simplet_error_init();
+  simplet_init();
   simplet_map_t *map;
   if(!(map = malloc(sizeof(*map))))
     return NULL;
