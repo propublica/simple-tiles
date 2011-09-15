@@ -4,7 +4,6 @@
 #include <ogr_api.h>
 #include <ogr_srs_api.h>
 #include "types.h"
-#include "point.h"
 
 #ifdef __cplusplus
 extern "C" {

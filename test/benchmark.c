@@ -4,6 +4,7 @@
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
 #include <simple-tiles/error.h>
+#include <simple-tiles/list.h>
 
 static void*
 setup_map(){
