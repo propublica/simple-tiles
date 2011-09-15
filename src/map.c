@@ -271,7 +271,6 @@ simplet_map_build_surface(simplet_map_t *map){
   simplet_layer_t *layer;
   simplet_status_t err;
 
-  OGRRegisterAll();
   while((layer = simplet_list_next(iter))){
     err = simplet_layer_process(layer, map);
     if(err != SIMPLET_OK) {

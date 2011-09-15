@@ -15,6 +15,7 @@ void
 simplet_error_init(){
   if(error_initialized) return;
   if(pthread_mutex_lock(&error_lock) > 0) return;
+  OGRRegisterAll();
   error_initialized = 1;
   CPLSetErrorHandler(ogr_error_handler);
   pthread_mutex_unlock(&error_lock);
