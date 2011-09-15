@@ -51,9 +51,10 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
   simplet_listiter_t *iter; OGRDataSourceH source;
   if(!(source = OGROpenShared(layer->source, 0, NULL)))
     return SIMPLET_OGR_ERR;
-
+  //retain the datasource
+  if(OGR_DS_GetRefCount(source) == 1) OGR_DS_Reference(source);
   if(!(iter = simplet_get_list_iter(layer->filters))){
-    OGR_DS_Destroy(source);
+    OGRReleaseDataSource(source);
     return SIMPLET_OOM;
   }
 
@@ -63,8 +64,10 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
     status = simplet_filter_process(filter, map, source, ctx);
     if(status != SIMPLET_OK){
       simplet_list_iter_free(iter);
+      OGRReleaseDataSource(source);
       return status;
     }
   }
+  OGRReleaseDataSource(source);
   return SIMPLET_OK;
 }

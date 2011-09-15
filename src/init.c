@@ -1,5 +1,6 @@
 #include "error.h"
 #include <pthread.h>
+#include <assert.h>
 
 static pthread_mutex_t simplet_lock = PTHREAD_MUTEX_INITIALIZER;
 static int initialized = 0;
@@ -8,8 +9,11 @@ static int initialized = 0;
 static void
 cleanup(){
 	for(int i = 0; i < OGRGetOpenDSCount(); i++)
-		OGR_DS_Destroy(OGRGetOpenDS(i));
-	OGRCleanupAll();
+    while(OGR_DS_GetRefCount(OGRGetOpenDS(i))) //ughh
+      OGRReleaseDataSource(OGRGetOpenDS(i));
+
+  assert(!OGRGetOpenDSCount());
+  OGRCleanupAll();
 }
 
 void
