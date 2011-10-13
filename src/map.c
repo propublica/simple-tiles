@@ -65,7 +65,7 @@ simplet_map_error(simplet_map_t *map, simplet_status_t err, const char* msg){
 simplet_status_t
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
   if(map->proj) {
-    if(map->bounds){
+    if(map->bounds) {
       simplet_bounds_t *tmp = map->bounds;
       char *s;
       simplet_map_get_srs(map, &s);
