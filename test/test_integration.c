@@ -1,5 +1,7 @@
 #include <string.h>
 #include <simple-tiles/map.h>
+#include <simple-tiles/layer.h>
+#include <simple-tiles/filter.h>
 #include "test.h"
 
 simplet_map_t*
@@ -37,9 +39,9 @@ test_many_layers(){
   assert((map = build_map()));
   assert(simplet_map_is_valid(map));
   simplet_layer_t  *layer  = simplet_map_add_layer(map,
-      "../data/10m_admin_0_countries.shp");
+      "../data/ne_10m_admin_0_countries.shp");
   simplet_filter_t *filter = simplet_layer_add_filter(layer,
-      "SELECT * from '10m_admin_0_countries' where SOV_A3 = 'US1'");
+      "SELECT * from 'ne_10m_admin_0_countries' where SOV_A3 = 'US1'");
   simplet_filter_add_style(filter, "fill", "#cc0000dd");
   simplet_map_render_to_png(map, "./layers.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));

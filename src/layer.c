@@ -54,12 +54,12 @@ simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
   simplet_listiter_t *iter; OGRDataSourceH source;
   if(!(source = OGROpenShared(layer->source, 0, NULL)))
-    return SIMPLET_OGR_ERR;
+    return set_error(layer, SIMPLET_OGR_ERR, "error opening layer source");
   //retain the datasource
   if(OGR_DS_GetRefCount(source) == 1) OGR_DS_Reference(source);
   if(!(iter = simplet_get_list_iter(layer->filters))){
     OGRReleaseDataSource(source);
-    return SIMPLET_OOM;
+    return set_error(layer, SIMPLET_OOM, "out of memory getting list iterator");
   }
 
   simplet_filter_t *filter;
