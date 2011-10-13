@@ -7,6 +7,7 @@
 #include "list.h"
 #include "map.h"
 #include "bounds.h"
+#include "error.h"
 
 simplet_filter_t *
 simplet_filter_new(const char *sqlquery){
