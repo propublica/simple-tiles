@@ -3,6 +3,9 @@
 #include <unistd.h>
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
+#include <simple-tiles/list.h>
+#include <simple-tiles/filter.h>
+#include <simple-tiles/layer.h>
 #include <simple-tiles/error.h>
 
 static void*
@@ -34,9 +37,9 @@ initialize_map(simplet_map_t *map){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 1, 2);
   simplet_layer_t  *layer  = simplet_map_add_layer(map,
-      "../data/10m_admin_0_countries.shp");
+      "../data/ne_10m_admin_0_countries.shp");
   simplet_filter_t *filter = simplet_layer_add_filter(layer,
-      "SELECT * from '10m_admin_0_countries'");
+      "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_filter_add_style(filter, "weight", "0.1");
   simplet_filter_add_style(filter, "fill",   "#061F37ff");
 }
@@ -76,15 +79,15 @@ bench_many_layers(void *ctx){
 
   simplet_layer_t *layer   = map->layers->tail->value;
   simplet_filter_t *filter = simplet_layer_add_filter(layer,
-                                      "SELECT * from '10m_admin_0_countries'");
+                                      "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_filter_add_style(filter, "weight", "0.1");
   simplet_filter_add_style(filter, "stroke", "#ffffffff");
 
-  filter = simplet_layer_add_filter(layer,  "SELECT * from '10m_admin_0_countries'");
+  filter = simplet_layer_add_filter(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_filter_add_style(filter, "weight", "0.1");
   simplet_filter_add_style(filter, "stroke", "#ffffffff");
 
-  filter = simplet_layer_add_filter(layer,  "SELECT * from '10m_admin_0_countries'");
+  filter = simplet_layer_add_filter(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_filter_add_style(filter, "weight", "0.1");
   simplet_filter_add_style(filter, "stroke", "#ffffffff");
 

@@ -13,9 +13,9 @@ build_map(){
   simplet_map_set_bounds(map,
       -179.231086, 17.831509, -100.859681, 71.441059);
   simplet_layer_t  *layer  = simplet_map_add_layer(map,
-      "../data/10m_admin_0_countries.shp");
+      "../data/ne_10m_admin_0_countries.shp");
   simplet_filter_t *filter = simplet_layer_add_filter(layer,
-      "SELECT * from '10m_admin_0_countries'");
+      "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_filter_add_style(filter, "line-cap",  "square");
   simplet_filter_add_style(filter, "line-join", "round");
   simplet_filter_add_style(filter, "fill",      "#061F3799");
@@ -56,7 +56,7 @@ test_many_filters(){
   simplet_filter_t *filter = simplet_layer_add_filter(
        // TODO: add simplet_list_get_at(idx) and simplet_map_get_layer_at(idx)
       (simplet_layer_t *) map->layers->tail->value,
-      "SELECT * from '10m_admin_0_countries' where SOV_A3 = 'US1'");
+      "SELECT * from 'ne_10m_admin_0_countries' where SOV_A3 = 'US1'");
   simplet_filter_add_style(filter, "weight", "1");
   simplet_filter_add_style(filter, "stroke", "#00cc00dd");
   simplet_filter_add_style(filter, "fill",   "#cc000099");

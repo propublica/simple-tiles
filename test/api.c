@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
+#include <simple-tiles/filter.h>
+#include <simple-tiles/layer.h>
 #define CHECK(x) if(x == NULL) { puts("##x is null!"); exit(1); }
 int
 main(){
@@ -12,9 +14,9 @@ main(){
 
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 0, 0);
-  simplet_layer_t *layer = simplet_map_add_layer(map, "../data/10m_admin_0_countries.shp");
+  simplet_layer_t *layer = simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
   CHECK(layer)
-  simplet_filter_t *filter = simplet_layer_add_filter(layer,  "SELECT * from '10m_admin_0_countries'");
+  simplet_filter_t *filter = simplet_layer_add_filter(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
   CHECK(filter)
   simplet_style_t *style   = simplet_filter_add_style(filter, "weight", "0.1");
   CHECK(style);
