@@ -1,10 +1,5 @@
 #include <cpl_error.h>
-#include <pthread.h>
 #include "error.h"
-
-
-static pthread_mutex_t error_lock = PTHREAD_MUTEX_INITIALIZER;
-static int error_initialized = 0;
 
 static void
 ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
@@ -13,11 +8,7 @@ ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
 
 void
 simplet_error_init(){
-  if(error_initialized) return;
-  if(pthread_mutex_lock(&error_lock) > 0) return;
-  error_initialized = 1;
   CPLSetErrorHandler(ogr_error_handler);
-  pthread_mutex_unlock(&error_lock);
 }
 
 simplet_status_t

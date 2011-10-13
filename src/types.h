@@ -86,7 +86,7 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   char *ogrsql;
-  simplet_list_t   *styles;
+  simplet_list_t *styles;
 } simplet_filter_t;
 
 typedef struct {

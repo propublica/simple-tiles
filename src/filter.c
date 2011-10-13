@@ -4,7 +4,9 @@
 #include "style.h"
 #include "filter.h"
 #include "util.h"
-#include "error.h"
+#include "list.h"
+#include "map.h"
+#include "bounds.h"
 
 simplet_filter_t *
 simplet_filter_new(const char *sqlquery){
@@ -62,21 +64,24 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bou
   OGR_G_GetPoint(geom, 0, &x, &y, NULL);
   last_x = x;
   last_y = y;
-  cairo_move_to(ctx, x - bounds->nw.x, bounds->nw.y - y);
+  cairo_move_to(ctx, x - bounds->nw.x,
+                bounds->nw.y - y);
   for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
     double dx = fabs(last_x - x), dy = fabs(last_y - y);
     cairo_user_to_device_distance(ctx, &dx, &dy);
 
     if(seamless || (dx >= 0.25 || dy >= 0.25)){
-      cairo_line_to(ctx, x - bounds->nw.x, bounds->nw.y - y);
+      cairo_line_to(ctx, x - bounds->nw.x,
+                    bounds->nw.y - y);
       last_x = x;
       last_y = y;
     }
   }
   // ensure something is always drawn
   OGR_G_GetPoint(geom, OGR_G_GetPointCount(geom) - 1, &x, &y, NULL);
-  cairo_line_to(ctx, x - bounds->nw.x, bounds->nw.y - y);
+  cairo_line_to(ctx, x - bounds->nw.x,
+                              bounds->nw.y - y);
 }
 
 static void
@@ -214,7 +219,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(ctx),
-                                CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
+                                  CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     return set_error(filter, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
 

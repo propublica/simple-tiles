@@ -1,6 +1,6 @@
 #ifndef _SIMPLE_TILES_UTIL_H
 #define _SIMPLE_TILES_UTIL_H
-
+#include <time.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

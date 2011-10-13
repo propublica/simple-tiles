@@ -1,12 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
+#include "init.h"
+#include "error.h"
 #include "map.h"
 #include "layer.h"
 #include "filter.h"
 #include "style.h"
 #include "util.h"
+#include "bounds.h"
+
 
 
 #define SIMPLET_SLIPPY_SIZE 256
@@ -14,7 +17,7 @@
 
 simplet_map_t*
 simplet_map_new(){
-  simplet_error_init();
+  simplet_init();
   simplet_map_t *map;
   if(!(map = malloc(sizeof(*map))))
     return NULL;
@@ -56,8 +59,17 @@ SIMPLET_ERROR_FUNC(map_t)
 
 simplet_status_t
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
-  if(map->proj)
+  if(map->proj) {
+    if(map->bounds) {
+      simplet_bounds_t *tmp = map->bounds;
+      char *s;
+      simplet_map_get_srs(map, &s);
+      map->bounds = simplet_bounds_reproject(map->bounds, (const char *) s, (const char *) proj);
+      free(s);
+      simplet_bounds_free(tmp);
+    }
     OSRRelease(map->proj);
+  }
 
   if(!(map->proj = OSRNewSpatialReference(NULL)))
     return set_error(map, SIMPLET_OGR_ERR, "could not assign spatial ref");
@@ -201,7 +213,6 @@ build_surface(simplet_map_t *map){
   simplet_layer_t *layer;
   simplet_status_t err;
 
-  OGRRegisterAll();
   while((layer = simplet_list_next(iter))){
     err = simplet_layer_process(layer, map, ctx);
     if(err != SIMPLET_OK) {

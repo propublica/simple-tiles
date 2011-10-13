@@ -53,12 +53,13 @@ simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
 simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
   simplet_listiter_t *iter; OGRDataSourceH source;
-  if(!(source = OGROpen(layer->source, 0, NULL)))
-    return set_error(layer, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
-
+  if(!(source = OGROpenShared(layer->source, 0, NULL)))
+    return SIMPLET_OGR_ERR;
+  //retain the datasource
+  if(OGR_DS_GetRefCount(source) == 1) OGR_DS_Reference(source);
   if(!(iter = simplet_get_list_iter(layer->filters))){
-    OGR_DS_Destroy(source);
-    return set_error(layer, SIMPLET_OOM, "out of memory getting list_iterator");
+    OGRReleaseDataSource(source);
+    return SIMPLET_OOM;
   }
 
   simplet_filter_t *filter;
@@ -66,13 +67,11 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
   while((filter = simplet_list_next(iter))) {
     status = simplet_filter_process(filter, map, source, ctx);
     if(status != SIMPLET_OK){
-      OGR_DS_Destroy(source);
       simplet_list_iter_free(iter);
+      OGRReleaseDataSource(source);
       return status;
     }
   }
-
-  OGR_DS_Destroy(source);
-
+  OGRReleaseDataSource(source);
   return SIMPLET_OK;
 }
