@@ -27,7 +27,7 @@ runner: runner.o $(OBJ)
 data:
 	cd ../data && make && cd ../test
 
-test: data runner
+run_tests: data runner
 	./runner
 
 run_benchmark: data benchmark
