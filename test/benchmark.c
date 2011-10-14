@@ -77,7 +77,7 @@ bench_many_layers(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
 
-  simplet_layer_t *layer   = map->layers->tail->value;
+  simplet_layer_t *layer   = simplet_list_tail(map->layers);
   simplet_filter_t *filter = simplet_layer_add_filter(layer,
                                       "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_filter_add_style(filter, "weight", "0.1");
@@ -177,6 +177,6 @@ main(){
                             bench->times, sum(runs, bench->times),
                             bench->times / sum(runs, bench->times));
     printf("\x1b[33mmean\x1b[0m: %f\n", mean(runs, bench->times));
-    printf("\x1b[33mstd\x1b[0m:  %f\n",  stdev(runs, bench->times));
+    printf("\x1b[33mstd\x1b[0m:  %f\n", stdev(runs, bench->times));
   }
 }

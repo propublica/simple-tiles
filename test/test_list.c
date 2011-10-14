@@ -44,7 +44,6 @@ build_list(){
   return list;
 }
 
-
 static void
 test_get(){
   simplet_list_t *list = build_list();
@@ -62,8 +61,8 @@ test_push(){
   assert(list->length == 0);
   wrap_t *test = wrap_new(5);
   simplet_list_push(list, test);
-  assert(list->head->value == test);
-  assert(list->tail->value == test);
+  assert(simplet_list_head(list) == test);
+  assert(simplet_list_tail(list) == test);
   assert(list->length == 1);
   simplet_list_set_item_free(list, free_wrap);
   simplet_list_free(list);

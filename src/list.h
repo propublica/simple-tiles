@@ -34,6 +34,14 @@ simplet_list_set_item_free(simplet_list_t *list, simplet_list_item_free free);
 void*
 simplet_list_next(simplet_listiter_t* iter);
 
+int
+simplet_list_get_length(simplet_list_t *list);
+
+void*
+simplet_list_head(simplet_list_t *list);
+
+void*
+simplet_list_tail(simplet_list_t *list);
 
 
 #ifdef __cplusplus

@@ -5,13 +5,11 @@
 static pthread_mutex_t simplet_lock = PTHREAD_MUTEX_INITIALIZER;
 static int initialized = 0;
 
-// TODO: probably needs locking.
 static void
 cleanup(){
 	for(int i = 0; i < OGRGetOpenDSCount(); i++)
     while(OGR_DS_GetRefCount(OGRGetOpenDS(i))) //ughh
       OGRReleaseDataSource(OGRGetOpenDS(i));
-
   assert(!OGRGetOpenDSCount());
   OGRCleanupAll();
 }

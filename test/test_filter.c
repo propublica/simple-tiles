@@ -11,7 +11,7 @@ test_filter(){
   assert(!strcmp(query, filter->ogrsql));
   simplet_filter_add_style(filter, "fill", "#CCCCCC");
   simplet_style_t *style;
-  style = filter->styles->tail->value;
+  style = simplet_list_tail(filter->styles);
   assert(!strcmp(style->key, "fill"));
   assert(!strcmp(style->arg, "#CCCCCC"));
   simplet_filter_free(filter);
@@ -25,7 +25,7 @@ test_lookup(){
   simplet_filter_add_style(filter, "fill",     "#CCCCCC");
   simplet_filter_add_style(filter, "stroke",   "#CCCCAA");
   simplet_filter_add_style(filter, "line-cap", "round");
-  assert(filter->styles->length == 3);
+  assert(simplet_list_get_length(filter->styles) == 3);
   simplet_filter_free(filter);
 }
 

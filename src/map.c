@@ -188,7 +188,7 @@ simplet_map_is_valid(simplet_map_t *map){
   if(!map->width)
     return SIMPLET_ERR;
 
-  if(!map->layers->tail)
+  if(!simplet_list_head(map->layers))
     return SIMPLET_ERR;
 
   return SIMPLET_OK;

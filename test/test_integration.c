@@ -2,6 +2,7 @@
 #include <simple-tiles/map.h>
 #include <simple-tiles/layer.h>
 #include <simple-tiles/filter.h>
+#include <simple-tiles/list.h>
 #include "test.h"
 
 simplet_map_t*
@@ -54,8 +55,7 @@ test_many_filters(){
   assert((map = build_map()));
   assert(simplet_map_is_valid(map));
   simplet_filter_t *filter = simplet_layer_add_filter(
-       // TODO: add simplet_list_get_at(idx) and simplet_map_get_layer_at(idx)
-      (simplet_layer_t *) map->layers->tail->value,
+      (simplet_layer_t *) simplet_list_get(map->layers, simplet_list_get_length(map->layers) - 1),
       "SELECT * from 'ne_10m_admin_0_countries' where SOV_A3 = 'US1'");
   simplet_filter_add_style(filter, "weight", "1");
   simplet_filter_add_style(filter, "stroke", "#00cc00dd");

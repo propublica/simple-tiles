@@ -36,6 +36,21 @@ simplet_list_push(simplet_list_t *list, void* val){
   return val;
 }
 
+int
+simplet_list_get_length(simplet_list_t *list){
+  return list->length;
+}
+
+void*
+simplet_list_tail(simplet_list_t *list){
+  return list->tail->value;
+}
+
+void*
+simplet_list_head(simplet_list_t *list){
+  return list->head->value;
+}
+
 void*
 simplet_list_pop(simplet_list_t *list){
   if(!list->tail)
