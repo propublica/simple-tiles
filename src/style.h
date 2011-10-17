@@ -42,6 +42,18 @@ simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, ...);
 simplet_style_t*
 simplet_lookup_style(simplet_list_t* styles, const char *key);
 
+void
+simplet_style_get_arg(simplet_style_t* style, char **arg);
+
+void
+simplet_style_get_key(simplet_style_t* style, char **key);
+
+void
+simplet_style_set_arg(simplet_style_t *style, char *arg);
+
+void
+simplet_style_set_key(simplet_style_t *style, char *key);
+
 #ifdef __cplusplus
 }
 #endif
