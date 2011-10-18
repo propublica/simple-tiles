@@ -12,6 +12,7 @@ simplet_layer_new(const char *datastring){
     return NULL;
 
   layer->source = simplet_copy_string(datastring);
+  layer->error.status = SIMPLET_OK;
 
   if(!(layer->filters = simplet_list_new())){
     free(layer);
@@ -75,3 +76,17 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
   OGRReleaseDataSource(source);
   return SIMPLET_OK;
 }
+
+
+void
+simplet_layer_get_source(simplet_layer_t *layer, char **source){
+  *source = simplet_copy_string(layer->source);
+}
+
+void
+simplet_layer_set_source(simplet_layer_t *layer, char *source){
+  char *src = simplet_copy_string(source);
+  if(!src) set_error(layer, SIMPLET_OOM, "out of memory setting source");
+  layer->source = src;
+}
+
