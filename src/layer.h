@@ -22,6 +22,12 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx);
 simplet_filter_t*
 simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql);
 
+void
+simplet_layer_get_source(simplet_layer_t *layer, char **source);
+
+void
+simplet_layer_set_source(simplet_layer_t *layer, char *source);
+
 #ifdef __cplusplus
 }
 #endif
