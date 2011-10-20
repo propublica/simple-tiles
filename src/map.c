@@ -102,10 +102,7 @@ simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
 
 void
 simplet_map_get_bgcolor(simplet_map_t *map, char **str){
-  if(map->bgcolor)
-    *str = simplet_copy_string(map->bgcolor);
-  else
-    *str = NULL;
+  *str = simplet_copy_string(map->bgcolor);
 }
 
 simplet_status_t

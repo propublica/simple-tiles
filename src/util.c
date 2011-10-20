@@ -7,13 +7,7 @@
 char*
 simplet_copy_string(const char *src){
   if(src == NULL) return NULL;
-  int len = strlen(src);
-  char *dest;
-  if(!(dest = malloc(len + 1)))
-    return NULL;
-  memcpy(dest, src, len);
-  dest[len] = '\0';
-  return dest;
+  return strdup(src);
 }
 
 int
