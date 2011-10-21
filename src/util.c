@@ -6,7 +6,7 @@
 
 char*
 simplet_copy_string(const char *src){
-  if(src == NULL) return NULL;
+  if(src == NULL) src = "";
   return strdup(src);
 }
 

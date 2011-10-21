@@ -21,6 +21,7 @@ test_lookup(){
   simplet_filter_add_style(filter, "fill",     "#CCCCCC");
   simplet_filter_add_style(filter, "stroke",   "#CCCCAA");
   simplet_filter_add_style(filter, "line-cap", "round");
+
   assert(filter->styles->length == 3);
   simplet_style_t *style;
   style = simplet_lookup_style(filter->styles, "fill");
