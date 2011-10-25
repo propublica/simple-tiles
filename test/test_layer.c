@@ -1,4 +1,5 @@
 #include "test.h"
+#include <simple-tiles/list.h>
 #include <simple-tiles/layer.h>
 
 void
@@ -18,7 +19,7 @@ test_add_filter(){
   simplet_layer_add_filter(layer, "SELECT * from tl_2010_us_cd108");
   simplet_layer_add_filter(layer, "SELECT * from tl_2010_us_cd108 where STATEFP00 = '47'");
   simplet_layer_add_filter(layer, "SELECT * from tl_2010_us_cd108 where STATEFP00 = '47'");
-  assert(layer->filters->length == 3);
+  assert(simplet_list_get_length(layer->filters) == 3);
   simplet_layer_free(layer);
 }
 
