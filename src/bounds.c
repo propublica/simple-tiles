@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include "math.h"
 #include "bounds.h"
-#include "point.h"
-
 
 void
 simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
@@ -74,8 +72,10 @@ simplet_bounds_new(){
   simplet_bounds_t *bounds;
   if((bounds = malloc(sizeof(*bounds))) == NULL)
     return NULL;
-  bounds->nw     = simplet_point_new(INFINITY, -INFINITY);
-  bounds->se     = simplet_point_new(-INFINITY, INFINITY);
+  bounds->nw.x   = INFINITY;
+  bounds->nw.y   = -INFINITY;
+  bounds->se.x   = -INFINITY;
+  bounds->se.y   = INFINITY;
   bounds->width  = 0;
   bounds->height = 0;
   return bounds;
@@ -86,7 +86,7 @@ simplet_status_t
 simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt){
   int wkt_size = 14 + 75 * 8;
   *wkt = malloc(sizeof(*wkt) * wkt_size);
-  snprintf(*wkt, wkt_size, "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))",
+  snprintf(*wkt, wkt_size, "POLYGON ((%.15f %.15f, %.15f %.15f, %.15f %.15f, %.15f %.15f, %.15f %.15f))",
                   bounds->se.x, bounds->nw.y,
                   bounds->se.x, bounds->se.y,
                   bounds->nw.x, bounds->se.y,
