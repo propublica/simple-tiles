@@ -38,14 +38,13 @@ simplet_filter_vfree(void *filter){
 }
 
 static void
-plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bounds_t *bounds){
+plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
   simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
   double x, y, last_x, last_y;
   OGR_G_GetPoint(geom, 0, &x, &y, NULL);
   last_x = x;
   last_y = y;
-  cairo_move_to(ctx, x - bounds->nw.x,
-                bounds->nw.y - y);
+  cairo_move_to(ctx, x, y);
   for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
     double dx = fabs(last_x - x);
@@ -53,20 +52,18 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bou
     cairo_user_to_device_distance(ctx, &dx, &dy);
 
     if(seamless || (dx >= 0.25 || dy >= 0.25)){
-      cairo_line_to(ctx, x - bounds->nw.x,
-                    bounds->nw.y - y);
+      cairo_line_to(ctx, x, y);
       last_x = x;
       last_y = y;
     }
   }
   // ensure something is always drawn
   OGR_G_GetPoint(geom, OGR_G_GetPointCount(geom) - 1, &x, &y, NULL);
-  cairo_line_to(ctx, x - bounds->nw.x,
-                              bounds->nw.y - y);
+  cairo_line_to(ctx, x, y);
 }
 
 static void
-plot_polygon(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bounds_t *bounds){
+plot_polygon(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
   cairo_save(ctx);
   cairo_new_path(ctx);
   for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
@@ -75,11 +72,11 @@ plot_polygon(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_
       continue;
 
     if(OGR_G_GetGeometryCount(subgeom) > 0) {
-      plot_polygon(subgeom, filter, ctx, bounds);
+      plot_polygon(subgeom, filter, ctx);
       continue;
     }
 
-    plot_part(subgeom, filter, ctx, bounds);
+    plot_part(subgeom, filter, ctx);
     cairo_close_path(ctx);
   }
   cairo_close_path(ctx);
@@ -90,7 +87,7 @@ plot_polygon(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_
 }
 
 static void
-plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bounds_t *bounds){
+plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
 	cairo_save(ctx);
   double x, y;
 
@@ -105,8 +102,7 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bo
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
     cairo_new_path(ctx);
-    cairo_arc(ctx, x - bounds->nw.x - r / 2,
-              bounds->nw.y - y - r / 2, r, 0., 2 * M_PI);
+    cairo_arc(ctx, x - r / 2, y - r / 2, r, 0., 2 * M_PI);
     cairo_close_path(ctx);
   }
   simplet_apply_styles(ctx, filter->styles,
@@ -115,10 +111,10 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bo
 }
 
 static void
-plot_line(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bounds_t *bounds){
+plot_line(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
   cairo_save(ctx);
   cairo_new_path(ctx);
-  plot_part(geom, filter, ctx, bounds);
+  plot_part(geom, filter, ctx);
   simplet_apply_styles(ctx, filter->styles,
                         "line-join", "line-cap", "weight", "stroke", NULL);
   cairo_close_path(ctx);
@@ -126,17 +122,17 @@ plot_line(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bou
 }
 
 static void
-dispatch(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_bounds_t *bounds){
+dispatch(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
   switch(wkbFlatten(OGR_G_GetGeometryType(geom))){
     case wkbPolygon:
-      plot_polygon(geom, filter, ctx, bounds);
+      plot_polygon(geom, filter, ctx);
       break;
     case wkbLinearRing:
     case wkbLineString:
-      plot_line(geom, filter, ctx, bounds);
+      plot_line(geom, filter, ctx);
       break;
     case wkbPoint:
-      plot_point(geom, filter, ctx, bounds);
+      plot_point(geom, filter, ctx);
       break;
     case wkbMultiPoint:
     case wkbMultiPolygon:
@@ -146,7 +142,7 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx, simplet_boun
         OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
         if(subgeom == NULL)
           continue;
-        dispatch(subgeom, filter, ctx, bounds);
+        dispatch(subgeom, filter, ctx);
       }
       break;
     default:
@@ -208,18 +204,22 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
   cairo_t *sub_ctx = cairo_create(surface);
   set_seamless(filter->styles, sub_ctx);
 
-  simplet_bounds_t *mbounds = map->bounds;
-  cairo_scale(sub_ctx, map->width / mbounds->width, map->width / mbounds->width);
+  cairo_matrix_t matrix;
+  cairo_matrix_init(&matrix, 1, 0, 0, -1, 0, 0);     
+  cairo_set_matrix(sub_ctx, &matrix);
+  cairo_translate(sub_ctx, 0, map->height * -1.0);
+  cairo_scale(sub_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
+  cairo_translate(sub_ctx, -map->bounds->nw.x, -map->bounds->se.y);
 
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL) continue;
     if(OGR_G_Transform(geom, transform) != OGRERR_NONE) continue;
-    dispatch(geom, filter, sub_ctx, mbounds);
+    dispatch(geom, filter, sub_ctx);
     OGR_F_Destroy(feature);
   }
-  cairo_scale(sub_ctx, mbounds->width / map->width, mbounds->width / map->width);
+
   cairo_set_source_surface(ctx, surface, 0, 0);
   cairo_paint(ctx);
   cairo_destroy(sub_ctx);

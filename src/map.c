@@ -265,6 +265,8 @@ build_surface(simplet_map_t *map){
   simplet_layer_t *layer;
   simplet_status_t err;
 
+
+
   while((layer = simplet_list_next(iter))){
     err = simplet_layer_process(layer, map, ctx);
     if(err != SIMPLET_OK) {
