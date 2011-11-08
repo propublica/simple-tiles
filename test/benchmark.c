@@ -67,7 +67,7 @@ bench_seamless(void *ctx){
 }
 
 static void
-bench_many_layers(void *ctx){
+bench_many_filters(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
   simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
@@ -118,7 +118,7 @@ bench_wrap_t benchmarks[] = {
   BENCH(map, render)
   BENCH(map, seamless)
   BENCH(map, empty)
-  BENCH(map, many_layers)
+  BENCH(map, many_filters)
   BENCH(list, list)
   { NULL, NULL, NULL, NULL, 0}
 };

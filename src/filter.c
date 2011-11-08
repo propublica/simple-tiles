@@ -51,7 +51,7 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
     double dy = fabs(last_y - y);
     cairo_user_to_device_distance(ctx, &dx, &dy);
 
-    if(seamless || (fabs(dx) >= 0.25 || fabs(dy) >= 0.25)){
+    if(seamless || (fabs(dx) >= 0.5 || fabs(dy) >= 0.5)){
       cairo_line_to(ctx, x, y);
       last_x = x;
       last_y = y;
