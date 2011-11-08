@@ -51,7 +51,7 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
     double dy = fabs(last_y - y);
     cairo_user_to_device_distance(ctx, &dx, &dy);
 
-    if(seamless || (dx >= 0.25 || dy >= 0.25)){
+    if(seamless || (fabs(dx) >= 0.25 || fabs(dy) >= 0.25)){
       cairo_line_to(ctx, x, y);
       last_x = x;
       last_y = y;
@@ -205,7 +205,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
   set_seamless(filter->styles, sub_ctx);
 
   cairo_matrix_t matrix;
-  cairo_matrix_init(&matrix, 1, 0, 0, -1, 0, 0);     
+  cairo_matrix_init(&matrix, 1, 0, 0, -1, 0, 0);
   cairo_set_matrix(sub_ctx, &matrix);
   cairo_translate(sub_ctx, 0, map->height * -1.0);
   cairo_scale(sub_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
