@@ -6,10 +6,8 @@ simplet_list_new(){
   simplet_list_t* list;
   if(!(list = malloc(sizeof(*list))))
     return NULL;
-  list->head   = NULL;
-  list->tail   = NULL;
-  list->free   = NULL;
-  list->length = 0;
+  
+  memset(list, 0, sizeof(*list));
 
   return list;
 }

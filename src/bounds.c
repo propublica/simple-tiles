@@ -72,12 +72,14 @@ simplet_bounds_new(){
   simplet_bounds_t *bounds;
   if((bounds = malloc(sizeof(*bounds))) == NULL)
     return NULL;
+
+  memset(bounds, 0, sizeof(*bounds));
+
   bounds->nw.x   = INFINITY;
   bounds->nw.y   = -INFINITY;
   bounds->se.x   = -INFINITY;
   bounds->se.y   = INFINITY;
-  bounds->width  = 0;
-  bounds->height = 0;
+  
   return bounds;
 }
 
