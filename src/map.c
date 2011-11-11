@@ -22,18 +22,16 @@ simplet_map_new(){
   if(!(map = malloc(sizeof(*map))))
     return NULL;
 
+  memset(map, 0, sizeof(*map));
+
   if(!(map->layers = simplet_list_new())){
     free(map);
     return NULL;
   }
 
-  map->bounds       = NULL;
-  map->proj         = NULL;
-  map->bgcolor      = NULL;
   map->error.status = SIMPLET_OK;
-  map->height       = 0;
-  map->width        = 0;
-  map->valid        = SIMPLET_OK;
+  map->valid = SIMPLET_OK;
+  
   return map;
 }
 
