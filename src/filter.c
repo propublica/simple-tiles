@@ -215,6 +215,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     if(geom == NULL) continue;
     if(OGR_G_Transform(geom, transform) != OGRERR_NONE) continue;
     dispatch(geom, filter, sub_ctx);
+    simplet_map_add_placement(map, feature, filter->styles, ctx);
     OGR_F_Destroy(feature);
   }
 

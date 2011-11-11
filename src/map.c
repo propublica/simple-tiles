@@ -29,9 +29,15 @@ simplet_map_new(){
     return NULL;
   }
 
+  if(!(map->placements = simplet_list_new())){
+    free(map);
+    return NULL;
+  }
+
+
   map->error.status = SIMPLET_OK;
   map->valid = SIMPLET_OK;
-  
+
   return map;
 }
 
@@ -41,8 +47,13 @@ simplet_map_free(simplet_map_t *map){
     simplet_bounds_free(map->bounds);
 
   if(map->layers) {
-    simplet_list_set_item_free(map->layers,simplet_layer_vfree);
+    simplet_list_set_item_free(map->layers, simplet_layer_vfree);
     simplet_list_free(map->layers);
+  }
+
+  if(map->placements) {
+    // simplet_list_set_item_free(map->placements, simplet_placements_vfree);
+    simplet_list_free(map->placements);
   }
 
   if(map->proj)
@@ -211,6 +222,21 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
   return style;
 }
 
+void
+simplet_map_add_placement(simplet_map_t *map, OGRFeatureH feature, simplet_list_t *styles, cairo_t *ctx){
+  simplet_style_t *field = simplet_lookup_style(styles, "text-field");
+  if(!field) return;
+  OGRFeatureDefnH defn;
+  if(!(defn = OGR_F_GetDefnRef(feature))) return;
+  int idx = OGR_FD_GetFieldIndex(defn, (const char*) field->arg);
+  if(idx < 0) return;
+  // printf("%s\n", OGR_F_GetFieldAsString(feature, idx));
+  // simplet_placement_t *placement = simplet_placement_new(simplet_copy_string(OGR_F_GetFieldAsString(feature, idx)), styles, ctx, feature);
+  // if(!simplet_try_placement(placement, map->placements))
+  //   simplet_placement_free(placement);
+}
+
+
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
   return map->error.status;
@@ -276,8 +302,6 @@ build_surface(simplet_map_t *map){
   cairo_destroy(ctx);
   return surface;
 }
-
-
 
 static void
 close_surface(cairo_surface_t *surface){

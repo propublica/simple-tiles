@@ -65,6 +65,7 @@ typedef struct {
 typedef struct {
   simplet_bounds_t *bounds;
   simplet_list_t   *layers;
+  simplet_list_t   *placements;
   OGRSpatialReferenceH proj;
   unsigned int width;
   unsigned int height;
@@ -87,7 +88,6 @@ typedef struct {
   char *key;
   char *arg;
 } simplet_style_t;
-
 
 #ifndef M_PI
 #define M_PI acos(-1.0)
