@@ -153,9 +153,7 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
 
 static void
 set_seamless(simplet_list_t *styles, cairo_t *ctx){
-  simplet_style_t *seamless = simplet_lookup_style(styles, "seamless");
-
-  if(seamless)
+  if(simplet_lookup_style(styles, "seamless"))
     cairo_set_operator(ctx, CAIRO_OPERATOR_SATURATE);
 }
 
