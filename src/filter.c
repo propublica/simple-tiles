@@ -47,8 +47,8 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
   cairo_move_to(ctx, x, y);
   for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
-    double dx = fabs(last_x - x);
-    double dy = fabs(last_y - y);
+    double dx = last_x - x;
+    double dy = last_y - y;
     cairo_user_to_device_distance(ctx, &dx, &dy);
 
     if(seamless || (fabs(dx) >= 0.5 || fabs(dy) >= 0.5)){
