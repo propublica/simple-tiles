@@ -35,7 +35,7 @@ initialize_map(simplet_map_t *map){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 1, 2);
   simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
-  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_map_add_filter(map, "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "weight", "0.1");
   simplet_map_add_style(map, "fill",   "#061F37ff");
 }
@@ -50,7 +50,7 @@ static void
 bench_empty(void *ctx){
   simplet_map_t *map = ctx;
   simplet_map_set_size(map, 256, 256);
-  simplet_map_set_slippy(map, 0, 1, 2);
+  simplet_map_set_slippy(map, 0, 0, 0);
   simplet_map_add_layer(map, "../data/noop");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
@@ -93,6 +93,17 @@ bench_render(void *ctx){
   assert(SIMPLET_OK == simplet_map_get_status(map));
 }
 
+static void
+bench_unprojected(void *ctx){
+  simplet_map_t *map = ctx;
+  initialize_map(map);
+  simplet_map_set_srs(map, SIMPLET_WGS84);
+  simplet_map_set_bounds(map, -179, 17, -100, 71);
+  char *data = NULL;
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+}
+
 #define ITEMS 100000
 static void
 bench_list(void *ctx){
@@ -116,6 +127,7 @@ typedef struct {
 
 bench_wrap_t benchmarks[] = {
   BENCH(map, render)
+  BENCH(map, unprojected)
   BENCH(map, seamless)
   BENCH(map, empty)
   BENCH(map, many_filters)
