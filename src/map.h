@@ -66,7 +66,7 @@ simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z);
 
 void
-simplet_map_add_placement(simplet_map_t *map, OGRFeatureH feature, simplet_list_t *styles, cairo_t *ctx);
+simplet_map_add_placement(simplet_map_t *map, OGRFeatureH feature, OGRGeometryH geom, simplet_list_t *styles, cairo_t *ctx);
 
 #ifdef __cplusplus
 }

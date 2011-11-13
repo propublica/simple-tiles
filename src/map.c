@@ -9,6 +9,7 @@
 #include "style.h"
 #include "util.h"
 #include "bounds.h"
+#include <pango/pangocairo.h>
 
 
 
@@ -33,7 +34,6 @@ simplet_map_new(){
     free(map);
     return NULL;
   }
-
 
   map->error.status = SIMPLET_OK;
   map->valid = SIMPLET_OK;
@@ -223,14 +223,34 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
 }
 
 void
-simplet_map_add_placement(simplet_map_t *map, OGRFeatureH feature, simplet_list_t *styles, cairo_t *ctx){
+simplet_map_add_placement(simplet_map_t *map, OGRFeatureH feature, OGRGeometryH geom, simplet_list_t *styles, cairo_t *ctx){
   simplet_style_t *field = simplet_lookup_style(styles, "text-field");
   if(!field) return;
   OGRFeatureDefnH defn;
   if(!(defn = OGR_F_GetDefnRef(feature))) return;
   int idx = OGR_FD_GetFieldIndex(defn, (const char*) field->arg);
   if(idx < 0) return;
-  // printf("%s\n", OGR_F_GetFieldAsString(feature, idx));
+  PangoLayout *layout;
+  PangoFontDescription *desc;
+  layout = pango_cairo_create_layout(ctx);
+  const char *s;
+  if((s = OGR_F_GetFieldAsString(feature, idx))){
+    pango_layout_set_text(layout, "123", -1);
+    desc = pango_font_description_from_string("futura");
+    pango_font_description_set_absolute_size(desc, 12);
+    pango_layout_set_font_description(layout, desc);
+    pango_font_description_free(desc);
+    cairo_save(ctx);
+    cairo_set_source_rgb(ctx, 0,0,0);
+    OGRGeometryH pt = OGR_G_CreateGeometry(wkbPoint);
+    OGR_G_Centroid(geom, pt);
+    cairo_move_to(ctx, OGR_G_GetX(pt, 0), OGR_G_GetY(pt, 0));
+    pango_cairo_show_layout(ctx, layout);
+    cairo_stroke(ctx);
+    cairo_fill(ctx);
+    cairo_restore(ctx);
+  }
+
   // simplet_placement_t *placement = simplet_placement_new(simplet_copy_string(OGR_F_GetFieldAsString(feature, idx)), styles, ctx, feature);
   // if(!simplet_try_placement(placement, map->placements))
   //   simplet_placement_free(placement);

@@ -98,7 +98,6 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
   double r = strtod(style->arg, NULL), dy = 0;
 
   cairo_device_to_user_distance(ctx, &r, &dy);
-  cairo_save(ctx);
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
     cairo_new_path(ctx);
@@ -214,8 +213,9 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL) continue;
     if(OGR_G_Transform(geom, transform) != OGRERR_NONE) continue;
-    dispatch(geom, filter, sub_ctx);
-    simplet_map_add_placement(map, feature, filter->styles, ctx);
+    simplet_map_add_placement(map, feature, geom, filter->styles, sub_ctx);
+
+    //dispatch(geom, filter, sub_ctx);
     OGR_F_Destroy(feature);
   }
 

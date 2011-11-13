@@ -1,9 +1,9 @@
 OPTIMIZATION ?= -O3
 DEBUG ?= -g -ggdb
 CFLAGS ?= -std=c99 $(OPTIMIZATION) $(DEBUG) -fPIC -Wall -W -Wwrite-strings -pthread $(ARCH) \
-  $(shell pkg-config --cflags cairo) \
+  $(shell pkg-config --cflags cairo pangocairo) \
   $(shell gdal-config --cflags)
-LDFLAGS = -lm $(shell pkg-config --libs cairo) \
+LDFLAGS = -lm $(shell pkg-config --libs cairo pangocairo) \
   $(shell gdal-config --libs)
 OBJ = list.o bounds.o style.o map.o util.o filter.o layer.o error.o init.o
 PKG_CF = simple-tiles.pc
