@@ -7,6 +7,7 @@
 #include "list.h"
 #include "map.h"
 #include "bounds.h"
+#include "text.h"
 
 simplet_filter_t *
 simplet_filter_new(const char *sqlquery){
@@ -159,7 +160,8 @@ set_seamless(simplet_list_t *styles, cairo_t *ctx){
 
 /* FIXME: this function is way too hairy and needs error handling */
 simplet_status_t
-simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSourceH source, cairo_t *ctx){
+simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
+  OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx){
 
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, NULL))){
@@ -213,9 +215,9 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSour
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
     if(geom == NULL) continue;
     if(OGR_G_Transform(geom, transform) != OGRERR_NONE) continue;
-    simplet_map_add_placement(map, feature, geom, filter->styles, sub_ctx);
+    dispatch(geom, filter, sub_ctx);
 
-    //dispatch(geom, filter, sub_ctx);
+    simplet_lithograph_add_placement(litho, feature, filter->styles, sub_ctx);
     OGR_F_Destroy(feature);
   }
 

@@ -9,9 +9,7 @@
 #include "style.h"
 #include "util.h"
 #include "bounds.h"
-#include <pango/pangocairo.h>
-
-
+#include "text.h"
 
 #define SIMPLET_SLIPPY_SIZE 256
 #define SIMPLET_MERC_LENGTH 40075016.68
@@ -30,11 +28,6 @@ simplet_map_new(){
     return NULL;
   }
 
-  if(!(map->placements = simplet_list_new())){
-    free(map);
-    return NULL;
-  }
-
   map->error.status = SIMPLET_OK;
   map->valid = SIMPLET_OK;
 
@@ -49,11 +42,6 @@ simplet_map_free(simplet_map_t *map){
   if(map->layers) {
     simplet_list_set_item_free(map->layers, simplet_layer_vfree);
     simplet_list_free(map->layers);
-  }
-
-  if(map->placements) {
-    // simplet_list_set_item_free(map->placements, simplet_placements_vfree);
-    simplet_list_free(map->placements);
   }
 
   if(map->proj)
@@ -222,41 +210,6 @@ simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
   return style;
 }
 
-void
-simplet_map_add_placement(simplet_map_t *map, OGRFeatureH feature, OGRGeometryH geom, simplet_list_t *styles, cairo_t *ctx){
-  simplet_style_t *field = simplet_lookup_style(styles, "text-field");
-  if(!field) return;
-  OGRFeatureDefnH defn;
-  if(!(defn = OGR_F_GetDefnRef(feature))) return;
-  int idx = OGR_FD_GetFieldIndex(defn, (const char*) field->arg);
-  if(idx < 0) return;
-  PangoLayout *layout;
-  PangoFontDescription *desc;
-  layout = pango_cairo_create_layout(ctx);
-  const char *s;
-  if((s = OGR_F_GetFieldAsString(feature, idx))){
-    pango_layout_set_text(layout, "123", -1);
-    desc = pango_font_description_from_string("futura");
-    pango_font_description_set_absolute_size(desc, 12);
-    pango_layout_set_font_description(layout, desc);
-    pango_font_description_free(desc);
-    cairo_save(ctx);
-    cairo_set_source_rgb(ctx, 0,0,0);
-    OGRGeometryH pt = OGR_G_CreateGeometry(wkbPoint);
-    OGR_G_Centroid(geom, pt);
-    cairo_move_to(ctx, OGR_G_GetX(pt, 0), OGR_G_GetY(pt, 0));
-    pango_cairo_show_layout(ctx, layout);
-    cairo_stroke(ctx);
-    cairo_fill(ctx);
-    cairo_restore(ctx);
-  }
-
-  // simplet_placement_t *placement = simplet_placement_new(simplet_copy_string(OGR_F_GetFieldAsString(feature, idx)), styles, ctx, feature);
-  // if(!simplet_try_placement(placement, map->placements))
-  //   simplet_placement_free(placement);
-}
-
-
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
   return map->error.status;
@@ -309,16 +262,19 @@ build_surface(simplet_map_t *map){
   simplet_layer_t *layer;
   simplet_status_t err;
 
-
+  cairo_t *litho_ctx = cairo_create(surface);
+  simplet_lithograph_t *litho = simplet_lithograph_new(litho_ctx);
 
   while((layer = simplet_list_next(iter))){
-    err = simplet_layer_process(layer, map, ctx);
+    err = simplet_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
       simplet_map_error(map, err, "error in rendering");
       break;
     }
   }
+  simplet_lithograph_apply(litho);
+  simplet_lithograph_free(litho);
   cairo_destroy(ctx);
   return surface;
 }

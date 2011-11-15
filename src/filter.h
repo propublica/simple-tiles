@@ -5,6 +5,8 @@
 #include "list.h"
 #include "map.h"
 #include "style.h"
+#include "text.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +25,8 @@ simplet_style_t*
 simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *arg);
 
 simplet_status_t
-simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map, OGRDataSourceH source, cairo_t *ctx);
+simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
+  OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx);
 
 #ifdef __cplusplus
 }

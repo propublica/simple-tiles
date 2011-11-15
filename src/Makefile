@@ -1,11 +1,11 @@
 OPTIMIZATION ?= -O3
 DEBUG ?= -g -ggdb
-CFLAGS ?= -std=c99 $(OPTIMIZATION) $(DEBUG) -fPIC -Wall -W -Wwrite-strings -pthread $(ARCH) \
+CFLAGS ?= -std=c99 $(OPTIMIZATION) $(DEBUG) -fPIC -Wall -Werror -Wextra -Wwrite-strings -pthread $(ARCH) \
   $(shell pkg-config --cflags cairo pangocairo) \
   $(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo pangocairo) \
   $(shell gdal-config --libs)
-OBJ = list.o bounds.o style.o map.o util.o filter.o layer.o error.o init.o
+OBJ = list.o bounds.o style.o map.o util.o filter.o layer.o error.o init.o text.o
 PKG_CF = simple-tiles.pc
 
 ifeq ($(shell uname -s),Darwin)
@@ -44,13 +44,16 @@ install: $(DYLIBNAME) $(STLIBNAME)
 
 bounds.o: bounds.c bounds.h types.h
 error.o: error.c error.h types.h
-filter.o: filter.c style.h types.h list.h filter.h map.h util.h bounds.h
+filter.o: filter.c style.h types.h list.h filter.h map.h text.h util.h \
+  bounds.h
 init.o: init.c error.h types.h
-layer.o: layer.c layer.h types.h filter.h list.h map.h style.h util.h
+layer.o: layer.c layer.h types.h text.h list.h filter.h map.h style.h \
+  util.h
 list.o: list.c list.h types.h
-map.o: map.c init.h error.h types.h map.h layer.h filter.h list.h style.h \
-  util.h bounds.h
+map.o: map.c init.h error.h types.h map.h layer.h text.h list.h filter.h \
+  style.h util.h bounds.h
 style.o: style.c map.h types.h style.h list.h util.h
+text.o: text.c text.h types.h list.h style.h util.h bounds.h
 util.o: util.c util.h
 
 dep:

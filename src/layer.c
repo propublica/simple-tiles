@@ -47,7 +47,7 @@ simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
 }
 
 simplet_status_t
-simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
+simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx){
   simplet_listiter_t *iter; OGRDataSourceH source;
   if(!(source = OGROpenShared(layer->source, 0, NULL)))
     return SIMPLET_OGR_ERR;
@@ -61,7 +61,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *ctx){
   simplet_filter_t *filter;
   simplet_status_t status = SIMPLET_OK;
   while((filter = simplet_list_next(iter))) {
-    status = simplet_filter_process(filter, map, source, ctx);
+    status = simplet_filter_process(filter, map, source, litho, ctx);
     if(status != SIMPLET_OK){
       simplet_list_iter_free(iter);
       OGRReleaseDataSource(source);

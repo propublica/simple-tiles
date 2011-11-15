@@ -35,6 +35,12 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   return ogrBounds;
 }
 
+int
+simplet_bounds_intersects(simplet_bounds_t *bounds, simplet_bounds_t *obounds){
+  return !(bounds->nw.x > obounds->se.x || bounds->nw.y < obounds->se.y
+        || bounds->se.x > obounds->nw.x || bounds->se.y > obounds->nw.y);
+}
+
 simplet_bounds_t*
 simplet_bounds_from_ogr(OGRGeometryH geom){
   OGRGeometryH hull;
@@ -70,7 +76,7 @@ simplet_bounds_free(simplet_bounds_t *bounds){
 simplet_bounds_t*
 simplet_bounds_new(){
   simplet_bounds_t *bounds;
-  if((bounds = malloc(sizeof(*bounds))) == NULL)
+  if(!(bounds = malloc(sizeof(*bounds))))
     return NULL;
 
   memset(bounds, 0, sizeof(*bounds));
@@ -79,7 +85,7 @@ simplet_bounds_new(){
   bounds->nw.y   = -INFINITY;
   bounds->se.x   = -INFINITY;
   bounds->se.y   = INFINITY;
-  
+
   return bounds;
 }
 
