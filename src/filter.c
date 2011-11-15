@@ -123,7 +123,7 @@ plot_line(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
 
 static void
 dispatch(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
-  switch(wkbFlatten(OGR_G_GetGeometryType(geom))){
+  switch(wkbFlatten(OGR_G_GetGeometryType(geom))) {
     case wkbPolygon:
       plot_polygon(geom, filter, ctx);
       break;
@@ -217,7 +217,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
     if(OGR_G_Transform(geom, transform) != OGRERR_NONE) continue;
     dispatch(geom, filter, sub_ctx);
 
-    simplet_lithograph_add_placement(litho, feature, filter->styles, sub_ctx);
+    simplet_lithograph_add_placement(litho, feature, sub_ctx);
     OGR_F_Destroy(feature);
   }
 

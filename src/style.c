@@ -13,12 +13,15 @@ typedef struct simplet_styledef_t {
 } simplet_styledef_t;
 
 simplet_styledef_t styleTable[] = {
-  { "fill",      simplet_style_fill      },
-  { "stroke",    simplet_style_stroke    },
-  { "weight",    simplet_style_weight    },
-  { "line-join", simplet_style_line_join },
-  { "line-cap",  simplet_style_line_cap  },
-  { "paint",     simplet_style_paint     },
+  { "fill",             simplet_style_fill        },
+  { "stroke",           simplet_style_stroke      },
+  { "weight",           simplet_style_weight      },
+  { "line-join",        simplet_style_line_join   },
+  { "line-cap",         simplet_style_line_cap    },
+  { "paint",            simplet_style_paint       },
+  { "color",            simplet_style_fill        },
+  { "text-halo-color",  simplet_style_stroke      },
+  { "text-halo-weight", simplet_style_weight }
   /* radius and seamless are special styles */
 };
 
@@ -86,7 +89,6 @@ simplet_style_weight(cairo_t *ctx, const char *arg){
   cairo_device_to_user_distance(ctx, &w, &y);
   cairo_set_line_width(ctx, w);
 }
-
 
 simplet_style_t*
 simplet_style_new(const char *key, const char *arg){

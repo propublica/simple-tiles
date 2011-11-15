@@ -19,6 +19,10 @@ main(){
   simplet_map_add_style(map, "stroke", "#ffffff");
 
   simplet_map_add_style(map, "text-field", "NAME");
+  simplet_map_add_style(map, "font", "Lucida Grande 20px");
+  simplet_map_add_style(map, "color", "#efefef");
+  simplet_map_add_style(map, "text-halo-color", "#666666");
+  simplet_map_add_style(map, "text-halo-weight", "5");
 
   if(simplet_map_is_valid(map))
     simplet_map_render_to_png(map, "./out.png");
