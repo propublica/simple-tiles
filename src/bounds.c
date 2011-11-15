@@ -38,7 +38,7 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
 int
 simplet_bounds_intersects(simplet_bounds_t *bounds, simplet_bounds_t *obounds){
   return !(bounds->nw.x > obounds->se.x || bounds->nw.y < obounds->se.y
-        || bounds->se.x > obounds->nw.x || bounds->se.y > obounds->nw.y);
+        || bounds->se.x < obounds->nw.x || bounds->se.y > obounds->nw.y);
 }
 
 simplet_bounds_t*

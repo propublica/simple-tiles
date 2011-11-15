@@ -7,23 +7,22 @@ LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles pangocairo) \
 
 MEMCHECK_OPTS ?= --memcheck:leak-check=full
 
-
-OBJ = test_list.o test_style.o test_filter.o test_layer.o test_map.o test_integration.o
+OBJ = test_list.o test_style.o test_filter.o test_layer.o test_map.o test_integration.o test_bounds.o
 
 api.o: api.c
 benchmark.o: benchmark.c
 runner.o: runner.c runner.h test.h
+test_bounds.o: test_bounds.c
+test_filter.o: test_filter.c test.h
 test_integration.o: test_integration.c test.h
 test_layer.o: test_layer.c test.h
 test_list.o: test_list.c test.h
 test_map.o: test_map.c test.h
-test_filter.o: test_filter.c test.h
 test_style.o: test_style.c test.h
 
 api: api.o
 benchmark: benchmark.o
 runner: runner.o $(OBJ)
-
 
 data:
 	cd ../data && make && cd ../test
