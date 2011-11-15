@@ -99,7 +99,7 @@ simplet_lithograph_apply(simplet_lithograph_t *litho){
 
   while((placement = (placement_t *) simplet_list_next(iter))){
     cairo_save(litho->ctx);
-    cairo_move_to(litho->ctx, placement->bounds->se.x, placement->bounds->nw.y);
+    cairo_move_to(litho->ctx, placement->bounds->nw.x, placement->bounds->se.y);
     pango_cairo_show_layout(litho->ctx, placement->layout);
     //simplet_apply_styles(litho->ctx, "text-halo", NULL);
     cairo_restore(litho->ctx);
