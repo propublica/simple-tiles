@@ -279,6 +279,7 @@ build_surface(simplet_map_t *map){
   }
 
   cairo_destroy(ctx);
+  cairo_destroy(litho_ctx);
   return surface;
 }
 

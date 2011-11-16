@@ -39,8 +39,8 @@ run-api: data api
 test-all: data test run-api run-benchmark
 
 memcheck: runner api
-	valgrind $(MEMCHECK_OPTS) ./runner
-	valgrind $(MEMCHECK_OPTS) ./api
+	#G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind $(MEMCHECK_OPTS) ./runner
+	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind $(MEMCHECK_OPTS) ./api
 
 dep:
 	@$(CC) -MM *.c

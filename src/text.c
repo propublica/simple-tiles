@@ -76,6 +76,7 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
   while((placement = (placement_t *) simplet_list_next(iter))){
     if(simplet_bounds_intersects(placement->bounds, bounds)){
       simplet_bounds_free(bounds);
+      g_object_unref(layout);
       simplet_list_iter_free(iter);
       return;
     }
@@ -85,6 +86,7 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
   placement_t *plc = placement_new(layout, bounds);
   if(!plc) {
     simplet_bounds_free(bounds);
+    g_object_unref(plc->layout);
     return;
   }
 
@@ -117,6 +119,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
   int idx = OGR_FD_GetFieldIndex(defn, (const char*) field->arg);
   if(idx < 0) return;
 
+
   OGRGeometryH super = OGR_F_GetGeometryRef(feature);
   OGRGeometryH geom;
   double area = 0.0;
@@ -147,6 +150,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
   char *txt = simplet_copy_string(OGR_F_GetFieldAsString(feature, idx));
   PangoLayout *layout = pango_cairo_create_layout(litho->ctx);
   pango_layout_set_text(layout, txt, -1);
+  free(txt);
 
   simplet_style_t *font = simplet_lookup_style(litho->styles, "font");
   const char *font_family;
@@ -162,7 +166,6 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
 
   double x = OGR_G_GetX(center, 0), y = OGR_G_GetY(center, 0);
   cairo_user_to_device(proj_ctx, &x, &y);
-
   try_placement(litho, layout, x, y);
   OGR_G_DestroyGeometry(center);
 }

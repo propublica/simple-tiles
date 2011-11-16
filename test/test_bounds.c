@@ -6,8 +6,6 @@ is_intersecting(simplet_bounds_t *bounds, double maxx, double maxy, double minx,
   simplet_bounds_t *other = simplet_bounds_new();
   simplet_bounds_extend(other, maxx, maxy);
   simplet_bounds_extend(other, minx, miny);
-  printf("\nbounds: %f %f, %f %f\n", bounds->se.x, bounds->nw.y, bounds->nw.x, bounds->se.y);
-  printf("other: %f %f, %f %f\n", maxx, maxy, minx, miny);
   int intersects = simplet_bounds_intersects(bounds, other);
   simplet_bounds_free(other);
   assert(intersects == flag);
