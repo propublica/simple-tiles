@@ -67,6 +67,7 @@ typedef struct {
   simplet_bounds_t *bounds;
   simplet_list_t   *layers;
   OGRSpatialReferenceH proj;
+  double buffer; // pixel coords
   unsigned int width;
   unsigned int height;
   char *bgcolor;

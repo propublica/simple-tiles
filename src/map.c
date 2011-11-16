@@ -30,7 +30,6 @@ simplet_map_new(){
 
   map->error.status = SIMPLET_OK;
   map->valid = SIMPLET_OK;
-
   return map;
 }
 
@@ -83,8 +82,27 @@ simplet_map_set_srs(simplet_map_t *map, const char *proj){
 }
 
 void
+simplet_map_set_buffer(simplet_map_t *map, double buffer){
+  map->buffer = buffer;
+}
+
+double
+simplet_map_get_buffer(simplet_map_t *map){
+  return map->buffer;
+}
+
+
+void
 simplet_map_get_srs(simplet_map_t *map, char **srs){
   OSRExportToProj4(map->proj, srs);
+}
+
+void
+simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
+  cairo_matrix_init(mat, 1, 0, 0, -1, 0, 0);
+  cairo_matrix_translate(mat, 0, map->height * -1.0);
+  cairo_matrix_scale(mat, map->width / map->bounds->width, map->width / map->bounds->width);
+  cairo_matrix_translate(mat, -map->bounds->nw.x, -map->bounds->se.y);
 }
 
 simplet_status_t
@@ -255,6 +273,7 @@ build_surface(simplet_map_t *map){
     return NULL;
 
   cairo_t *ctx = cairo_create(surface);
+
 
   if(map->bgcolor) simplet_style_paint(ctx, map->bgcolor);
 
