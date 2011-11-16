@@ -86,7 +86,7 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
   placement_t *plc = placement_new(layout, bounds);
   if(!plc) {
     simplet_bounds_free(bounds);
-    g_object_unref(plc->layout);
+    g_object_unref(layout);
     return;
   }
 
@@ -121,7 +121,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
 
 
   OGRGeometryH super = OGR_F_GetGeometryRef(feature);
-  OGRGeometryH geom;
+  OGRGeometryH geom = super;
   double area = 0.0;
   switch(wkbFlatten(OGR_G_GetGeometryType(super))) {
     case wkbMultiPolygon:
@@ -137,7 +137,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
       }
       break;
     default:
-      geom = super;
+      ;
   }
 
   OGRGeometryH center;
