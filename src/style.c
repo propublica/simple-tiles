@@ -21,7 +21,7 @@ simplet_styledef_t styleTable[] = {
   { "paint",            simplet_style_paint       },
   { "color",            simplet_style_fill        },
   { "text-halo-color",  simplet_style_stroke      },
-  { "text-halo-weight", simplet_style_weight }
+  { "text-halo-weight", simplet_style_weight      }
   /* radius and seamless are special styles */
 };
 

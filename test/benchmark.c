@@ -94,6 +94,20 @@ bench_render(void *ctx){
 }
 
 static void
+bench_text(void *ctx){
+  simplet_map_t *map = ctx;
+  initialize_map(map);
+  simplet_map_add_style(map, "text-field", "ABBREV");
+  simplet_map_add_style(map, "font", "Futura Medium 8");
+  simplet_map_add_style(map, "color", "#226688");
+  simplet_map_add_style(map, "text-halo-color", "#ffffff88");
+  simplet_map_add_style(map, "text-halo-weight", "1");
+  char *data = NULL;
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+}
+
+static void
 bench_unprojected(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
@@ -128,6 +142,7 @@ typedef struct {
 bench_wrap_t benchmarks[] = {
   BENCH(map, render)
   BENCH(map, unprojected)
+  BENCH(map, text)
   BENCH(map, seamless)
   BENCH(map, empty)
   BENCH(map, many_filters)
@@ -156,7 +171,6 @@ stdev(double *arr, int count){
     var += pow(arr[i] - avg, 2);
   return sqrt(var / (count - 1));
 }
-
 
 int
 main(){
