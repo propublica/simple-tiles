@@ -263,6 +263,7 @@ build_surface(simplet_map_t *map){
   simplet_status_t err;
 
   cairo_t *litho_ctx = cairo_create(surface);
+  simplet_lithograph_t *litho = simplet_lithograph_new(litho_ctx, filter->styles);
 
   // defaults
   simplet_style_line_join(litho_ctx, "round");
@@ -270,13 +271,16 @@ build_surface(simplet_map_t *map){
 
 
   while((layer = simplet_list_next(iter))){
-    err = simplet_layer_process(layer, map, litho_ctx, ctx);
+    err = simplet_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
       simplet_map_error(map, err, "error in rendering");
       break;
     }
   }
+  
+  simplet_lithograph_apply(litho);
+  simplet_lithograph_free(litho);
 
   cairo_destroy(ctx);
   cairo_destroy(litho_ctx);

@@ -1,5 +1,5 @@
 OPTIMIZATION?=-O1
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings \
+CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings -fcatch-undefined-behavior \
 	$(ARCH) $(shell pkg-config --cflags cairo simple-tiles pangocairo) \
 	$(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles pangocairo) \
@@ -40,7 +40,7 @@ test-all: data test run-api run-benchmark
 
 memcheck: runner api
 	#G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind $(MEMCHECK_OPTS) ./runner
-	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind $(MEMCHECK_OPTS) ./api
+	G_SLICE=always-malloc G_DEBUG=gc-friendly,resident-modules valgrind $(MEMCHECK_OPTS) ./api
 
 dep:
 	@$(CC) -MM *.c

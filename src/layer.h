@@ -18,13 +18,10 @@ void
 simplet_layer_free(simplet_layer_t *layer);
 
 simplet_status_t
-simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *litho_ctx, cairo_t *ctx);
+simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx);
 
 simplet_filter_t*
 simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql);
-
-simplet_status_t
-simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, cairo_t *litho_ctx, cairo_t *ctx);
 
 #ifdef __cplusplus
 }
