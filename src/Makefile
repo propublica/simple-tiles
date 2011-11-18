@@ -1,6 +1,6 @@
 OPTIMIZATION ?= -O3
 DEBUG ?= -g -ggdb
-CFLAGS ?= -std=c99 $(OPTIMIZATION) $(DEBUG) -fPIC -Wall -Werror -Wextra -Wwrite-strings -fcatch-undefined-behavior -pthread $(ARCH) \
+CFLAGS ?= -std=c99 $(OPTIMIZATION) $(DEBUG) -fPIC -Wall -Werror -Wextra -Wwrite-strings -pthread $(ARCH) \
   $(shell pkg-config --cflags cairo pangocairo) \
   $(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs cairo pangocairo) \
