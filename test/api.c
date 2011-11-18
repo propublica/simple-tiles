@@ -11,6 +11,8 @@ main(){
     exit(1);
 
   simplet_map_set_slippy(map, 0, 0, 0);
+  //simplet_map_set_size(map, 2000, 2000);
+
   simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
   simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "weight", "0.1");
@@ -19,7 +21,7 @@ main(){
   simplet_map_add_style(map, "line-join", "round");
 
   simplet_map_add_style(map, "text-field", "ABBREV");
-  simplet_map_add_style(map, "font", "Futura Medium 8");
+  simplet_map_add_style(map, "font", "Futura Medium 12");
   simplet_map_add_style(map, "color", "#226688");
   simplet_map_add_style(map, "text-halo-color", "#ffffff88");
   simplet_map_add_style(map, "text-halo-weight", "1");

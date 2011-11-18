@@ -1,8 +1,8 @@
 OPTIMIZATION?=-O1
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings \
-	$(ARCH) $(shell pkg-config --cflags cairo simple-tiles pangocairo) \
+	$(ARCH) $(shell pkg-config --cflags simple-tiles pangocairo) \
 	$(shell gdal-config --cflags)
-LDFLAGS = -lm $(shell pkg-config --libs cairo simple-tiles pangocairo) \
+LDFLAGS = -lm $(shell pkg-config --libs simple-tiles pangocairo) \
 	$(shell gdal-config --libs)
 
 MEMCHECK_OPTS ?= --memcheck:leak-check=full

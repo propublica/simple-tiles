@@ -24,6 +24,19 @@ test_intersects(){
   simplet_bounds_free(unit);
 }
 
+void
+test_buffer(){
+  simplet_bounds_t *unit = simplet_bounds_new();
+  simplet_bounds_extend(unit, 1, 1);
+  simplet_bounds_extend(unit, -1, -1);
+  simplet_bounds_t *big = simplet_bounds_buffer(unit, 1);
+  assert(big->nw.x == -2);
+  assert(big->nw.y == 2);
+  assert(big->se.x == 2);
+  assert(big->se.y == -2);
+  simplet_bounds_free(big);
+  simplet_bounds_free(unit);
+}
 
 TASK(bounds){
   test(intersects);

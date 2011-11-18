@@ -35,7 +35,7 @@ placement_vfree(void *placement){
   placement_t *plc = placement;
   simplet_bounds_free(plc->bounds);
   g_object_unref(plc->layout);
-  free((placement_t *)plc);
+  free(plc);
 }
 
 void

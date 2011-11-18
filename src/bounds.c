@@ -35,6 +35,9 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   return ogrBounds;
 }
 
+
+
+
 int
 simplet_bounds_intersects(simplet_bounds_t *bounds, simplet_bounds_t *obounds){
   return !(bounds->nw.x > obounds->se.x || bounds->nw.y < obounds->se.y
@@ -99,6 +102,18 @@ simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt){
                   bounds->nw.x, bounds->nw.y,
                   bounds->se.x, bounds->nw.y);
   return SIMPLET_OK;
+}
+
+simplet_bounds_t*
+simplet_bounds_buffer(simplet_bounds_t* bounds, double extend){
+  simplet_bounds_t* new;
+  if(!(new = simplet_bounds_new()))
+    return NULL;
+
+  simplet_bounds_extend(new, bounds->nw.x - extend, bounds->nw.y + extend);
+  simplet_bounds_extend(new, bounds->se.x + extend, bounds->se.y - extend);
+
+  return new;
 }
 
 simplet_bounds_t*

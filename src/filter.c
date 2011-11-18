@@ -182,7 +182,26 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
       return SIMPLET_OGR_ERR;
   }
 
-  OGRGeometryH bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
+  OGRGeometryH bounds;
+  if(simplet_map_get_buffer(map) > 0) {
+    cairo_matrix_t mat;
+    simplet_map_init_matrix(map, &mat);
+    cairo_matrix_invert(&mat);
+    double dx, dy;
+    dx = dy = simplet_map_get_buffer(map);
+    cairo_matrix_transform_distance(&mat, &dx, &dy);
+
+    simplet_bounds_t *bbounds = simplet_bounds_buffer(map->bounds, dx);
+    if(!bbounds) {
+      OGR_DS_ReleaseResultSet(source, olayer);
+      return SIMPLET_OGR_ERR;
+    }
+    bounds = simplet_bounds_to_ogr(bbounds, map->proj);
+    free(bbounds);
+  } else {
+    bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
+  }
+
   OGR_G_TransformTo(bounds, srs);
   OGR_DS_ReleaseResultSet(source, olayer);
 
@@ -202,13 +221,9 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
 
   cairo_t *sub_ctx = cairo_create(surface);
   set_seamless(filter->styles, sub_ctx);
-
-  cairo_matrix_t matrix;
-  cairo_matrix_init(&matrix, 1, 0, 0, -1, 0, 0);
-  cairo_set_matrix(sub_ctx, &matrix);
-  cairo_translate(sub_ctx, 0, map->height * -1.0);
-  cairo_scale(sub_ctx, map->width / map->bounds->width, map->width / map->bounds->width);
-  cairo_translate(sub_ctx, -map->bounds->nw.x, -map->bounds->se.y);
+  cairo_matrix_t mat;
+  simplet_map_init_matrix(map, &mat);
+  cairo_set_matrix(sub_ctx, &mat);
 
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
