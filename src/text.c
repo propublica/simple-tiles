@@ -8,7 +8,6 @@ typedef struct {
   double x;
   double y;
   simplet_bounds_t *bounds;
-  simplet_list_t   *styles;
 } placement_t;
 
 simplet_lithograph_t *

@@ -1,12 +1,9 @@
-OPTIMIZATION?=-O1
+OPTIMIZATION?=-O3
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings \
 	$(ARCH) $(shell pkg-config --cflags simple-tiles pangocairo) \
 	$(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs simple-tiles pangocairo) \
 	$(shell gdal-config --libs)
-
-MEMCHECK_OPTS ?= --memcheck:leak-check=full
-
 OBJ = test_list.o test_style.o test_filter.o test_layer.o test_map.o test_integration.o test_bounds.o
 
 api.o: api.c
@@ -37,10 +34,6 @@ run-api: data api
 	time ./api
 
 test-all: data test run-api run-benchmark
-
-memcheck: runner api
-	#G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind $(MEMCHECK_OPTS) ./runner
-	G_DEBUG=gc-friendly G_SLICE=always-malloc valgrind $(MEMCHECK_OPTS) ./api
 
 dep:
 	@$(CC) -MM *.c
