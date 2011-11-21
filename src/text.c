@@ -7,11 +7,12 @@ typedef struct {
   PangoLayout *layout;
   double x;
   double y;
+  int placed;
   simplet_bounds_t *bounds;
 } placement_t;
 
 simplet_lithograph_t *
-simplet_lithograph_new(cairo_t *ctx, simplet_list_t *styles){
+simplet_lithograph_new(cairo_t *ctx){
   simplet_lithograph_t *litho;
   if(!(litho = malloc(sizeof(*litho))))
     return NULL;
@@ -22,7 +23,7 @@ simplet_lithograph_new(cairo_t *ctx, simplet_list_t *styles){
     free(litho);
     return NULL;
   }
-  litho->styles = styles;
+
   litho->ctx = ctx;
   cairo_reference(ctx);
 
@@ -42,7 +43,6 @@ simplet_lithograph_free(simplet_lithograph_t *litho){
   cairo_destroy(litho->ctx);
   simplet_list_set_item_free(litho->placements, placement_vfree);
   simplet_list_free(litho->placements);
-  // style is not owned by the lithos, TODO: Copy it.
   free(litho);
 }
 
@@ -93,23 +93,25 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
 }
 
 void
-simplet_lithograph_apply(simplet_lithograph_t *litho){
+simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
   simplet_listiter_t *iter = simplet_get_list_iter(litho->placements);
   placement_t *placement;
   cairo_save(litho->ctx);
   while((placement = (placement_t *) simplet_list_next(iter))){
+    if(placement->placed) continue;
     cairo_move_to(litho->ctx, placement->bounds->nw.x, placement->bounds->se.y);
     pango_cairo_layout_path(litho->ctx, placement->layout);
+    placement->placed = 1;
   }
-  simplet_apply_styles(litho->ctx, litho->styles, "text-halo-weight", "text-halo-color", "color",  NULL);
+  simplet_apply_styles(litho->ctx, styles, "text-halo-weight", "text-halo-color", "color",  NULL);
   cairo_restore(litho->ctx);
 }
 
 void
 simplet_lithograph_add_placement(simplet_lithograph_t *litho,
-  OGRFeatureH feature, cairo_t *proj_ctx) {
+  OGRFeatureH feature, simplet_list_t *styles, cairo_t *proj_ctx) {
 
-  simplet_style_t *field = simplet_lookup_style(litho->styles, "text-field");
+  simplet_style_t *field = simplet_lookup_style(styles, "text-field");
   if(!field) return;
 
   OGRFeatureDefnH defn;
@@ -151,7 +153,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
   pango_layout_set_text(layout, txt, -1);
   free(txt);
 
-  simplet_style_t *font = simplet_lookup_style(litho->styles, "font");
+  simplet_style_t *font = simplet_lookup_style(styles, "font");
   const char *font_family;
 
   if(!font)
