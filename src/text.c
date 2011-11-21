@@ -63,10 +63,12 @@ placement_new(PangoLayout *layout, simplet_bounds_t *bounds){
 
 void
 try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double y){
-  int width, height;
+  int width = 2, height = 2;
   pango_layout_get_pixel_size(layout, &width, &height);
+
   simplet_bounds_t *bounds = simplet_bounds_new();
   if(!bounds) return;
+
   simplet_bounds_extend(bounds, x - width / 2, y - height / 2);
   simplet_bounds_extend(bounds, x + width / 2 , y + height / 2);
 

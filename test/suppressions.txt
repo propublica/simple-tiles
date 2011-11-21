@@ -1,0 +1,55 @@
+{
+   fontconfig
+   Memcheck:Leak
+   fun:realloc
+   fun:FcPatternObjectInsertElt
+   fun:FcPatternObjectAddWithBinding
+}
+
+{
+   pango_fc_font_map_load_fontset
+   Memcheck:Leak
+   fun:malloc
+   fun:FcLangSetCreate
+   fun:FcLangSetCopy
+   fun:FcValueSave
+   fun:FcPatternObjectAddWithBinding
+   fun:FcPatternObjectAdd
+   fun:FcFontRenderPrepare
+   fun:pango_fc_font_map_load_fontset
+   fun:pango_font_map_load_fontset
+}
+
+{
+   pango_font_map_load_fontset
+   Memcheck:Leak
+   fun:malloc
+   fun:FcPatternObjectAddWithBinding
+   fun:FcPatternObjectAdd
+   fun:FcFontRenderPrepare
+   fun:pango_fc_font_map_load_fontset
+   fun:pango_font_map_load_fontset
+}
+
+{
+   pango_fc_font_map_load_fontset
+   Memcheck:Leak
+   fun:malloc
+   fun:FcStrStaticName
+   fun:FcPatternObjectAddWithBinding
+   fun:FcPatternObjectAdd
+   fun:FcFontRenderPrepare
+   fun:pango_fc_font_map_load_fontset
+}
+
+{
+   pango_fc_font_map_list_families
+   Memcheck:Leak
+   fun:malloc
+   fun:FcStrStaticName
+   fun:FcPatternObjectAddWithBinding
+   fun:FcPatternAdd
+   fun:FcFontSetList
+   fun:FcFontList
+   fun:pango_fc_font_map_list_families
+}

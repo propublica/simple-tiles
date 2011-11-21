@@ -33,9 +33,15 @@ run-benchmark: data benchmark
 run-api: data api
 	time ./api
 
+memcheck: runner api benchmark
+	valgrind --leak-check=full --suppressions=./suppressions.txt ./runner
+	valgrind --leak-check=full --suppressions=./suppressions.txt ./api
+	valgrind --leak-check=full --suppressions=./suppressions.txt ./benchmark
+
+
 test-all: data test run-api run-benchmark
 
 dep:
 	@$(CC) -MM *.c
 
-.PHONY: dep test run_benchmark run_tests run_api
+.PHONY: dep test run_benchmark run_tests run_api memcheck
