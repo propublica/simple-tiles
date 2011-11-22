@@ -274,7 +274,6 @@ build_surface(simplet_map_t *map){
 
   cairo_t *ctx = cairo_create(surface);
 
-
   if(map->bgcolor) simplet_style_paint(ctx, map->bgcolor);
 
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);

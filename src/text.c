@@ -2,8 +2,7 @@
 #include "style.h"
 #include "util.h"
 #include "bounds.h"
-#include <assert.h>
-int frees = 0;
+#include <math.h>
 
 typedef struct {
   PangoLayout *layout;
@@ -27,6 +26,7 @@ simplet_lithograph_new(cairo_t *ctx){
   }
 
   litho->ctx = ctx;
+  litho->pango_ctx = pango_cairo_create_context(ctx);
   cairo_reference(ctx);
 
   return litho;
@@ -44,7 +44,7 @@ void
 simplet_lithograph_free(simplet_lithograph_t *litho){
   cairo_destroy(litho->ctx);
   simplet_list_set_item_free(litho->placements, placement_vfree);
-
+  g_object_unref(litho->pango_ctx);
   simplet_list_free(litho->placements);
   free(litho);
 }
@@ -70,8 +70,8 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
   simplet_bounds_t *bounds = simplet_bounds_new();
   if(!bounds) return;
 
-  simplet_bounds_extend(bounds, x - width / 2, y - height / 2);
-  simplet_bounds_extend(bounds, x + width / 2 , y + height / 2);
+  simplet_bounds_extend(bounds, floor(x - width / 2), floor(y - height / 2));
+  simplet_bounds_extend(bounds, floor(x + width / 2), floor(y + height / 2));
 
   simplet_listiter_t *iter = simplet_get_list_iter(litho->placements);
   placement_t *placement;
@@ -150,9 +150,8 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
     OGR_G_DestroyGeometry(center);
     return;
   }
-  // pango_cairo_create_layout is a bad idea, try pango-cairo-font-map-create-context instead....
   char *txt = simplet_copy_string(OGR_F_GetFieldAsString(feature, idx));
-  PangoLayout *layout = pango_cairo_create_layout(litho->ctx);
+  PangoLayout *layout = pango_layout_new(litho->pango_ctx);
   pango_layout_set_text(layout, txt, -1);
   free(txt);
 

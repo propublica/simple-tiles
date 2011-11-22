@@ -10,6 +10,7 @@ extern "C" {
 
 typedef struct {
   cairo_t *ctx;
+  PangoContext *pango_ctx;
   simplet_list_t *placements;
 } simplet_lithograph_t;
 

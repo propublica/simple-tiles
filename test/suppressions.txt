@@ -14,6 +14,13 @@
 }
 
 {
+   font_map_default
+   Memcheck:Leak
+   ...
+   fun:pango_cairo_font_map_get_default
+}
+
+{
    # see this nonsense: https://bugs.freedesktop.org/show_bug.cgi?id=8428
    fontconfig_mess
    Memcheck:Leak
@@ -27,6 +34,21 @@
    ...
    fun:FcConfigValues
 }
+
+{
+   internal_pango
+   Memcheck:Leak
+   ...
+   fun:_pango_cairo_fc_font_new
+}
+
+{
+   internal_pango
+   Memcheck:Leak
+   ...
+   fun:pango_cairo_create_context
+}
+
 
 {
    shaper
