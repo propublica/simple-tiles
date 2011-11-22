@@ -33,11 +33,14 @@ run-benchmark: data benchmark
 run-api: data api
 	time ./api
 
-memcheck: runner api benchmark
-	valgrind --leak-check=full --suppressions=./suppressions.txt ./runner
-	valgrind --leak-check=full --suppressions=./suppressions.txt ./api
-	valgrind --leak-check=full --suppressions=./suppressions.txt ./benchmark
 
+GLIB_OPTS = G_SLICE=always-malloc G_DEBUG=gc-friendly
+MEM_OPTS = --leak-resolution=high --leak-check=full --suppressions=./suppressions.txt
+
+memcheck: api runner benchmark
+	$(GLIB_OPTS) valgrind $(MEM_OPTS) ./api
+	#$(GLIB_OPTS) valgrind $(MEM_OPTS) ./runner
+	#$(GLIB_OPTS) valgrind $(MEM_OPTS) ./benchmark
 
 test-all: data test run-api run-benchmark
 

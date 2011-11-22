@@ -1,55 +1,43 @@
+# all from chrome because glib and fontconfig are crazy
+{
+   pango_renderer
+   Memcheck:Leak
+   ...
+   fun:pango_renderer_get_type
+}
+
+{
+   internal_pango
+   Memcheck:Leak
+   ...
+   fun:pango_itemize_with_base_dir
+}
+
+{
+   # see this nonsense: https://bugs.freedesktop.org/show_bug.cgi?id=8428
+   fontconfig_mess
+   Memcheck:Leak
+   ...
+   fun:FcPatternObjectAddWithBinding
+}
+
 {
    fontconfig
    Memcheck:Leak
-   fun:realloc
-   fun:FcPatternObjectInsertElt
-   fun:FcPatternObjectAddWithBinding
+   ...
+   fun:FcConfigValues
 }
 
 {
-   pango_fc_font_map_load_fontset
+   shaper
    Memcheck:Leak
-   fun:malloc
-   fun:FcLangSetCreate
-   fun:FcLangSetCopy
-   fun:FcValueSave
-   fun:FcPatternObjectAddWithBinding
-   fun:FcPatternObjectAdd
-   fun:FcFontRenderPrepare
-   fun:pango_fc_font_map_load_fontset
-   fun:pango_font_map_load_fontset
+   ...
+   fun:get_shaper_and_font
 }
 
 {
-   pango_font_map_load_fontset
+   lines
    Memcheck:Leak
-   fun:malloc
-   fun:FcPatternObjectAddWithBinding
-   fun:FcPatternObjectAdd
-   fun:FcFontRenderPrepare
-   fun:pango_fc_font_map_load_fontset
-   fun:pango_font_map_load_fontset
-}
-
-{
-   pango_fc_font_map_load_fontset
-   Memcheck:Leak
-   fun:malloc
-   fun:FcStrStaticName
-   fun:FcPatternObjectAddWithBinding
-   fun:FcPatternObjectAdd
-   fun:FcFontRenderPrepare
-   fun:pango_fc_font_map_load_fontset
-}
-
-{
-   pango_fc_font_map_list_families
-   Memcheck:Leak
-   fun:malloc
-   fun:FcStrStaticName
-   fun:FcPatternObjectAddWithBinding
-   fun:FcPatternAdd
-   fun:FcFontSetList
-   fun:FcFontList
-   fun:pango_fc_font_map_list_families
+   ...
+   fun:pango_layout_check_lines
 }
