@@ -29,7 +29,7 @@ main(){
   simplet_map_add_style(map, "line-join", "round");
 
   simplet_map_add_style(map, "text-field", "NAME");
-  simplet_map_add_style(map, "font", "Franklin Gothic Medium, Regular 12");
+  simplet_map_add_style(map, "font", "Lucida Grande, Regular 12");
   simplet_map_add_style(map, "color", "#444444ff");
   simplet_map_add_style(map, "text-halo-color", "#ffffffcc");
   simplet_map_add_style(map, "text-halo-weight", "2");
