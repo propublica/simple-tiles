@@ -152,7 +152,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
   }
 
   cairo_font_options_t *opts;
-  if(!opts = cairo_font_options_create()){
+  if(!(opts = cairo_font_options_create())){
     OGR_G_DestroyGeometry(center);
     return;
   }
