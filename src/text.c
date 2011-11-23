@@ -150,6 +150,19 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
     OGR_G_DestroyGeometry(center);
     return;
   }
+
+  cairo_font_options_t *opts;
+  if(!opts = cairo_font_options_create()){
+    OGR_G_DestroyGeometry(center);
+    return;
+  }
+
+  cairo_font_options_set_hint_style(opts, CAIRO_HINT_STYLE_NONE);
+  cairo_font_options_set_hint_metrics(opts, CAIRO_HINT_METRICS_OFF);
+
+  pango_cairo_context_set_font_options(litho->pango_ctx, opts);
+
+
   char *txt = simplet_copy_string(OGR_F_GetFieldAsString(feature, idx));
   PangoLayout *layout = pango_layout_new(litho->pango_ctx);
   pango_layout_set_text(layout, txt, -1);

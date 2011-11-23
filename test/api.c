@@ -11,7 +11,7 @@ main(){
     exit(1);
 
   simplet_map_set_slippy(map, 0, 0, 0);
-  simplet_map_set_size(map, 256, 256);
+  simplet_map_set_size(map, 1000, 1000);
 
   simplet_map_set_bgcolor(map, "#ddeeff");
 
@@ -29,7 +29,7 @@ main(){
   simplet_map_add_style(map, "line-join", "round");
 
   simplet_map_add_style(map, "text-field", "NAME");
-  simplet_map_add_style(map, "font", "Futura, Regular 9");
+  simplet_map_add_style(map, "font", "Franklin Gothic Medium, Regular 12");
   simplet_map_add_style(map, "color", "#444444ff");
   simplet_map_add_style(map, "text-halo-color", "#ffffffcc");
   simplet_map_add_style(map, "text-halo-weight", "2");
