@@ -7,15 +7,15 @@ test_resetting(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
   simplet_map_set_bounds(map, 10, 10, 0, 0);
-  assert(map->bounds->se.x == 10);
-  assert(map->bounds->nw.y == 10);
-  assert(map->bounds->nw.x == 0);
-  assert(map->bounds->se.y == 0);
+  assert(map->bounds->se->x == 10);
+  assert(map->bounds->nw->y == 10);
+  assert(map->bounds->nw->x == 0);
+  assert(map->bounds->se->y == 0);
   simplet_map_set_bounds(map, 0, 0, -10, -10);
-  assert(map->bounds->se.x == 0);
-  assert(map->bounds->nw.y == 0);
-  assert(map->bounds->nw.x == -10);
-  assert(map->bounds->se.y == -10);
+  assert(map->bounds->se->x == 0);
+  assert(map->bounds->nw->y == 0);
+  assert(map->bounds->nw->x == -10);
+  assert(map->bounds->se->y == -10);
   simplet_map_free(map);
 }
 
@@ -54,10 +54,10 @@ test_slippy(){
   assert((map = simplet_map_new()));
   assert(simplet_map_set_slippy(map, 0, 0, 1));
   assert(map->bounds);
-  assert(map->bounds->nw.x == -20037508.34);
-  assert(map->bounds->nw.y == 20037508.34);
-  assert(map->bounds->se.y == 0.0);
-  assert(map->bounds->se.x == 0.0);
+  assert(map->bounds->nw->x == -20037508.34);
+  assert(map->bounds->nw->y == 20037508.34);
+  assert(map->bounds->se->y == 0.0);
+  assert(map->bounds->se->x == 0.0);
   simplet_map_free(map);
 }
 

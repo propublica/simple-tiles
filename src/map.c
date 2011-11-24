@@ -102,7 +102,7 @@ simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
   cairo_matrix_init(mat, 1, 0, 0, -1, 0, 0);
   cairo_matrix_translate(mat, 0, map->height * -1.0);
   cairo_matrix_scale(mat, map->width / map->bounds->width, map->width / map->bounds->width);
-  cairo_matrix_translate(mat, -map->bounds->nw.x, -map->bounds->se.y);
+  cairo_matrix_translate(mat, -map->bounds->nw->x, -map->bounds->se->y);
 }
 
 simplet_status_t
