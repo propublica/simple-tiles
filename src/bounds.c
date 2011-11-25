@@ -70,6 +70,8 @@ simplet_bounds_from_ogr(OGRGeometryH geom){
 
 void
 simplet_bounds_free(simplet_bounds_t *bounds){
+  free(bounds->nw);
+  free(bounds->se);
   free(bounds);
 }
 
