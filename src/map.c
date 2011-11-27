@@ -28,6 +28,12 @@ simplet_map_new(){
     return NULL;
   }
 
+  if(!(map->bounds = simplet_bounds_new())){
+    simplet_list_free(map->layers);
+    free(map);
+    return NULL;
+  }
+
   map->error.status = SIMPLET_OK;
   map->valid = SIMPLET_OK;
   return map;
@@ -91,7 +97,6 @@ simplet_map_get_buffer(simplet_map_t *map){
   return map->buffer;
 }
 
-
 void
 simplet_map_get_srs(simplet_map_t *map, char **srs){
   OSRExportToProj4(map->proj, srs);
@@ -137,7 +142,6 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
   simplet_bounds_extend(map->bounds, minx, miny);
   return SIMPLET_OK;
 }
-
 
 simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
