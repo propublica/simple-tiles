@@ -19,7 +19,6 @@ test_resetting(){
   simplet_map_free(map);
 }
 
-
 void
 test_map(){
   simplet_map_t *map;
@@ -47,7 +46,6 @@ test_proj(){
   free(test);
   simplet_map_free(map);
 }
-
 
 void
 test_slippy(){
