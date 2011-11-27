@@ -5,8 +5,6 @@
 #include "style.h"
 #include "util.h"
 
-#define ST_CCEIL 256.0
-
 typedef struct simplet_styledef_t {
   const char *key;
   void (*call)(cairo_t *ctx, const char *arg);
