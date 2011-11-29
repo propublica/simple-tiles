@@ -28,6 +28,12 @@ simplet_map_new(){
     return NULL;
   }
 
+  if(!(map->bounds = simplet_bounds_new())){
+    simplet_list_free(map->layers);
+    free(map);
+    return NULL;
+  }
+
   map->error.status = SIMPLET_OK;
   map->valid = SIMPLET_OK;
   return map;
@@ -91,7 +97,6 @@ simplet_map_get_buffer(simplet_map_t *map){
   return map->buffer;
 }
 
-
 void
 simplet_map_get_srs(simplet_map_t *map, char **srs){
   OSRExportToProj4(map->proj, srs);
@@ -102,7 +107,7 @@ simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
   cairo_matrix_init(mat, 1, 0, 0, -1, 0, 0);
   cairo_matrix_translate(mat, 0, map->height * -1.0);
   cairo_matrix_scale(mat, map->width / map->bounds->width, map->width / map->bounds->width);
-  cairo_matrix_translate(mat, -map->bounds->nw.x, -map->bounds->se.y);
+  cairo_matrix_translate(mat, -map->bounds->nw->x, -map->bounds->se->y);
 }
 
 simplet_status_t
@@ -137,7 +142,6 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
   simplet_bounds_extend(map->bounds, minx, miny);
   return SIMPLET_OK;
 }
-
 
 simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){

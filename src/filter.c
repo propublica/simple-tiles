@@ -102,7 +102,7 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
   for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
     cairo_new_path(ctx);
-    cairo_arc(ctx, x - r / 2, y - r / 2, r, 0., 2 * M_PI);
+    cairo_arc(ctx, x - r / 2, y - r / 2, r, 0., 2 * SIMPLET_PI);
     cairo_close_path(ctx);
   }
   simplet_apply_styles(ctx, filter->styles,

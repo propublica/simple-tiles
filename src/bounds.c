@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include "math.h"
@@ -5,12 +6,12 @@
 
 void
 simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
-  bounds->nw.x = fmin(x, bounds->nw.x);
-  bounds->nw.y = fmax(y, bounds->nw.y);
-  bounds->se.x = fmax(x, bounds->se.x);
-  bounds->se.y = fmin(y, bounds->se.y);
-  bounds->width  = fabs(bounds->nw.x - bounds->se.x);
-  bounds->height = fabs(bounds->nw.y - bounds->se.y);
+  bounds->nw->x = fmin(x, bounds->nw->x);
+  bounds->nw->y = fmax(y, bounds->nw->y);
+  bounds->se->x = fmax(x, bounds->se->x);
+  bounds->se->y = fmin(y, bounds->se->y);
+  bounds->width  = fabs(bounds->nw->x - bounds->se->x);
+  bounds->height = fabs(bounds->nw->y - bounds->se->y);
 }
 
 OGRGeometryH
@@ -19,10 +20,10 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   if(!(tmpLine = OGR_G_CreateGeometry(wkbLineString)))
     return NULL;
 
-  OGR_G_AddPoint_2D(tmpLine, bounds->nw.x, bounds->nw.y);
-  OGR_G_AddPoint_2D(tmpLine, bounds->se.x, bounds->se.y);
-  OGR_G_AddPoint_2D(tmpLine, bounds->nw.x, bounds->se.y);
-  OGR_G_AddPoint_2D(tmpLine, bounds->se.x, bounds->nw.y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->nw->y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->se->y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->nw->x, bounds->se->y);
+  OGR_G_AddPoint_2D(tmpLine, bounds->se->x, bounds->nw->y);
 
   OGRGeometryH ogrBounds;
   if(!(ogrBounds = OGR_G_ConvexHull(tmpLine))){
@@ -35,13 +36,10 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   return ogrBounds;
 }
 
-
-
-
 int
 simplet_bounds_intersects(simplet_bounds_t *bounds, simplet_bounds_t *obounds){
-  return !(bounds->nw.x > obounds->se.x || bounds->nw.y < obounds->se.y
-        || bounds->se.x < obounds->nw.x || bounds->se.y > obounds->nw.y);
+  return !(bounds->nw->x > obounds->se->x || bounds->nw->y < obounds->se->y
+        || bounds->se->x < obounds->nw->x || bounds->se->y > obounds->nw->y);
 }
 
 simplet_bounds_t*
@@ -73,6 +71,8 @@ simplet_bounds_from_ogr(OGRGeometryH geom){
 
 void
 simplet_bounds_free(simplet_bounds_t *bounds){
+  free(bounds->nw);
+  free(bounds->se);
   free(bounds);
 }
 
@@ -83,11 +83,21 @@ simplet_bounds_new(){
     return NULL;
 
   memset(bounds, 0, sizeof(*bounds));
-
-  bounds->nw.x   = INFINITY;
-  bounds->nw.y   = -INFINITY;
-  bounds->se.x   = -INFINITY;
-  bounds->se.y   = INFINITY;
+  
+  bounds->nw = malloc(sizeof(*bounds->nw));
+  bounds->se = malloc(sizeof(*bounds->se));
+  
+  if(!(bounds->nw && bounds->se)){
+    if(bounds->nw) free(bounds->nw);
+    if(bounds->se) free(bounds->se);
+    free(bounds);
+    return NULL;
+  }
+    
+  bounds->nw->x = INFINITY;
+  bounds->nw->y = -INFINITY;
+  bounds->se->x = -INFINITY;
+  bounds->se->y = INFINITY;
 
   return bounds;
 }
@@ -95,13 +105,14 @@ simplet_bounds_new(){
 
 simplet_status_t
 simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt){
-  asprintf(wkt, "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))",
-                  bounds->se.x, bounds->nw.y,
-                  bounds->se.x, bounds->se.y,
-                  bounds->nw.x, bounds->se.y,
-                  bounds->nw.x, bounds->nw.y,
-                  bounds->se.x, bounds->nw.y);
-  return SIMPLET_OK;
+  int ret = asprintf(wkt, "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))",
+                  bounds->se->x, bounds->nw->y,
+                  bounds->se->x, bounds->se->y,
+                  bounds->nw->x, bounds->se->y,
+                  bounds->nw->x, bounds->nw->y,
+                  bounds->se->x, bounds->nw->y);
+  if(ret) return SIMPLET_OK;
+  return SIMPLET_ERR;
 }
 
 simplet_bounds_t*
@@ -110,8 +121,8 @@ simplet_bounds_buffer(simplet_bounds_t* bounds, double extend){
   if(!(new = simplet_bounds_new()))
     return NULL;
 
-  simplet_bounds_extend(new, bounds->nw.x - extend, bounds->nw.y + extend);
-  simplet_bounds_extend(new, bounds->se.x + extend, bounds->se.y - extend);
+  simplet_bounds_extend(new, bounds->nw->x - extend, bounds->nw->y + extend);
+  simplet_bounds_extend(new, bounds->se->x + extend, bounds->se->y - extend);
 
   return new;
 }

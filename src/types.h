@@ -18,8 +18,8 @@ typedef struct {
 } simplet_point_t;
 
 typedef struct {
-  simplet_point_t nw;
-  simplet_point_t se;
+  simplet_point_t *nw;
+  simplet_point_t *se;
   double width;
   double height;
 } simplet_bounds_t;
@@ -92,7 +92,9 @@ typedef struct {
 
 
 #ifndef M_PI
-#define M_PI acos(-1.0)
+#define SIMPLET_PI acos(-1.0)
+#else
+#define SIMPLET_PI M_PI
 #endif
 
 #define SIMPLET_MERCATOR "epsg:3785"
