@@ -15,7 +15,7 @@ main(){
 
   simplet_map_set_bgcolor(map, "#ddeeff");
 
-  simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
+  simplet_map_add_layer(map, "/Users/jlarson/dev/simple-tiles/data/ne_10m_admin_0_countries.shp");
 
   simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_map_add_style(map, "stroke", "#226688");

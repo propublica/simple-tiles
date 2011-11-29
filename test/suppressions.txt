@@ -1,5 +1,12 @@
 # all from chrome because glib and fontconfig are crazy
 {
+   g_type_leak
+   Memcheck:Leak
+   ...
+   fun:pango_cairo_font_map_get_default
+}
+
+{
    pango_renderer
    Memcheck:Leak
    ...
@@ -13,12 +20,6 @@
    fun:pango_itemize_with_base_dir
 }
 
-{
-   font_map_default
-   Memcheck:Leak
-   ...
-   fun:pango_cairo_font_map_get_default
-}
 
 {
    # see this nonsense: https://bugs.freedesktop.org/show_bug.cgi?id=8428
@@ -63,3 +64,4 @@
    ...
    fun:pango_layout_check_lines
 }
+

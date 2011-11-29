@@ -228,8 +228,12 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
   OGRFeatureH feature;
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
-    if(geom == NULL) continue;
-    if(OGR_G_Transform(geom, transform) != OGRERR_NONE) continue;
+
+    if(geom == NULL || OGR_G_Transform(geom, transform) != OGRERR_NONE){
+      OGR_F_Destroy(feature);
+      continue;
+    }
+
     dispatch(geom, filter, sub_ctx);
 
     simplet_lithograph_add_placement(litho, feature, filter->styles, sub_ctx);
