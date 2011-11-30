@@ -1,6 +1,6 @@
 OPTIMIZATION ?= -O3
 DEBUG ?= -g -ggdb
-CFLAGS ?= -fpic -std=c99 $(OPTIMIZATION) $(DEBUG) -Wall -Werror -Wextra -Wwrite-strings -pthread $(ARCH) \
+CFLAGS ?= -std=c99 $(OPTIMIZATION) $(DEBUG) -Wall -Werror -Wextra -Wwrite-strings $(ARCH) \
   $(shell pkg-config --cflags pangocairo) \
   $(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs pangocairo) \

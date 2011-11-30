@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include "math.h"
@@ -83,17 +82,17 @@ simplet_bounds_new(){
     return NULL;
 
   memset(bounds, 0, sizeof(*bounds));
-  
+
   bounds->nw = malloc(sizeof(*bounds->nw));
   bounds->se = malloc(sizeof(*bounds->se));
-  
+
   if(!(bounds->nw && bounds->se)){
-    if(bounds->nw) free(bounds->nw);
-    if(bounds->se) free(bounds->se);
+    if(!bounds->nw) free(bounds->nw);
+    if(!bounds->se) free(bounds->se);
     free(bounds);
     return NULL;
   }
-    
+
   bounds->nw->x = INFINITY;
   bounds->nw->y = -INFINITY;
   bounds->se->x = -INFINITY;
@@ -111,7 +110,7 @@ simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt){
                   bounds->nw->x, bounds->se->y,
                   bounds->nw->x, bounds->nw->y,
                   bounds->se->x, bounds->nw->y);
-  if(ret) return SIMPLET_OK;
+  if(ret > -1) return SIMPLET_OK;
   return SIMPLET_ERR;
 }
 
