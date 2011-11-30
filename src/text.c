@@ -102,7 +102,7 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
   cairo_save(litho->ctx);
   while((placement = (placement_t *) simplet_list_next(iter))){
     if(placement->placed) continue;
-    cairo_move_to(litho->ctx, placement->bounds->nw->x, placement->bounds->se->y);
+    cairo_move_to(litho->ctx, placement->bounds->nw.x, placement->bounds->se.y);
     pango_cairo_layout_path(litho->ctx, placement->layout);
     placement->placed = 1;
   }
