@@ -1,13 +1,13 @@
 ifeq ($(shell uname -s),Darwin)
   DYLIBNAME?=libsimple-tiles.dylib
-  DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) - $(OBJ)
+  DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDLIBS) $(DEBUG) - $(OBJ)
   STLIBNAME?=libsimple-tiles.a
   STLIB_MAKE?=libtool -static -o $(STLIBNAME) - $(OBJ)
 	INSTALL?=cp -a
 else
 	DEFINES = -D_BSD_SOURCE -D_GNU_SOURCE
 	CC = libtool --mode=compile gcc
-  DYLIBNAME?=libsimple-tiles.la
+	DYLIBNAME?=libsimple-tiles.la
 	DYLIB_MAKE?=libtool --mode=link gcc -rpath /usr/local/lib -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) $(OBJ:.o=.lo)
 	INSTALL?=libtool --mode=install install -c
 	AFTER = ldconfig
@@ -18,7 +18,7 @@ DEBUG ?= -g -ggdb
 CFLAGS ?= -fPIC -std=c99 $(OPTIMIZATION) $(DEFINES) $(DEBUG) -Wall -Werror -Wextra -Wwrite-strings $(ARCH) \
   $(shell pkg-config --cflags pangocairo) \
   $(shell gdal-config --cflags)
-LDFLAGS = -lm $(shell pkg-config --libs pangocairo) \
+LDLIBS = -lm $(shell pkg-config --libs pangocairo) \
   $(shell gdal-config --libs)
 OBJ = list.o bounds.o style.o map.o util.o filter.o layer.o error.o init.o text.o
 PKG_CF = simple-tiles.pc
