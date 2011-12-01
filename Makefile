@@ -9,7 +9,7 @@ test run-api memcheck test-all: all
 	cd test && $(MAKE) $@
 
 clean:
-	rm -rf bin build test/*.o src/*.o test/runner test/api test/benchmark
+	rm -rf bin build test/*.o src/*.o src/*.lo src/.libs test/runner test/api test/benchmark
 
 lint:
 	CC=scan-build $(MAKE)

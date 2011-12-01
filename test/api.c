@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
+#include <simple-tiles/map.h>
 
 int
 main(){

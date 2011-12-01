@@ -1,6 +1,21 @@
+ifeq ($(shell uname -s),Darwin)
+  DYLIBNAME?=libsimple-tiles.dylib
+  DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) - $(OBJ)
+  STLIBNAME?=libsimple-tiles.a
+  STLIB_MAKE?=libtool -static -o $(STLIBNAME) - $(OBJ)
+	INSTALL?=cp -a
+else
+	DEFINES = -D_BSD_SOURCE -D_GNU_SOURCE
+	CC = libtool --mode=compile gcc
+  DYLIBNAME?=libsimple-tiles.la
+	DYLIB_MAKE?=libtool --mode=link gcc -rpath /usr/local/lib -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) $(OBJ:.o=.lo)
+	INSTALL?=libtool --mode=install install -c
+	AFTER = ldconfig
+endif
+
 OPTIMIZATION ?= -O3
 DEBUG ?= -g -ggdb
-CFLAGS ?= -std=c99 $(OPTIMIZATION) $(DEBUG) -Wall -Werror -Wextra -Wwrite-strings $(ARCH) \
+CFLAGS ?= -fPIC -std=c99 $(OPTIMIZATION) $(DEFINES) $(DEBUG) -Wall -Werror -Wextra -Wwrite-strings $(ARCH) \
   $(shell pkg-config --cflags pangocairo) \
   $(shell gdal-config --cflags)
 LDFLAGS = -lm $(shell pkg-config --libs pangocairo) \
@@ -8,18 +23,6 @@ LDFLAGS = -lm $(shell pkg-config --libs pangocairo) \
 OBJ = list.o bounds.o style.o map.o util.o filter.o layer.o error.o init.o text.o
 PKG_CF = simple-tiles.pc
 
-ifeq ($(shell uname -s),Darwin)
-  DYLIBNAME?=libsimple-tiles.dylib
-  DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) - $(OBJ)
-  STLIBNAME?=libsimple-tiles.a
-  STLIB_MAKE?=libtool -static -o $(STLIBNAME) - $(OBJ)
-else
-  DYLIBNAME?=libsimple-tiles.so
-  DYLIB_MAKE?=gcc -shared -Wl,-soname,$(DYLIBNAME) -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) $(OBJ)
-  STLIBNAME?=libsimple-tiles.a
-  STLIB_MAKE?=ar rcs $(STLIBNAME) $(OBJ)
-	AFTER = ldconfig
-endif
 
 all: $(OBJ)
 
@@ -33,13 +36,12 @@ PREFIX?= /usr/local
 INSTALL_INC= $(PREFIX)/include/simple-tiles/
 INSTALL_LIB= $(PREFIX)/lib
 INSTALL_PKG= $(INSTALL_LIB)/pkgconfig/
-INSTALL= cp -a
 
 install: $(DYLIBNAME) $(STLIBNAME)
 	mkdir -p $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_PKG)
-	$(INSTALL) *.h $(INSTALL_INC)
+	cp *.h $(INSTALL_INC)
 	$(INSTALL) $(DYLIBNAME) $(STLIBNAME) $(INSTALL_LIB)
-	$(INSTALL) $(PKG_CF) $(INSTALL_PKG)
+	cp $(PKG_CF) $(INSTALL_PKG)
 	$(AFTER)
 
 bounds.o: bounds.c bounds.h types.h
