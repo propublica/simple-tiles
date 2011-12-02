@@ -7,27 +7,14 @@
 
 typedef struct simplet_styledef_t {
   const char *key;
-  void (*call)(cairo_t *ctx, const char *arg);
+  void (*call)(void *ct, const char *arg);
 } simplet_styledef_t;
 
-simplet_styledef_t styleTable[] = {
-  { "fill",             simplet_style_fill        },
-  { "stroke",           simplet_style_stroke      },
-  { "weight",           simplet_style_weight      },
-  { "line-join",        simplet_style_line_join   },
-  { "line-cap",         simplet_style_line_cap    },
-  { "paint",            simplet_style_paint       },
-  { "color",            simplet_style_fill        },
-  { "text-halo-color",  simplet_style_stroke      },
-  { "text-halo-weight", simplet_style_weight      }
-  /* radius and seamless are special styles */
-};
-
-const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
 
 static void
-set_color(cairo_t *ctx, const char *arg){
+set_color(void *ct, const char *arg){
+  cairo_t *ctx = ct;
   unsigned int r, g, b, a, count;
   count = simplet_parse_color(arg, &r, &g, &b, &a);
   switch(count){
@@ -44,7 +31,8 @@ set_color(cairo_t *ctx, const char *arg){
 }
 
 void
-simplet_style_line_join(cairo_t *ctx, const char *arg){
+simplet_style_line_join(void *ct, const char *arg){
+  cairo_t *ctx = ct;
   if(!strcmp("miter", arg))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
   if(!strcmp("round", arg))
@@ -53,8 +41,9 @@ simplet_style_line_join(cairo_t *ctx, const char *arg){
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_BEVEL);
 }
 
-void
-simplet_style_line_cap(cairo_t *ctx, const char *arg){
+static void
+line_cap(void *ct, const char *arg){
+  cairo_t *ctx = ct;
   if(!strcmp("butt", arg))
     cairo_set_line_cap(ctx, CAIRO_LINE_CAP_BUTT);
   if(!strcmp("round", arg))
@@ -64,29 +53,67 @@ simplet_style_line_cap(cairo_t *ctx, const char *arg){
 }
 
 void
-simplet_style_paint(cairo_t *ctx, const char *arg){
+simplet_style_paint(void *ct, const char *arg){
+  cairo_t *ctx = ct;
   set_color(ctx, arg);
   cairo_paint(ctx);
 }
 
-void
-simplet_style_fill(cairo_t *ctx, const char *arg){
+static void
+fill(void *ct, const char *arg){
+  cairo_t *ctx = ct;
   set_color(ctx, arg);
   cairo_fill_preserve(ctx);
 }
 
-void
-simplet_style_stroke(cairo_t *ctx, const char *arg){
+static void
+stroke(void *ct, const char *arg){
+  cairo_t *ctx = ct;
   set_color(ctx, arg);
   cairo_stroke_preserve(ctx);
 }
 
-void
-simplet_style_weight(cairo_t *ctx, const char *arg){
+static void
+weight(void *ct, const char *arg){
+  cairo_t *ctx = ct;
   double w = strtod(arg, NULL), y = 0;
   cairo_device_to_user_distance(ctx, &w, &y);
   cairo_set_line_width(ctx, w);
 }
+
+static void
+letter_spacing(void *ct, const char *arg){
+  PangoAttribute *spacing;
+  if(!(spacing = pango_attr_letter_spacing_new(atoi(arg) * PANGO_SCALE))) return;
+
+  PangoLayout *layout = ct;
+  PangoAttrList *attrs = pango_layout_get_attributes(layout);
+
+  if(!attrs)
+    if(!(attrs = pango_attr_list_new())) return;
+  else
+    pango_attr_list_ref(attrs);
+
+  pango_attr_list_insert(attrs, spacing);
+  pango_layout_set_attributes(layout, attrs);
+  pango_attr_list_unref(attrs);
+}
+
+simplet_styledef_t styleTable[] = {
+  { "fill",             fill                    },
+  { "stroke",           stroke                  },
+  { "weight",           weight                  },
+  { "line-cap",         line_cap                },
+  { "color",            fill                    },
+  { "text-halo-color",  stroke                  },
+  { "text-halo-weight", weight                  },
+  { "letter-spacing",   letter_spacing          },
+  { "paint",            simplet_style_paint     }, //used by map
+  { "line-join",        simplet_style_line_join }  //used by map
+  /* radius and seamless are special styles */
+};
+
+const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
 simplet_style_t*
 simplet_style_new(const char *key, const char *arg){
@@ -126,7 +153,7 @@ lookup_styledef(char *key){
 }
 
 void
-simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, ...){
+simplet_apply_styles(void *ct, simplet_list_t* styles, ...){
   va_list args;
   va_start(args, styles);
   char* key;
@@ -139,7 +166,7 @@ simplet_apply_styles(cairo_t *ctx, simplet_list_t* styles, ...){
     if(style == NULL)
       continue;
 
-    def->call(ctx, style->arg);
+    def->call(ct, style->arg);
   }
   va_end(args);
 }

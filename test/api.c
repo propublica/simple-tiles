@@ -34,7 +34,7 @@ main(){
   simplet_map_add_style(map, "color", "#444444ff");
   simplet_map_add_style(map, "text-halo-color", "#ffffffcc");
   simplet_map_add_style(map, "text-halo-weight", "2");
-
+  simplet_map_add_style(map, "letter-spacing", "1");
   if(simplet_map_is_valid(map))
     simplet_map_render_to_png(map, "./out.png");
   simplet_map_free(map);

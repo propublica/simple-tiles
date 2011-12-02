@@ -95,6 +95,8 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
   simplet_list_push(litho->placements, (void *)plc);
 }
 
+
+
 void
 simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
   simplet_listiter_t *iter = simplet_get_list_iter(litho->placements);
@@ -169,6 +171,8 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
   free(txt);
 
   simplet_style_t *font = simplet_lookup_style(styles, "font");
+  simplet_apply_styles(layout, styles, "letter-spacing", NULL);
+
   const char *font_family;
 
   if(!font)
