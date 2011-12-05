@@ -89,10 +89,11 @@ letter_spacing(void *ct, const char *arg){
   PangoLayout *layout = ct;
   PangoAttrList *attrs = pango_layout_get_attributes(layout);
 
-  if(!attrs)
+  if(!attrs) {
     if(!(attrs = pango_attr_list_new())) return;
-  else
+  } else {
     pango_attr_list_ref(attrs);
+  }
 
   pango_attr_list_insert(attrs, spacing);
   pango_layout_set_attributes(layout, attrs);
