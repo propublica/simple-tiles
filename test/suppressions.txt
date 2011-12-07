@@ -1,0 +1,67 @@
+# all from chrome because glib and fontconfig are crazy
+{
+   g_type_leak
+   Memcheck:Leak
+   ...
+   fun:pango_cairo_font_map_get_default
+}
+
+{
+   pango_renderer
+   Memcheck:Leak
+   ...
+   fun:pango_renderer_get_type
+}
+
+{
+   internal_pango
+   Memcheck:Leak
+   ...
+   fun:pango_itemize_with_base_dir
+}
+
+
+{
+   # see this nonsense: https://bugs.freedesktop.org/show_bug.cgi?id=8428
+   fontconfig_mess
+   Memcheck:Leak
+   ...
+   fun:FcPatternObjectAddWithBinding
+}
+
+{
+   fontconfig
+   Memcheck:Leak
+   ...
+   fun:FcConfigValues
+}
+
+{
+   internal_pango
+   Memcheck:Leak
+   ...
+   fun:_pango_cairo_fc_font_new
+}
+
+{
+   internal_pango
+   Memcheck:Leak
+   ...
+   fun:pango_cairo_create_context
+}
+
+
+{
+   shaper
+   Memcheck:Leak
+   ...
+   fun:get_shaper_and_font
+}
+
+{
+   lines
+   Memcheck:Leak
+   ...
+   fun:pango_layout_check_lines
+}
+

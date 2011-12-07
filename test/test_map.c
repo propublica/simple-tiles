@@ -19,11 +19,11 @@ test_resetting(){
   simplet_map_free(map);
 }
 
-
 void
 test_map(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
+  assert(map->bounds->nw.x);
   simplet_map_set_srs(map, "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs");
   assert(map->proj);
   simplet_map_set_size(map, 256, 256);
@@ -46,7 +46,6 @@ test_proj(){
   free(test);
   simplet_map_free(map);
 }
-
 
 void
 test_slippy(){

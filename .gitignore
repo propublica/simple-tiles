@@ -6,6 +6,9 @@ build
 *.a
 *.dylib
 *.so
+*.lo
+*.la
+.libs
 api
 test_list
 runner

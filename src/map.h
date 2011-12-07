@@ -59,6 +59,18 @@ simplet_map_get_srs(simplet_map_t *map, char **srs);
 simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z);
 
+void
+simplet_map_add_placement(simplet_map_t *map, OGRFeatureH feature, OGRGeometryH geom, simplet_list_t *styles, cairo_t *ctx);
+
+void
+simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat);
+
+double
+simplet_map_get_buffer(simplet_map_t *map);
+
+void
+simplet_map_set_buffer(simplet_map_t *map, double buffer);
+
 #ifdef __cplusplus
 }
 #endif

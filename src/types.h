@@ -4,6 +4,7 @@
 #include <ogr_api.h>
 #include <ogr_srs_api.h>
 #include <cairo/cairo.h>
+#include <pango/pangocairo.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,6 +73,7 @@ typedef struct {
   simplet_bounds_t     *bounds;
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
+  double buffer; // pixel coords
   unsigned int width;
   unsigned int height;
   char *bgcolor;
@@ -96,7 +98,9 @@ typedef struct {
 
 
 #ifndef M_PI
-#define M_PI acos(-1.0)
+#define SIMPLET_PI acos(-1.0)
+#else
+#define SIMPLET_PI M_PI
 #endif
 
 #define SIMPLET_MERCATOR "epsg:3785"

@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include "math.h"
 #include "bounds.h"
-#include "point.h"
-
 
 void
 simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y){
@@ -35,6 +33,12 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   OGR_G_AssignSpatialReference(ogrBounds, proj);
   OGR_G_DestroyGeometry(tmpLine);
   return ogrBounds;
+}
+
+int
+simplet_bounds_intersects(simplet_bounds_t *bounds, simplet_bounds_t *obounds){
+  return !(bounds->nw.x > obounds->se.x || bounds->nw.y < obounds->se.y
+        || bounds->se.x < obounds->nw.x || bounds->se.y > obounds->nw.y);
 }
 
 simplet_bounds_t*
@@ -72,13 +76,15 @@ simplet_bounds_free(simplet_bounds_t *bounds){
 simplet_bounds_t*
 simplet_bounds_new(){
   simplet_bounds_t *bounds;
-  if((bounds = malloc(sizeof(*bounds))) == NULL)
+  if(!(bounds = malloc(sizeof(*bounds))))
     return NULL;
-  
+
   memset(bounds, 0, sizeof(*bounds));
 
-  bounds->nw     = simplet_point_new(INFINITY, -INFINITY);
-  bounds->se     = simplet_point_new(-INFINITY, INFINITY);
+  bounds->nw.x = INFINITY;
+  bounds->nw.y = -INFINITY;
+  bounds->se.x = -INFINITY;
+  bounds->se.y = INFINITY;
 
   return bounds;
 }
@@ -86,13 +92,26 @@ simplet_bounds_new(){
 
 simplet_status_t
 simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt){
-  asprintf(wkt, "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))",
+  int ret = asprintf(wkt, "POLYGON ((%f %f, %f %f, %f %f, %f %f, %f %f))",
                   bounds->se.x, bounds->nw.y,
                   bounds->se.x, bounds->se.y,
                   bounds->nw.x, bounds->se.y,
                   bounds->nw.x, bounds->nw.y,
                   bounds->se.x, bounds->nw.y);
-  return SIMPLET_OK;
+  if(ret > -1) return SIMPLET_OK;
+  return SIMPLET_ERR;
+}
+
+simplet_bounds_t*
+simplet_bounds_buffer(simplet_bounds_t* bounds, double extend){
+  simplet_bounds_t* new;
+  if(!(new = simplet_bounds_new()))
+    return NULL;
+
+  simplet_bounds_extend(new, bounds->nw.x - extend, bounds->nw.y + extend);
+  simplet_bounds_extend(new, bounds->se.x + extend, bounds->se.y - extend);
+
+  return new;
 }
 
 simplet_bounds_t*

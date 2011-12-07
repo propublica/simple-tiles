@@ -9,8 +9,7 @@
 #include "style.h"
 #include "util.h"
 #include "bounds.h"
-
-
+#include "text.h"
 
 #define SIMPLET_SLIPPY_SIZE 256
 #define SIMPLET_MERC_LENGTH 40075016.68
@@ -29,6 +28,12 @@ simplet_map_new(){
     return NULL;
   }
 
+  if(!(map->bounds = simplet_bounds_new())){
+    simplet_list_free(map->layers);
+    free(map);
+    return NULL;
+  }
+
   map->error.status = SIMPLET_OK;
 
   return map;
@@ -40,7 +45,7 @@ simplet_map_free(simplet_map_t *map){
     simplet_bounds_free(map->bounds);
 
   if(map->layers) {
-    simplet_list_set_item_free(map->layers,simplet_layer_vfree);
+    simplet_list_set_item_free(map->layers, simplet_layer_vfree);
     simplet_list_free(map->layers);
   }
 
@@ -79,8 +84,26 @@ simplet_map_set_srs(simplet_map_t *map, const char *proj){
 }
 
 void
+simplet_map_set_buffer(simplet_map_t *map, double buffer){
+  map->buffer = buffer;
+}
+
+double
+simplet_map_get_buffer(simplet_map_t *map){
+  return map->buffer;
+}
+
+void
 simplet_map_get_srs(simplet_map_t *map, char **srs){
   OSRExportToProj4(map->proj, srs);
+}
+
+void
+simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
+  cairo_matrix_init(mat, 1, 0, 0, -1, 0, 0);
+  cairo_matrix_translate(mat, 0, map->height * -1.0);
+  cairo_matrix_scale(mat, map->width / map->bounds->width, map->width / map->bounds->width);
+  cairo_matrix_translate(mat, -map->bounds->nw.x, -map->bounds->se.y);
 }
 
 simplet_status_t
@@ -115,7 +138,6 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
   simplet_bounds_extend(map->bounds, minx, miny);
   return SIMPLET_OK;
 }
-
 
 simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
@@ -208,19 +230,26 @@ build_surface(simplet_map_t *map){
   simplet_layer_t *layer;
   simplet_status_t err;
 
+  cairo_t *litho_ctx = cairo_create(surface);
+  simplet_lithograph_t *litho = simplet_lithograph_new(litho_ctx);
+
+  // defaults
+  simplet_style_line_join(litho_ctx, "round");
+
   while((layer = simplet_list_next(iter))){
-    err = simplet_layer_process(layer, map, ctx);
+    err = simplet_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
       set_error(map, err, "error in rendering");
       break;
     }
   }
+
+  simplet_lithograph_free(litho);
   cairo_destroy(ctx);
+  cairo_destroy(litho_ctx);
   return surface;
 }
-
-
 
 static void
 close_surface(cairo_surface_t *surface){
@@ -249,3 +278,4 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
 
   close_surface(surface);
 }
+

@@ -30,6 +30,12 @@ simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt);
 simplet_bounds_t*
 simplet_bounds_reproject(simplet_bounds_t* bounds, const char *from, const char *to);
 
+int
+simplet_bounds_intersects(simplet_bounds_t *bounds, simplet_bounds_t *obounds);
+
+simplet_bounds_t*
+simplet_bounds_buffer(simplet_bounds_t* bounds, double extend);
+
 #ifdef __cplusplus
 }
 #endif
