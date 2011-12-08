@@ -64,8 +64,8 @@ static void
 bench_seamless(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_layer_t  *layer  = map->layers->tail->value;
-  simplet_filter_t *filter = layer->filters->tail->value;
+  simplet_layer_t  *layer  = simplet_list_tail(map->layers);
+  simplet_filter_t *filter = simplet_list_tail(layer->filters);
   simplet_filter_add_style(filter, "seamless", "true");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
@@ -109,11 +109,13 @@ static void
 bench_text(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_map_add_style(map, "text-field", "ABBREV");
-  simplet_map_add_style(map, "font", "Futura Medium 8");
-  simplet_map_add_style(map, "color", "#226688");
-  simplet_map_add_style(map, "text-halo-color", "#ffffff88");
-  simplet_map_add_style(map, "text-halo-weight", "1");
+  simplet_layer_t *layer   = simplet_list_tail(map->layers);
+  simplet_filter_t *filter = simplet_list_tail(layer->filters);
+  simplet_filter_add_style(filter, "text-field", "ABBREV");
+  simplet_filter_add_style(filter, "font", "Futura Medium 8");
+  simplet_filter_add_style(filter, "color", "#226688");
+  simplet_filter_add_style(filter, "text-halo-color", "#ffffff88");
+  simplet_filter_add_style(filter, "text-halo-weight", "1");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));

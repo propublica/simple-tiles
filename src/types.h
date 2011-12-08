@@ -10,9 +10,6 @@
 extern "C" {
 #endif
 
-#define SIMPLET_ERROR_FIELDS \
-    simplet_error_t error;
-
 /* bounds and simple points */
 typedef struct {
   double x;
@@ -56,6 +53,9 @@ typedef enum {
   SIMPLET_OK
 } simplet_status_t;
 
+#define SIMPLET_ERROR_FIELDS \
+    simplet_error_t error;
+
 #define SIMPLET_MAX_ERROR 1024
 typedef struct {
   simplet_status_t status;
@@ -66,7 +66,6 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
 } simplet_errorable_t;
-
 
 typedef struct {
   SIMPLET_ERROR_FIELDS
