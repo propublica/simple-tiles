@@ -60,9 +60,19 @@ test_slippy(){
   simplet_map_free(map);
 }
 
+void
+test_user_data(){
+  simplet_map_t *map;
+  assert((map = simplet_map_new()));
+  int i = 5;
+  simplet_map_set_user_data(map, &i);
+  assert(*(int *)simplet_map_get_user_data(map) == i);
+}
+
 TASK(map){
   test(resetting);
   test(map);
   test(proj);
   test(slippy);
+  test(user_data);
 }
