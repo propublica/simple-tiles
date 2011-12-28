@@ -96,7 +96,7 @@ test_holes(){
   simplet_map_set_bounds(map, -92.889433, 42.491912,-86.763988, 47.080772);
   simplet_map_add_layer(map, "../data/tl_2010_55_cd108.shp");
   simplet_filter_t *filter = simplet_layer_add_filter(
-      (simplet_layer_t *) map->layers->tail->value,
+      (simplet_layer_t *) simplet_list_tail(map->layers),
       "SELECT * from 'tl_2010_55_cd108'");
   simplet_filter_add_style(filter, "line-cap",  "square");
   simplet_filter_add_style(filter, "line-join", "round");

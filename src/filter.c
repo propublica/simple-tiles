@@ -9,6 +9,8 @@
 #include "bounds.h"
 #include "error.h"
 
+SIMPLET_HAS_USER_DATA(filter)
+
 simplet_filter_t *
 simplet_filter_new(const char *sqlquery){
   simplet_filter_t *filter;

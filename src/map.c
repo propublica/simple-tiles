@@ -14,6 +14,8 @@
 #define SIMPLET_SLIPPY_SIZE 256
 #define SIMPLET_MERC_LENGTH 40075016.68
 
+SIMPLET_HAS_USER_DATA(map)
+
 simplet_map_t*
 simplet_map_new(){
   simplet_init();

@@ -2,6 +2,7 @@
 #define _SIMPLE_TILES_MAP_H
 
 #include "types.h"
+#include "user_data.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,6 +71,8 @@ simplet_map_get_buffer(simplet_map_t *map);
 
 void
 simplet_map_set_buffer(simplet_map_t *map, double buffer);
+
+SIMPLET_HAS_USER_DATA_PROTOS(map)
 
 #ifdef __cplusplus
 }

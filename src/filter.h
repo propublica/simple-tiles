@@ -6,7 +6,7 @@
 #include "map.h"
 #include "style.h"
 #include "text.h"
-
+#include "user_data.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +33,8 @@ simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
   OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx);
+
+SIMPLET_HAS_USER_DATA_PROTOS(filter)
 
 #ifdef __cplusplus
 }

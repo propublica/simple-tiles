@@ -29,7 +29,7 @@ void
 simplet_list_iter_free(simplet_listiter_t* iter);
 
 void
-simplet_list_set_item_free(simplet_list_t *list, simplet_list_item_free free);
+simplet_list_set_item_free(simplet_list_t *list, simplet_user_data_free free);
 
 void*
 simplet_list_next(simplet_listiter_t* iter);

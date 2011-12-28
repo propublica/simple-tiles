@@ -4,6 +4,8 @@
 #include "error.h"
 #include <cpl_error.h>
 
+SIMPLET_HAS_USER_DATA(layer)
+
 // TODO: test for broken copy
 simplet_layer_t*
 simplet_layer_new(const char *datastring){
@@ -56,7 +58,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithog
   simplet_listiter_t *iter; OGRDataSourceH source;
   if(!(source = OGROpenShared(layer->source, 0, NULL)))
     return set_error(layer, SIMPLET_OGR_ERR, "error opening layer source");
-  //retain the datasource
+  // retain the datasource
   if(OGR_DS_GetRefCount(source) == 1) OGR_DS_Reference(source);
   if(!(iter = simplet_get_list_iter(layer->filters))){
     OGRReleaseDataSource(source);

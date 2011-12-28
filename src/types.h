@@ -24,19 +24,24 @@ typedef struct {
 } simplet_bounds_t;
 
 
+typedef void (*simplet_user_data_free)(void *val);
+#define SIMPLET_USER_DATA \
+  void *user_data;
+#define SIMPLET_FREEFUNC \
+  simplet_user_data_free free;
+
 /* lists, nodes, and iterators */
 typedef struct simplet_node_t {
   struct simplet_node_t *next;
   struct simplet_node_t *prev;
-  void *value;
+  SIMPLET_USER_DATA
 } simplet_node_t;
 
 
-typedef void (*simplet_list_item_free)(void *val);
 typedef struct simplet_list_t {
   simplet_node_t *head;
   simplet_node_t *tail;
-  simplet_list_item_free free;
+  SIMPLET_FREEFUNC
   unsigned int length;
 } simplet_list_t;
 
@@ -54,7 +59,7 @@ typedef enum {
 } simplet_status_t;
 
 #define SIMPLET_ERROR_FIELDS \
-    simplet_error_t error;
+  simplet_error_t error;
 
 #define SIMPLET_MAX_ERROR 1024
 typedef struct {
@@ -69,6 +74,12 @@ typedef struct {
 
 typedef struct {
   SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+} simplet_with_user_data_t;
+
+typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
   simplet_bounds_t     *bounds;
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
@@ -80,12 +91,14 @@ typedef struct {
 
 typedef struct {
   SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
   char           *source;
   simplet_list_t *filters;
 } simplet_layer_t;
 
 typedef struct {
   SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
   char *ogrsql;
   simplet_list_t *styles;
 } simplet_filter_t;
