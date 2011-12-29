@@ -10,6 +10,7 @@ typedef struct simplet_styledef_t {
   void (*call)(void *ct, const char *arg);
 } simplet_styledef_t;
 
+SIMPLET_HAS_USER_DATA(style)
 
 
 static void

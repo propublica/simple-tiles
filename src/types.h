@@ -104,6 +104,8 @@ typedef struct {
 } simplet_filter_t;
 
 typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
   char *key;
   char *arg;
 } simplet_style_t;

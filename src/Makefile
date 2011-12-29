@@ -46,7 +46,7 @@ install: $(DYLIBNAME) $(STLIBNAME)
 
 bounds.o: bounds.c bounds.h types.h
 error.o: error.c error.h types.h
-filter.o: filter.c style.h types.h list.h filter.h map.h user_data.h \
+filter.o: filter.c style.h types.h list.h user_data.h filter.h map.h \
   text.h util.h bounds.h error.h
 init.o: init.c error.h types.h
 layer.o: layer.c layer.h types.h text.h list.h user_data.h filter.h map.h \
@@ -55,7 +55,7 @@ list.o: list.c list.h types.h
 map.o: map.c init.h error.h types.h map.h user_data.h layer.h text.h \
   list.h filter.h style.h util.h bounds.h
 style.o: style.c map.h types.h user_data.h style.h list.h util.h
-text.o: text.c text.h types.h list.h style.h util.h bounds.h
+text.o: text.c text.h types.h list.h style.h user_data.h util.h bounds.h
 user_data.o: user_data.c user_data.h types.h
 util.o: util.c util.h
 

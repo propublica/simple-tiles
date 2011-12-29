@@ -4,6 +4,7 @@
 #include <cairo/cairo.h>
 #include "types.h"
 #include "list.h"
+#include "user_data.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,6 +42,8 @@ simplet_style_set_arg(simplet_style_t *style, char *arg);
 
 void
 simplet_style_set_key(simplet_style_t *style, char *key);
+
+SIMPLET_HAS_USER_DATA_PROTOS(style)
 
 #ifdef __cplusplus
 }
