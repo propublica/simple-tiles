@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-
 #define SIMPLET_ERROR_FUNC(type) \
 static simplet_status_t \
 set_error(simplet_##type *item, simplet_status_t status, const char *msg) { \

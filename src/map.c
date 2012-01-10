@@ -179,6 +179,12 @@ simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   return layer;
 }
 
+simplet_layer_t*
+simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer){
+  if(!simplet_list_push(map->layers, layer)) return NULL;
+  return layer;
+}
+
 
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){

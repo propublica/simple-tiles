@@ -32,6 +32,9 @@ simplet_map_get_bgcolor(simplet_map_t *map, char **str);
 simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring);
 
+simplet_layer_t*
+simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer);
+
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map);
 

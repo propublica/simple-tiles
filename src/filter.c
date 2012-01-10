@@ -283,3 +283,11 @@ simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *
 
   return style;
 }
+
+simplet_style_t*
+simplet_filter_add_style_directly(simplet_filter_t *filter, simplet_style_t *style){
+  if(!simplet_list_push(filter->styles, style)) return NULL;
+  return style;
+}
+
+

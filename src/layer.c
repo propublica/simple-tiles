@@ -53,6 +53,12 @@ simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
   return filter;
 }
 
+simplet_filter_t*
+simplet_layer_add_filter_directly(simplet_layer_t *layer, simplet_filter_t *filter){
+  if(!simplet_list_push(layer->filters, filter)) return NULL;
+  return filter;
+}
+
 simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx){
   simplet_listiter_t *iter; OGRDataSourceH source;

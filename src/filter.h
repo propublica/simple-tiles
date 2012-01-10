@@ -30,6 +30,9 @@ simplet_filter_get_query(simplet_filter_t *filter, char **query);
 simplet_style_t*
 simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *arg);
 
+simplet_style_t*
+simplet_filter_add_style_directly(simplet_filter_t *filter, simplet_style_t *style);
+
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
   OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx);
