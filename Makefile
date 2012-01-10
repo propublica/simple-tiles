@@ -14,4 +14,8 @@ clean:
 lint:
 	CC=scan-build $(MAKE)
 
+docco:
+	docco src/*.c
+	docco src/*.h
+
 .PHONY: all test clean install lint
