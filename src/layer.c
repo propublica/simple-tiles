@@ -1,6 +1,10 @@
 #include "layer.h"
 #include "filter.h"
 #include "util.h"
+#include "error.h"
+#include <cpl_error.h>
+
+SIMPLET_HAS_USER_DATA(layer)
 
 // TODO: test for broken copy
 simplet_layer_t*
@@ -10,6 +14,7 @@ simplet_layer_new(const char *datastring){
     return NULL;
 
   layer->source = simplet_copy_string(datastring);
+  layer->error.status = SIMPLET_OK;
 
   if(!(layer->filters = simplet_list_new())){
     free(layer);
@@ -18,6 +23,8 @@ simplet_layer_new(const char *datastring){
 
   return layer;
 }
+
+SIMPLET_ERROR_FUNC(layer_t)
 
 void
 simplet_layer_vfree(void *layer){
@@ -46,16 +53,22 @@ simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
   return filter;
 }
 
+simplet_filter_t*
+simplet_layer_add_filter_directly(simplet_layer_t *layer, simplet_filter_t *filter){
+  if(!simplet_list_push(layer->filters, filter)) return NULL;
+  return filter;
+}
+
 simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx){
   simplet_listiter_t *iter; OGRDataSourceH source;
   if(!(source = OGROpenShared(layer->source, 0, NULL)))
-    return SIMPLET_OGR_ERR;
-  //retain the datasource
+    return set_error(layer, SIMPLET_OGR_ERR, "error opening layer source");
+  // retain the datasource
   if(OGR_DS_GetRefCount(source) == 1) OGR_DS_Reference(source);
   if(!(iter = simplet_get_list_iter(layer->filters))){
     OGRReleaseDataSource(source);
-    return SIMPLET_OOM;
+    return set_error(layer, SIMPLET_OOM, "out of memory getting list iterator");
   }
 
   simplet_filter_t *filter;
@@ -74,3 +87,17 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithog
   OGRReleaseDataSource(source);
   return SIMPLET_OK;
 }
+
+
+void
+simplet_layer_get_source(simplet_layer_t *layer, char **source){
+  *source = simplet_copy_string(layer->source);
+}
+
+void
+simplet_layer_set_source(simplet_layer_t *layer, char *source){
+  char *src = simplet_copy_string(source);
+  if(!src) set_error(layer, SIMPLET_OOM, "out of memory setting source");
+  layer->source = src;
+}
+

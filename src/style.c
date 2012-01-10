@@ -10,6 +10,7 @@ typedef struct simplet_styledef_t {
   void (*call)(void *ct, const char *arg);
 } simplet_styledef_t;
 
+SIMPLET_HAS_USER_DATA(style)
 
 
 static void
@@ -173,7 +174,7 @@ simplet_apply_styles(void *ct, simplet_list_t* styles, ...){
 }
 
 simplet_style_t*
-simplet_lookup_style(simplet_list_t* styles, const char *key){
+simplet_lookup_style(simplet_list_t *styles, const char *key){
   simplet_listiter_t* iter;
   if(!(iter = simplet_get_list_iter(styles)))
     return NULL;
@@ -186,4 +187,25 @@ simplet_lookup_style(simplet_list_t* styles, const char *key){
     }
   }
   return NULL;
+}
+
+// TODO: add oom to these which requires that styles be errorable.
+void
+simplet_style_get_arg(simplet_style_t *style, char **arg){
+  *arg = simplet_copy_string(style->arg);
+}
+
+void
+simplet_style_get_key(simplet_style_t *style, char **key){
+  *key = simplet_copy_string(style->key);
+}
+
+void
+simplet_style_set_arg(simplet_style_t *style, char *arg){
+  style->arg = simplet_copy_string(arg);
+}
+
+void
+simplet_style_set_key(simplet_style_t *style, char *key){
+  style->key = simplet_copy_string(key);
 }

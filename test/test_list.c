@@ -44,6 +44,14 @@ build_list(){
   return list;
 }
 
+static void
+test_get(){
+  simplet_list_t *list = build_list();
+  wrap_t *test = simplet_list_get(list, 0);
+  assert(test->val == 5);
+  test = simplet_list_get(list, list->length);
+  assert(!test);
+}
 
 static void
 test_push(){
@@ -53,8 +61,8 @@ test_push(){
   assert(list->length == 0);
   wrap_t *test = wrap_new(5);
   simplet_list_push(list, test);
-  assert(list->head->value == test);
-  assert(list->tail->value == test);
+  assert(simplet_list_head(list) == test);
+  assert(simplet_list_tail(list) == test);
   assert(list->length == 1);
   simplet_list_set_item_free(list, free_wrap);
   simplet_list_free(list);
@@ -98,6 +106,7 @@ test_iter(){
 TASK(list) {
   test(push);
   test(pop);
+  test(get);
   test(destroy);
   test(iter);
 }

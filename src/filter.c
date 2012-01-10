@@ -8,6 +8,9 @@
 #include "map.h"
 #include "bounds.h"
 #include "text.h"
+#include "error.h"
+
+SIMPLET_HAS_USER_DATA(filter)
 
 simplet_filter_t *
 simplet_filter_new(const char *sqlquery){
@@ -20,7 +23,8 @@ simplet_filter_new(const char *sqlquery){
     return NULL;
   }
 
-  filter->ogrsql = simplet_copy_string(sqlquery);
+  filter->error.status = SIMPLET_OK;
+  filter->ogrsql       = simplet_copy_string(sqlquery);
   return filter;
 }
 
@@ -31,6 +35,25 @@ simplet_filter_free(simplet_filter_t *filter){
   simplet_list_free(styles);
   free(filter->ogrsql);
   free(filter);
+}
+
+SIMPLET_ERROR_FUNC(filter_t)
+
+simplet_status_t
+simplet_filter_set_query(simplet_filter_t *filter, const char* query){
+  free(filter->ogrsql);
+  if(!(filter->ogrsql = simplet_copy_string(query)))
+    return set_error(filter, SIMPLET_OOM, "Out of memory setting filter query");
+  return SIMPLET_OK;
+}
+
+simplet_status_t
+simplet_filter_get_query(simplet_filter_t *filter, char** query){
+  if(!(*query = simplet_copy_string(filter->ogrsql))){
+    query = NULL;
+    return set_error(filter, SIMPLET_OOM, "Out of memory copying query");
+  }
+  return SIMPLET_OK;
 }
 
 void
@@ -158,7 +181,6 @@ set_seamless(simplet_list_t *styles, cairo_t *ctx){
 }
 
 
-/* FIXME: this function is way too hairy and needs error handling */
 simplet_status_t
 simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
   OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx){
@@ -169,7 +191,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
     if(!err)
       return SIMPLET_OK;
     else
-      return SIMPLET_OGR_ERR;
+      return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
   }
 
   OGRSpatialReferenceH srs;
@@ -179,7 +201,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
     if(!err)
       return SIMPLET_OK;
     else
-      return SIMPLET_OGR_ERR;
+      return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
   }
 
   OGRGeometryH bounds;
@@ -208,16 +230,16 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
   olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, bounds, NULL);
   OGR_G_DestroyGeometry(bounds);
   if(!olayer)
-    return SIMPLET_OGR_ERR;
+    return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
-    return SIMPLET_OGR_ERR;
+    return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(ctx),
                                   CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-    return SIMPLET_CAIRO_ERR;
+    return set_error(filter, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
 
   cairo_t *sub_ctx = cairo_create(surface);
   set_seamless(filter->styles, sub_ctx);
@@ -262,3 +284,11 @@ simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *
 
   return style;
 }
+
+simplet_style_t*
+simplet_filter_add_style_directly(simplet_filter_t *filter, simplet_style_t *style){
+  if(!simplet_list_push(filter->styles, style)) return NULL;
+  return style;
+}
+
+

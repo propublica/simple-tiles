@@ -11,7 +11,6 @@ extern "C" {
 #endif
 
 /* bounds and simple points */
-
 typedef struct {
   double x;
   double y;
@@ -25,19 +24,24 @@ typedef struct {
 } simplet_bounds_t;
 
 
+typedef void (*simplet_user_data_free)(void *val);
+#define SIMPLET_USER_DATA \
+  void *user_data;
+#define SIMPLET_FREEFUNC \
+  simplet_user_data_free free;
+
 /* lists, nodes, and iterators */
 typedef struct simplet_node_t {
   struct simplet_node_t *next;
   struct simplet_node_t *prev;
-  void *value;
+  SIMPLET_USER_DATA
 } simplet_node_t;
 
 
-typedef void (*simplet_list_item_free)(void *val);
 typedef struct simplet_list_t {
   simplet_node_t *head;
   simplet_node_t *tail;
-  simplet_list_item_free free;
+  SIMPLET_FREEFUNC
   unsigned int length;
 } simplet_list_t;
 
@@ -51,9 +55,11 @@ typedef enum {
   SIMPLET_OOM,
   SIMPLET_CAIRO_ERR,
   SIMPLET_OGR_ERR,
-  SIMPLET_INVALID_MAP,
   SIMPLET_OK
 } simplet_status_t;
+
+#define SIMPLET_ERROR_FIELDS \
+  simplet_error_t error;
 
 #define SIMPLET_MAX_ERROR 1024
 typedef struct {
@@ -62,30 +68,44 @@ typedef struct {
 } simplet_error_t;
 
 /* map structures */
+typedef struct {
+  SIMPLET_ERROR_FIELDS
+} simplet_errorable_t;
 
 typedef struct {
-  simplet_bounds_t *bounds;
-  simplet_list_t   *layers;
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+} simplet_with_user_data_t;
+
+typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+  simplet_bounds_t     *bounds;
+  simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
   double buffer; // pixel coords
   unsigned int width;
   unsigned int height;
   char *bgcolor;
-  simplet_error_t error;
-  int valid;
 } simplet_map_t;
 
 typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
   char           *source;
   simplet_list_t *filters;
 } simplet_layer_t;
 
 typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
   char *ogrsql;
   simplet_list_t *styles;
 } simplet_filter_t;
 
 typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
   char *key;
   char *arg;
 } simplet_style_t;

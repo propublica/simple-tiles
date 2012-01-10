@@ -24,13 +24,13 @@ runner: runner.o $(OBJ)
 data:
 	cd ../data && make && cd ../test
 
-test: data runner
+run_tests: data runner
 	./runner
 
-run-benchmark: data benchmark
+run_benchmark: data benchmark
 	./benchmark
 
-run-api: data api
+run_api: api
 	time ./api
 
 
@@ -39,10 +39,8 @@ MEM_OPTS = --leak-resolution=high --leak-check=full --suppressions=./suppression
 
 memcheck: api runner benchmark
 	$(GLIB_OPTS) valgrind $(MEM_OPTS) ./api
-	#$(GLIB_OPTS) valgrind $(MEM_OPTS) ./runner
-	#$(GLIB_OPTS) valgrind $(MEM_OPTS) ./benchmark
 
-test-all: data test run-api run-benchmark
+test: data run_tests run_api run_benchmark
 
 dep:
 	@$(CC) -MM *.c

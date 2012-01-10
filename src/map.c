@@ -14,6 +14,8 @@
 #define SIMPLET_SLIPPY_SIZE 256
 #define SIMPLET_MERC_LENGTH 40075016.68
 
+SIMPLET_HAS_USER_DATA(map)
+
 simplet_map_t*
 simplet_map_new(){
   simplet_init();
@@ -35,7 +37,7 @@ simplet_map_new(){
   }
 
   map->error.status = SIMPLET_OK;
-  map->valid = SIMPLET_OK;
+
   return map;
 }
 
@@ -58,11 +60,7 @@ simplet_map_free(simplet_map_t *map){
   free(map);
 }
 
-static simplet_status_t
-simplet_map_error(simplet_map_t *map, simplet_status_t err, const char* msg){
-  simplet_set_error(&map->error, err, msg);
-  return map->valid = err;
-}
+SIMPLET_ERROR_FUNC(map_t)
 
 simplet_status_t
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
@@ -79,10 +77,10 @@ simplet_map_set_srs(simplet_map_t *map, const char *proj){
   }
 
   if(!(map->proj = OSRNewSpatialReference(NULL)))
-    return simplet_map_error(map, SIMPLET_OGR_ERR, "could not assign spatial ref");
+    return set_error(map, SIMPLET_OGR_ERR, "could not assign spatial ref");
 
   if(OSRSetFromUserInput(map->proj, proj) != OGRERR_NONE)
-    return simplet_map_error(map, SIMPLET_OGR_ERR, "bad projection string");
+    return set_error(map, SIMPLET_OGR_ERR, "bad projection string");
 
   return SIMPLET_OK;
 }
@@ -122,7 +120,7 @@ simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
   free(map->bgcolor);
   if((map->bgcolor = simplet_copy_string(str)))
     return SIMPLET_OK;
-  return simplet_map_error(map, SIMPLET_OOM, "couldn't copy bgcolor");
+  return set_error(map, SIMPLET_OOM, "couldn't copy bgcolor");
 }
 
 void
@@ -136,7 +134,7 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
     simplet_bounds_free(map->bounds);
 
   if(!(map->bounds = simplet_bounds_new()))
-    return simplet_map_error(map, SIMPLET_OOM, "couldn't create bounds");
+    return set_error(map, SIMPLET_OOM, "couldn't create bounds");
 
   simplet_bounds_extend(map->bounds, maxx, maxy);
   simplet_bounds_extend(map->bounds, minx, miny);
@@ -148,7 +146,7 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
   if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
-    return simplet_map_error(map, SIMPLET_OGR_ERR, "couldn't set slippy projection");
+    return set_error(map, SIMPLET_OGR_ERR, "couldn't set slippy projection");
 
   double zfactor, length, origin;
   zfactor = pow(2.0, z);
@@ -159,7 +157,7 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
                                   origin - (y + 1) * length,
                                   x * length - origin,
                                   origin - y * length))
-    return simplet_map_error(map, SIMPLET_OOM, "out of memory setting bounds");
+    return simplet_error((simplet_errorable_t *) map, SIMPLET_OOM, "out of memory setting bounds");
 
   return SIMPLET_OK;
 }
@@ -168,69 +166,25 @@ simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   simplet_layer_t *layer;
   if(!(layer = simplet_layer_new(datastring))){
-    simplet_map_error(map, SIMPLET_OOM, "couldn't create a layer");
+    set_error(map, SIMPLET_OOM, "couldn't create a layer");
     return NULL;
   }
 
   if(!simplet_list_push(map->layers, layer)){
     simplet_layer_free(layer);
-    simplet_map_error(map, SIMPLET_OOM, "couldn't add anymore layers");
+    set_error(map, SIMPLET_OOM, "couldn't add any more layers");
     return NULL;
   }
 
   return layer;
 }
 
-simplet_filter_t*
-simplet_map_add_filter(simplet_map_t *map, const char *sqlquery){
-  if(!map->layers->tail){
-    simplet_map_error(map, SIMPLET_ERR, "tried to add a filter without any layers defined");
-    return NULL;
-  }
-
-  simplet_layer_t *layer = map->layers->tail->value;
-  if(!layer){
-    simplet_map_error(map, SIMPLET_ERR, "tried to add a filter without any layers defined");
-    return NULL;
-  }
-
-  simplet_filter_t *filter;
-  if(!(filter = simplet_layer_add_filter(layer, sqlquery))){
-    simplet_map_error(map, SIMPLET_OOM, "couldn't add a filter");
-    return NULL;
-  }
-
-  return filter;
+simplet_layer_t*
+simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer){
+  if(!simplet_list_push(map->layers, layer)) return NULL;
+  return layer;
 }
 
-simplet_style_t *
-simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg){
-  if(!map->layers->tail){
-    simplet_map_error(map, SIMPLET_ERR, "couldn't add a style without a layer");
-    return NULL;
-  }
-  simplet_layer_t *layer = map->layers->tail->value;
-
-  if(!layer){
-    simplet_map_error(map, SIMPLET_ERR, "couldn't add a style without a layer");
-    return NULL;
-  }
-
-  simplet_filter_t *filter = layer->filters->tail->value;
-
-  if(!filter){
-    simplet_map_error(map, SIMPLET_ERR, "couldn't add a style without a filter");
-    return NULL;
-  }
-
-  simplet_style_t *style;
-  if(!(style = simplet_filter_add_style(filter, key, arg))){
-    simplet_map_error(map, SIMPLET_OOM, "couldn't add a style");
-    return NULL;
-  }
-
-  return style;
-}
 
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
@@ -244,7 +198,7 @@ simplet_map_status_to_string(simplet_map_t *map){
 
 simplet_status_t
 simplet_map_is_valid(simplet_map_t *map){
-  if(map->valid != SIMPLET_OK)
+  if(!map->error.status == SIMPLET_OK)
     return SIMPLET_ERR;
 
   if(!map->bounds)
@@ -259,7 +213,7 @@ simplet_map_is_valid(simplet_map_t *map){
   if(!map->width)
     return SIMPLET_ERR;
 
-  if(!map->layers->tail)
+  if(!simplet_list_head(map->layers))
     return SIMPLET_ERR;
 
   return SIMPLET_OK;
@@ -294,7 +248,7 @@ build_surface(simplet_map_t *map){
     err = simplet_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
-      simplet_map_error(map, err, "error in rendering");
+      set_error(map, err, "error in rendering");
       break;
     }
   }
@@ -317,7 +271,7 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   if(!(surface = build_surface(map))) return;
 
   if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS)
-    simplet_map_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_surface_status(surface)));
+    set_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_surface_status(surface)));
 
   close_surface(surface);
 }
@@ -328,7 +282,7 @@ simplet_map_render_to_png(simplet_map_t *map, const char *path){
   if(!(surface = build_surface(map))) return;
 
   if(cairo_surface_write_to_png(surface, path) != CAIRO_STATUS_SUCCESS)
-    simplet_map_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_surface_status(surface)));
+    set_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_surface_status(surface)));
 
   close_surface(surface);
 }

@@ -6,7 +6,7 @@ simplet_list_new(){
   simplet_list_t* list;
   if(!(list = malloc(sizeof(*list))))
     return NULL;
-  
+
   memset(list, 0, sizeof(*list));
 
   return list;
@@ -18,7 +18,7 @@ simplet_list_push(simplet_list_t *list, void* val){
   if(!(node = malloc(sizeof(*node))))
     return NULL;
 
-  node->value = val;
+  node->user_data = val;
 
   if(!(list->head || list->tail)) {
     list->head = list->tail = node;
@@ -34,13 +34,28 @@ simplet_list_push(simplet_list_t *list, void* val){
   return val;
 }
 
+int
+simplet_list_get_length(simplet_list_t *list){
+  return list->length;
+}
+
+void*
+simplet_list_tail(simplet_list_t *list){
+  return list->tail->user_data;
+}
+
+void*
+simplet_list_head(simplet_list_t *list){
+  return list->head->user_data;
+}
+
 void*
 simplet_list_pop(simplet_list_t *list){
   if(!list->tail)
     return NULL;
 
   simplet_node_t *node = list->tail;
-  void *val = node->value;
+  void *val = node->user_data;
 
   if (node->prev)
     node->prev->next = NULL;
@@ -54,6 +69,16 @@ simplet_list_pop(simplet_list_t *list){
   return val;
 }
 
+void*
+simplet_list_get(simplet_list_t* list, unsigned int idx){
+  if(idx > list->length) return NULL;
+  simplet_node_t *n = list->head;
+  if(idx <= 0) return n->user_data;
+  while(idx-- && n) n = n->next;
+  if(n) return n->user_data;
+  return NULL;
+}
+
 void
 simplet_list_free(simplet_list_t *list){
   void* val;
@@ -63,7 +88,7 @@ simplet_list_free(simplet_list_t *list){
 }
 
 void
-simplet_list_set_item_free(simplet_list_t *list, simplet_list_item_free destroy){
+simplet_list_set_item_free(simplet_list_t *list, simplet_user_data_free destroy){
   list->free = destroy;
 }
 
@@ -87,7 +112,7 @@ simplet_list_next(simplet_listiter_t* iter){
   simplet_node_t *current = iter->next;
   if(current != NULL) {
     iter->next = current->next;
-    return current->value;
+    return current->user_data;
   } else {
     simplet_list_iter_free(iter);
   }

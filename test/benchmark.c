@@ -3,8 +3,10 @@
 #include <unistd.h>
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
-#include <simple-tiles/error.h>
 #include <simple-tiles/list.h>
+#include <simple-tiles/filter.h>
+#include <simple-tiles/layer.h>
+#include <simple-tiles/error.h>
 
 static void*
 setup_map(){
@@ -34,10 +36,12 @@ static void
 initialize_map(simplet_map_t *map){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 1, 2);
-  simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
-  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "fill",   "#061F37ff");
+  simplet_layer_t  *layer  = simplet_map_add_layer(map,
+      "../data/ne_10m_admin_0_countries.shp");
+  simplet_filter_t *filter = simplet_layer_add_filter(layer,
+      "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "fill",   "#061F37ff");
 }
 
 static cairo_status_t
@@ -60,7 +64,9 @@ static void
 bench_seamless(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_map_add_style(map, "seamless", "true");
+  simplet_layer_t  *layer  = simplet_list_tail(map->layers);
+  simplet_filter_t *filter = simplet_list_tail(layer->filters);
+  simplet_filter_add_style(filter, "seamless", "true");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
@@ -70,15 +76,21 @@ static void
 bench_many_filters(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "stroke",   "#ffffffff");
-  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "stroke",   "#ffffffff");
-  simplet_map_add_filter(map,  "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_map_add_style(map, "weight", "0.1");
-  simplet_map_add_style(map, "stroke",   "#ffffffff");
+
+  simplet_layer_t *layer   = simplet_list_tail(map->layers);
+  simplet_filter_t *filter = simplet_layer_add_filter(layer,
+                                      "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+
+  filter = simplet_layer_add_filter(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+
+  filter = simplet_layer_add_filter(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_filter_add_style(filter, "weight", "0.1");
+  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
@@ -97,11 +109,13 @@ static void
 bench_text(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_map_add_style(map, "text-field", "ABBREV");
-  simplet_map_add_style(map, "font", "Futura Medium 8");
-  simplet_map_add_style(map, "color", "#226688");
-  simplet_map_add_style(map, "text-halo-color", "#ffffff88");
-  simplet_map_add_style(map, "text-halo-weight", "1");
+  simplet_layer_t *layer   = simplet_list_tail(map->layers);
+  simplet_filter_t *filter = simplet_list_tail(layer->filters);
+  simplet_filter_add_style(filter, "text-field", "ABBREV");
+  simplet_filter_add_style(filter, "font", "Futura Medium 8");
+  simplet_filter_add_style(filter, "color", "#226688");
+  simplet_filter_add_style(filter, "text-halo-color", "#ffffff88");
+  simplet_filter_add_style(filter, "text-halo-weight", "1");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
@@ -191,6 +205,6 @@ main(){
                             bench->times, sum(runs, bench->times),
                             bench->times / sum(runs, bench->times));
     printf("\x1b[33mmean\x1b[0m: %f\n", mean(runs, bench->times));
-    printf("\x1b[33mstd\x1b[0m:  %f\n",  stdev(runs, bench->times));
+    printf("\x1b[33mstd\x1b[0m:  %f\n", stdev(runs, bench->times));
   }
 }

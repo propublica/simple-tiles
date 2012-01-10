@@ -2,6 +2,7 @@
 #define _SIMPLE_TILES_MAP_H
 
 #include "types.h"
+#include "user_data.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,11 +32,8 @@ simplet_map_get_bgcolor(simplet_map_t *map, char **str);
 simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring);
 
-simplet_filter_t*
-simplet_map_add_filter(simplet_map_t *map, const char *sqlquery);
-
-simplet_style_t*
-simplet_map_add_style(simplet_map_t *map, const char *key, const char *arg);
+simplet_layer_t*
+simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer);
 
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map);
@@ -76,6 +74,8 @@ simplet_map_get_buffer(simplet_map_t *map);
 
 void
 simplet_map_set_buffer(simplet_map_t *map, double buffer);
+
+SIMPLET_HAS_USER_DATA_PROTOS(map)
 
 #ifdef __cplusplus
 }

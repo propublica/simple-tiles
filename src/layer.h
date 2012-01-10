@@ -3,6 +3,8 @@
 
 #include "types.h"
 #include "text.h"
+#include "user_data.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,8 +22,20 @@ simplet_layer_free(simplet_layer_t *layer);
 simplet_filter_t*
 simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql);
 
+simplet_filter_t*
+simplet_layer_add_filter_directly(simplet_layer_t *layer, simplet_filter_t *filter);
+
 simplet_status_t
 simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx);
+
+void
+simplet_layer_get_source(simplet_layer_t *layer, char **source);
+
+void
+simplet_layer_set_source(simplet_layer_t *layer, char *source);
+
+SIMPLET_HAS_USER_DATA_PROTOS(layer)
+
 
 #ifdef __cplusplus
 }
