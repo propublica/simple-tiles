@@ -1,31 +1,45 @@
-<!DOCTYPE html>  <html> <head>   <title>error.h</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.h               </a>                                           <a class="source" href="error.html">                 error.h               </a>                                           <a class="source" href="filter.html">                 filter.h               </a>                                           <a class="source" href="init.html">                 init.h               </a>                                           <a class="source" href="layer.html">                 layer.h               </a>                                           <a class="source" href="list.html">                 list.h               </a>                                           <a class="source" href="map.html">                 map.h               </a>                                           <a class="source" href="simple_tiles.html">                 simple_tiles.h               </a>                                           <a class="source" href="style.html">                 style.h               </a>                                           <a class="source" href="text.html">                 text.h               </a>                                           <a class="source" href="types.html">                 types.h               </a>                                           <a class="source" href="user_data.html">                 user_data.h               </a>                                           <a class="source" href="util.html">                 util.h               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               error.h             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#ifndef _SIMPLE_TILES_ERROR_H</span>
-<span class="cp">#define _SIMPLE_TILES_ERROR_H</span>
+<!DOCTYPE html>  <html> <head>   <title>error.c</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.c               </a>                                           <a class="source" href="error.html">                 error.c               </a>                                           <a class="source" href="filter.html">                 filter.c               </a>                                           <a class="source" href="init.html">                 init.c               </a>                                           <a class="source" href="layer.html">                 layer.c               </a>                                           <a class="source" href="list.html">                 list.c               </a>                                           <a class="source" href="map.html">                 map.c               </a>                                           <a class="source" href="style.html">                 style.c               </a>                                           <a class="source" href="text.html">                 text.c               </a>                                           <a class="source" href="user_data.html">                 user_data.c               </a>                                           <a class="source" href="util.html">                 util.c               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               error.c             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#include &lt;cpl_error.h&gt;</span>
+<span class="cp">#include &quot;error.h&quot;</span>
 
-<span class="cp">#include &quot;types.h&quot;</span>
-
-<span class="cp">#ifdef __cplusplus</span>
-<span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
-<span class="cp">#endif</span>
-
-<span class="cp">#define SIMPLET_ERROR_FUNC(type) \</span>
-<span class="cp">static simplet_status_t \</span>
-<span class="cp">set_error(simplet_##type *item, simplet_status_t status, const char *msg) { \</span>
-<span class="cp">  return simplet_error((simplet_errorable_t *)item, status, msg); \</span>
-<span class="cp">}</span>
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">ogr_error_handler</span><span class="p">(</span><span class="n">CPLErr</span> <span class="n">eclass</span><span class="p">,</span> <span class="kt">int</span> <span class="n">err_no</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="p">){</span>
+  <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">eclass</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">err_no</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">msg</span><span class="p">;</span> <span class="c1">// silence ogr errors</span>
+<span class="p">}</span>
 
 <span class="kt">void</span>
-<span class="n">simplet_set_error</span><span class="p">(</span><span class="n">simplet_error_t</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="n">simplet_status_t</span> <span class="n">status</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_error_init</span><span class="p">();</span>
+<span class="n">simplet_error_init</span><span class="p">(){</span>
+  <span class="n">CPLSetErrorHandler</span><span class="p">(</span><span class="n">ogr_error_handler</span><span class="p">);</span>
+<span class="p">}</span>
 
 <span class="n">simplet_status_t</span>
-<span class="n">simplet_error</span><span class="p">(</span><span class="n">simplet_errorable_t</span> <span class="o">*</span><span class="n">errr</span><span class="p">,</span> <span class="n">simplet_status_t</span> <span class="n">err</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">msg</span><span class="p">);</span>
-
-<span class="cp">#ifdef __cplusplus</span>
+<span class="n">simplet_error</span><span class="p">(</span><span class="n">simplet_errorable_t</span> <span class="o">*</span><span class="n">errr</span><span class="p">,</span> <span class="n">simplet_status_t</span> <span class="n">err</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="p">){</span>
+  <span class="n">simplet_set_error</span><span class="p">(</span><span class="o">&amp;</span><span class="n">errr</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">err</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="cp">#endif</span>
 
-<span class="cp">#endif</span>
+<span class="kt">void</span>
+<span class="n">simplet_set_error</span><span class="p">(</span><span class="n">simplet_error_t</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="n">simplet_status_t</span> <span class="n">status</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="p">){</span>
+  <span class="k">switch</span><span class="p">(</span><span class="n">status</span><span class="p">){</span>
+    <span class="k">case</span> <span class="n">SIMPLET_ERR</span>:
+      <span class="n">error</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">=</span> <span class="n">SIMPLET_ERR</span><span class="p">;</span>
+      <span class="n">snprintf</span><span class="p">(</span><span class="n">error</span><span class="o">-&gt;</span><span class="n">msg</span><span class="p">,</span> <span class="n">SIMPLET_MAX_ERROR</span><span class="p">,</span> <span class="s">&quot;simple tiles error: %s&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">SIMPLET_OOM</span>:
+      <span class="n">error</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">=</span> <span class="n">SIMPLET_OOM</span><span class="p">;</span>
+      <span class="n">snprintf</span><span class="p">(</span><span class="n">error</span><span class="o">-&gt;</span><span class="n">msg</span><span class="p">,</span> <span class="n">SIMPLET_MAX_ERROR</span><span class="p">,</span> <span class="s">&quot;out of memory for allocation, %s&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">SIMPLET_CAIRO_ERR</span>:
+      <span class="n">error</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">=</span> <span class="n">SIMPLET_CAIRO_ERR</span><span class="p">;</span>
+      <span class="n">snprintf</span><span class="p">(</span><span class="n">error</span><span class="o">-&gt;</span><span class="n">msg</span><span class="p">,</span> <span class="n">SIMPLET_MAX_ERROR</span><span class="p">,</span> <span class="s">&quot;cairo error: %s&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">SIMPLET_OGR_ERR</span>:
+      <span class="n">error</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">=</span> <span class="n">SIMPLET_OGR_ERR</span><span class="p">;</span>
+      <span class="n">snprintf</span><span class="p">(</span><span class="n">error</span><span class="o">-&gt;</span><span class="n">msg</span><span class="p">,</span> <span class="n">SIMPLET_MAX_ERROR</span><span class="p">,</span> <span class="s">&quot;OGR error: %s, %s&quot;</span><span class="p">,</span> <span class="n">CPLGetLastErrorMsg</span><span class="p">(),</span> <span class="n">msg</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">SIMPLET_OK</span>:
+      <span class="n">error</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">=</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+      <span class="n">snprintf</span><span class="p">(</span><span class="n">error</span><span class="o">-&gt;</span><span class="n">msg</span><span class="p">,</span> <span class="n">SIMPLET_MAX_ERROR</span><span class="p">,</span> <span class="s">&quot;%s&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

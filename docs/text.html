@@ -1,37 +1,187 @@
-<!DOCTYPE html>  <html> <head>   <title>text.h</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.h               </a>                                           <a class="source" href="error.html">                 error.h               </a>                                           <a class="source" href="filter.html">                 filter.h               </a>                                           <a class="source" href="init.html">                 init.h               </a>                                           <a class="source" href="layer.html">                 layer.h               </a>                                           <a class="source" href="list.html">                 list.h               </a>                                           <a class="source" href="map.html">                 map.h               </a>                                           <a class="source" href="simple_tiles.html">                 simple_tiles.h               </a>                                           <a class="source" href="style.html">                 style.h               </a>                                           <a class="source" href="text.html">                 text.h               </a>                                           <a class="source" href="types.html">                 types.h               </a>                                           <a class="source" href="user_data.html">                 user_data.h               </a>                                           <a class="source" href="util.html">                 util.h               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               text.h             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#ifndef _SIMPLE_TEXT_H</span>
-<span class="cp">#define _SIMPLE_TEXT_H</span>
-
-<span class="cp">#include &quot;types.h&quot;</span>
-<span class="cp">#include &quot;list.h&quot;</span>
-
-<span class="cp">#ifdef __cplusplus</span>
-<span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
-<span class="cp">#endif</span>
+<!DOCTYPE html>  <html> <head>   <title>text.c</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.c               </a>                                           <a class="source" href="error.html">                 error.c               </a>                                           <a class="source" href="filter.html">                 filter.c               </a>                                           <a class="source" href="init.html">                 init.c               </a>                                           <a class="source" href="layer.html">                 layer.c               </a>                                           <a class="source" href="list.html">                 list.c               </a>                                           <a class="source" href="map.html">                 map.c               </a>                                           <a class="source" href="style.html">                 style.c               </a>                                           <a class="source" href="text.html">                 text.c               </a>                                           <a class="source" href="user_data.html">                 user_data.c               </a>                                           <a class="source" href="util.html">                 util.c               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               text.c             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#include &quot;text.h&quot;</span>
+<span class="cp">#include &quot;style.h&quot;</span>
+<span class="cp">#include &quot;util.h&quot;</span>
+<span class="cp">#include &quot;bounds.h&quot;</span>
+<span class="cp">#include &lt;math.h&gt;</span>
 
 <span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
-  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span><span class="p">;</span>
-  <span class="n">PangoContext</span> <span class="o">*</span><span class="n">pango_ctx</span><span class="p">;</span>
-  <span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">placements</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">simplet_lithograph_t</span><span class="p">;</span>
-
+  <span class="n">PangoLayout</span> <span class="o">*</span><span class="n">layout</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">x</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">y</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">placed</span><span class="p">;</span>
+  <span class="n">simplet_bounds_t</span> <span class="o">*</span><span class="n">bounds</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">placement_t</span><span class="p">;</span>
 
 <span class="n">simplet_lithograph_t</span> <span class="o">*</span>
-<span class="n">simplet_lithograph_new</span><span class="p">(</span><span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span><span class="p">);</span>
+<span class="n">simplet_lithograph_new</span><span class="p">(</span><span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span><span class="p">){</span>
+  <span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">litho</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">litho</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
 
-<span class="kt">void</span>
-<span class="n">simplet_lithograph_free</span><span class="p">(</span><span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">);</span>
+  <span class="n">memset</span><span class="p">(</span><span class="n">litho</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">litho</span><span class="p">));</span>
 
-<span class="kt">void</span>
-<span class="n">simplet_lithograph_add_placement</span><span class="p">(</span><span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">,</span> <span class="n">OGRFeatureH</span> <span class="n">feature</span><span class="p">,</span>
-  <span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">styles</span><span class="p">,</span> <span class="n">cairo_t</span> <span class="o">*</span><span class="n">proj_ctx</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">placements</span> <span class="o">=</span> <span class="n">simplet_list_new</span><span class="p">(</span><span class="n">litho</span><span class="p">))){</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">litho</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="p">}</span>
 
-<span class="kt">void</span>
-<span class="n">simplet_lithograph_apply</span><span class="p">(</span><span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">,</span> <span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">styles</span><span class="p">);</span>
+  <span class="n">litho</span><span class="o">-&gt;</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ctx</span><span class="p">;</span>
+  <span class="n">litho</span><span class="o">-&gt;</span><span class="n">pango_ctx</span> <span class="o">=</span> <span class="n">pango_cairo_create_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
+  <span class="n">cairo_reference</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
 
-<span class="cp">#ifdef __cplusplus</span>
+  <span class="k">return</span> <span class="n">litho</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="cp">#endif</span>
 
-<span class="cp">#endif</span>
+<span class="kt">void</span>
+<span class="n">placement_vfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">placement</span><span class="p">){</span>
+  <span class="n">placement_t</span> <span class="o">*</span><span class="n">plc</span> <span class="o">=</span> <span class="n">placement</span><span class="p">;</span>
+  <span class="n">simplet_bounds_free</span><span class="p">(</span><span class="n">plc</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">);</span>
+  <span class="n">g_object_unref</span><span class="p">(</span><span class="n">plc</span><span class="o">-&gt;</span><span class="n">layout</span><span class="p">);</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">plc</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_lithograph_free</span><span class="p">(</span><span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">){</span>
+  <span class="n">cairo_destroy</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">);</span>
+  <span class="n">simplet_list_set_item_free</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">placements</span><span class="p">,</span> <span class="n">placement_vfree</span><span class="p">);</span>
+  <span class="n">g_object_unref</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">pango_ctx</span><span class="p">);</span>
+  <span class="n">simplet_list_free</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">placements</span><span class="p">);</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">litho</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">placement_t</span> <span class="o">*</span>
+<span class="n">placement_new</span><span class="p">(</span><span class="n">PangoLayout</span> <span class="o">*</span><span class="n">layout</span><span class="p">,</span> <span class="n">simplet_bounds_t</span> <span class="o">*</span><span class="n">bounds</span><span class="p">){</span>
+  <span class="n">placement_t</span> <span class="o">*</span><span class="n">placement</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">placement</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">placement</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">memset</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">placement</span><span class="p">));</span>
+
+  <span class="n">placement</span><span class="o">-&gt;</span><span class="n">layout</span> <span class="o">=</span> <span class="n">layout</span><span class="p">;</span>
+  <span class="n">placement</span><span class="o">-&gt;</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">placement</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">try_placement</span><span class="p">(</span><span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">,</span> <span class="n">PangoLayout</span> <span class="o">*</span><span class="n">layout</span><span class="p">,</span> <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">){</span>
+  <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">;</span>
+  <span class="n">pango_layout_get_pixel_size</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">);</span>
+  <span class="n">simplet_bounds_t</span> <span class="o">*</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">simplet_bounds_new</span><span class="p">();</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">bounds</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+  <span class="n">simplet_bounds_extend</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">floor</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">floor</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">));</span>
+  <span class="n">simplet_bounds_extend</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">floor</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">floor</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">));</span>
+
+  <span class="n">simplet_listiter_t</span> <span class="o">*</span><span class="n">iter</span> <span class="o">=</span> <span class="n">simplet_get_list_iter</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">placements</span><span class="p">);</span>
+  <span class="n">placement_t</span> <span class="o">*</span><span class="n">placement</span><span class="p">;</span>
+  <span class="k">while</span><span class="p">((</span><span class="n">placement</span> <span class="o">=</span> <span class="p">(</span><span class="n">placement_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">simplet_list_next</span><span class="p">(</span><span class="n">iter</span><span class="p">))){</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">simplet_bounds_intersects</span><span class="p">(</span><span class="n">placement</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)){</span>
+      <span class="n">simplet_bounds_free</span><span class="p">(</span><span class="n">bounds</span><span class="p">);</span>
+      <span class="n">g_object_unref</span><span class="p">(</span><span class="n">layout</span><span class="p">);</span>
+      <span class="n">simplet_list_iter_free</span><span class="p">(</span><span class="n">iter</span><span class="p">);</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>if we get here we can create and insert a new placement;</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="n">placement_t</span> <span class="o">*</span><span class="n">plc</span> <span class="o">=</span> <span class="n">placement_new</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">bounds</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">plc</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">simplet_bounds_free</span><span class="p">(</span><span class="n">bounds</span><span class="p">);</span>
+    <span class="n">g_object_unref</span><span class="p">(</span><span class="n">layout</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">simplet_list_push</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">placements</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">plc</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+
+<span class="kt">void</span>
+<span class="n">simplet_lithograph_apply</span><span class="p">(</span><span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">,</span> <span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">styles</span><span class="p">){</span>
+  <span class="n">simplet_listiter_t</span> <span class="o">*</span><span class="n">iter</span> <span class="o">=</span> <span class="n">simplet_get_list_iter</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">placements</span><span class="p">);</span>
+  <span class="n">placement_t</span> <span class="o">*</span><span class="n">placement</span><span class="p">;</span>
+  <span class="n">cairo_save</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">);</span>
+  <span class="k">while</span><span class="p">((</span><span class="n">placement</span> <span class="o">=</span> <span class="p">(</span><span class="n">placement_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">simplet_list_next</span><span class="p">(</span><span class="n">iter</span><span class="p">))){</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">placement</span><span class="o">-&gt;</span><span class="n">placed</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
+    <span class="n">cairo_move_to</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">,</span> <span class="n">placement</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="o">-&gt;</span><span class="n">nw</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="o">-&gt;</span><span class="n">se</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+    <span class="n">pango_cairo_layout_path</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">,</span> <span class="n">placement</span><span class="o">-&gt;</span><span class="n">layout</span><span class="p">);</span>
+    <span class="n">placement</span><span class="o">-&gt;</span><span class="n">placed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">simplet_apply_styles</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">,</span> <span class="n">styles</span><span class="p">,</span> <span class="s">&quot;text-halo-weight&quot;</span><span class="p">,</span> <span class="s">&quot;text-halo-color&quot;</span><span class="p">,</span> <span class="s">&quot;color&quot;</span><span class="p">,</span>  <span class="nb">NULL</span><span class="p">);</span>
+  <span class="n">cairo_restore</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_lithograph_add_placement</span><span class="p">(</span><span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span><span class="p">,</span>
+  <span class="n">OGRFeatureH</span> <span class="n">feature</span><span class="p">,</span> <span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">styles</span><span class="p">,</span> <span class="n">cairo_t</span> <span class="o">*</span><span class="n">proj_ctx</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">field</span> <span class="o">=</span> <span class="n">simplet_lookup_style</span><span class="p">(</span><span class="n">styles</span><span class="p">,</span> <span class="s">&quot;text-field&quot;</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">field</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+  <span class="n">OGRFeatureDefnH</span> <span class="n">defn</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">defn</span> <span class="o">=</span> <span class="n">OGR_F_GetDefnRef</span><span class="p">(</span><span class="n">feature</span><span class="p">)))</span> <span class="k">return</span><span class="p">;</span>
+
+  <span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">OGR_FD_GetFieldIndex</span><span class="p">(</span><span class="n">defn</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span> <span class="n">field</span><span class="o">-&gt;</span><span class="n">arg</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+
+  <span class="n">OGRGeometryH</span> <span class="n">super</span> <span class="o">=</span> <span class="n">OGR_F_GetGeometryRef</span><span class="p">(</span><span class="n">feature</span><span class="p">);</span>
+  <span class="n">OGRGeometryH</span> <span class="n">geom</span> <span class="o">=</span> <span class="n">super</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">area</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+  <span class="k">switch</span><span class="p">(</span><span class="n">wkbFlatten</span><span class="p">(</span><span class="n">OGR_G_GetGeometryType</span><span class="p">(</span><span class="n">super</span><span class="p">)))</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="n">wkbMultiPolygon</span>:
+    <span class="k">case</span> <span class="n">wkbGeometryCollection</span>:
+      <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">OGR_G_GetGeometryCount</span><span class="p">(</span><span class="n">super</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">OGRGeometryH</span> <span class="n">subgeom</span> <span class="o">=</span> <span class="n">OGR_G_GetGeometryRef</span><span class="p">(</span><span class="n">super</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">subgeom</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
+        <span class="kt">double</span> <span class="n">ar</span> <span class="o">=</span> <span class="n">OGR_G_Area</span><span class="p">(</span><span class="n">subgeom</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">ar</span> <span class="o">&gt;</span> <span class="n">area</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">geom</span> <span class="o">=</span> <span class="n">subgeom</span><span class="p">;</span>
+          <span class="n">area</span> <span class="o">=</span> <span class="n">ar</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="nl">default:</span>
+      <span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">OGRGeometryH</span> <span class="n">center</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">center</span> <span class="o">=</span> <span class="n">OGR_G_CreateGeometry</span><span class="p">(</span><span class="n">wkbPoint</span><span class="p">)))</span> <span class="k">return</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">OGR_G_Centroid</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">center</span><span class="p">)</span> <span class="o">==</span> <span class="n">OGRERR_FAILURE</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">OGR_G_DestroyGeometry</span><span class="p">(</span><span class="n">center</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>turn hinting off</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="n">cairo_font_options_t</span> <span class="o">*</span><span class="n">opts</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">opts</span> <span class="o">=</span> <span class="n">cairo_font_options_create</span><span class="p">())){</span>
+    <span class="n">OGR_G_DestroyGeometry</span><span class="p">(</span><span class="n">center</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">cairo_font_options_set_hint_style</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="n">CAIRO_HINT_STYLE_NONE</span><span class="p">);</span>
+  <span class="n">cairo_font_options_set_hint_metrics</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="n">CAIRO_HINT_METRICS_OFF</span><span class="p">);</span>
+  <span class="n">pango_cairo_context_set_font_options</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">pango_ctx</span><span class="p">,</span> <span class="n">opts</span><span class="p">);</span>
+  <span class="n">cairo_font_options_destroy</span><span class="p">(</span><span class="n">opts</span><span class="p">);</span>
+
+  <span class="kt">char</span> <span class="o">*</span><span class="n">txt</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">OGR_F_GetFieldAsString</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">idx</span><span class="p">));</span>
+  <span class="n">PangoLayout</span> <span class="o">*</span><span class="n">layout</span> <span class="o">=</span> <span class="n">pango_layout_new</span><span class="p">(</span><span class="n">litho</span><span class="o">-&gt;</span><span class="n">pango_ctx</span><span class="p">);</span>
+  <span class="n">pango_layout_set_text</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">txt</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">txt</span><span class="p">);</span>
+
+  <span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">font</span> <span class="o">=</span> <span class="n">simplet_lookup_style</span><span class="p">(</span><span class="n">styles</span><span class="p">,</span> <span class="s">&quot;font&quot;</span><span class="p">);</span>
+  <span class="n">simplet_apply_styles</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">styles</span><span class="p">,</span> <span class="s">&quot;letter-spacing&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+
+  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">font_family</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">font</span><span class="p">)</span>
+    <span class="n">font_family</span> <span class="o">=</span> <span class="s">&quot;helvetica 12px&quot;</span><span class="p">;</span>
+  <span class="k">else</span>
+    <span class="n">font_family</span> <span class="o">=</span> <span class="n">font</span><span class="o">-&gt;</span><span class="n">arg</span><span class="p">;</span>
+
+  <span class="n">PangoFontDescription</span> <span class="o">*</span><span class="n">desc</span> <span class="o">=</span> <span class="n">pango_font_description_from_string</span><span class="p">(</span><span class="n">font_family</span><span class="p">);</span>
+  <span class="n">pango_layout_set_font_description</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">desc</span><span class="p">);</span>
+  <span class="n">pango_font_description_free</span><span class="p">(</span><span class="n">desc</span><span class="p">);</span>
+
+  <span class="kt">double</span> <span class="n">x</span> <span class="o">=</span> <span class="n">OGR_G_GetX</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="n">OGR_G_GetY</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">cairo_user_to_device</span><span class="p">(</span><span class="n">proj_ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span>
+  <span class="n">try_placement</span><span class="p">(</span><span class="n">litho</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">);</span>
+  <span class="n">OGR_G_DestroyGeometry</span><span class="p">(</span><span class="n">center</span><span class="p">);</span>
+<span class="p">}</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

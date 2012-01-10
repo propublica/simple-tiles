@@ -1,54 +1,210 @@
-<!DOCTYPE html>  <html> <head>   <title>style.h</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.h               </a>                                           <a class="source" href="error.html">                 error.h               </a>                                           <a class="source" href="filter.html">                 filter.h               </a>                                           <a class="source" href="init.html">                 init.h               </a>                                           <a class="source" href="layer.html">                 layer.h               </a>                                           <a class="source" href="list.html">                 list.h               </a>                                           <a class="source" href="map.html">                 map.h               </a>                                           <a class="source" href="simple_tiles.html">                 simple_tiles.h               </a>                                           <a class="source" href="style.html">                 style.h               </a>                                           <a class="source" href="text.html">                 text.h               </a>                                           <a class="source" href="types.html">                 types.h               </a>                                           <a class="source" href="user_data.html">                 user_data.h               </a>                                           <a class="source" href="util.html">                 util.h               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               style.h             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#ifndef _SIMPLE_TILES_STYLE_H</span>
-<span class="cp">#define _SIMPLE_TILES_STYLE_H</span>
+<!DOCTYPE html>  <html> <head>   <title>style.c</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.c               </a>                                           <a class="source" href="error.html">                 error.c               </a>                                           <a class="source" href="filter.html">                 filter.c               </a>                                           <a class="source" href="init.html">                 init.c               </a>                                           <a class="source" href="layer.html">                 layer.c               </a>                                           <a class="source" href="list.html">                 list.c               </a>                                           <a class="source" href="map.html">                 map.c               </a>                                           <a class="source" href="style.html">                 style.c               </a>                                           <a class="source" href="text.html">                 text.c               </a>                                           <a class="source" href="user_data.html">                 user_data.c               </a>                                           <a class="source" href="util.html">                 util.c               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               style.c             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#include &lt;stdarg.h&gt;</span>
+<span class="cp">#include &lt;stdlib.h&gt;</span>
 
-<span class="cp">#include &lt;cairo/cairo.h&gt;</span>
-<span class="cp">#include &quot;types.h&quot;</span>
-<span class="cp">#include &quot;list.h&quot;</span>
-<span class="cp">#include &quot;user_data.h&quot;</span>
+<span class="cp">#include &quot;map.h&quot;</span>
+<span class="cp">#include &quot;style.h&quot;</span>
+<span class="cp">#include &quot;util.h&quot;</span>
 
-<span class="cp">#ifdef __cplusplus</span>
-<span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
-<span class="cp">#endif</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">simplet_styledef_t</span> <span class="p">{</span>
+  <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">call</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">);</span>
+<span class="p">}</span> <span class="n">simplet_styledef_t</span><span class="p">;</span>
 
-<span class="kt">void</span>
-<span class="n">simplet_style_line_join</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">);</span>
+<span class="n">SIMPLET_HAS_USER_DATA</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
 
-<span class="kt">void</span>
-<span class="n">simplet_style_paint</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">);</span>
 
-<span class="n">simplet_style_t</span><span class="o">*</span>
-<span class="n">simplet_style_new</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_style_vfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">style</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_style_free</span><span class="p">(</span><span class="n">simplet_style_t</span><span class="o">*</span> <span class="n">style</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_apply_styles</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="n">simplet_list_t</span><span class="o">*</span> <span class="n">styles</span><span class="p">,</span> <span class="p">...);</span>
-
-<span class="n">simplet_style_t</span><span class="o">*</span>
-<span class="n">simplet_lookup_style</span><span class="p">(</span><span class="n">simplet_list_t</span><span class="o">*</span> <span class="n">styles</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_style_get_arg</span><span class="p">(</span><span class="n">simplet_style_t</span><span class="o">*</span> <span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">arg</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_style_get_key</span><span class="p">(</span><span class="n">simplet_style_t</span><span class="o">*</span> <span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">key</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_style_set_arg</span><span class="p">(</span><span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_style_set_key</span><span class="p">(</span><span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span>
-
-<span class="n">SIMPLET_HAS_USER_DATA_PROTOS</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
-
-<span class="cp">#ifdef __cplusplus</span>
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">set_color</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">count</span><span class="p">;</span>
+  <span class="n">count</span> <span class="o">=</span> <span class="n">simplet_parse_color</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">r</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">g</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">);</span>
+  <span class="k">switch</span><span class="p">(</span><span class="n">count</span><span class="p">){</span>
+  <span class="k">case</span> <span class="mi">3</span>:
+    <span class="n">cairo_set_source_rgb</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">r</span> <span class="o">/</span> <span class="n">SIMPLET_CCEIL</span><span class="p">,</span> <span class="n">g</span> <span class="o">/</span> <span class="n">SIMPLET_CCEIL</span><span class="p">,</span> <span class="n">b</span> <span class="o">/</span> <span class="n">SIMPLET_CCEIL</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="k">case</span> <span class="mi">4</span>:
+    <span class="n">cairo_set_source_rgba</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">r</span> <span class="o">/</span> <span class="n">SIMPLET_CCEIL</span><span class="p">,</span> <span class="n">g</span> <span class="o">/</span> <span class="n">SIMPLET_CCEIL</span><span class="p">,</span> <span class="n">b</span> <span class="o">/</span> <span class="n">SIMPLET_CCEIL</span><span class="p">,</span>
+        <span class="n">a</span> <span class="o">/</span> <span class="n">SIMPLET_CCEIL</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="nl">default:</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
 <span class="p">}</span>
-<span class="cp">#endif</span>
 
-<span class="cp">#endif</span>
+<span class="kt">void</span>
+<span class="n">simplet_style_line_join</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="s">&quot;miter&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+    <span class="n">cairo_set_line_join</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">CAIRO_LINE_JOIN_MITER</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="s">&quot;round&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+    <span class="n">cairo_set_line_join</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">CAIRO_LINE_JOIN_ROUND</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="s">&quot;bevel&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+    <span class="n">cairo_set_line_join</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">CAIRO_LINE_JOIN_BEVEL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">line_cap</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="s">&quot;butt&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+    <span class="n">cairo_set_line_cap</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">CAIRO_LINE_CAP_BUTT</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="s">&quot;round&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+    <span class="n">cairo_set_line_cap</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">CAIRO_LINE_CAP_ROUND</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="s">&quot;square&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+    <span class="n">cairo_set_line_cap</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">CAIRO_LINE_CAP_SQUARE</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_style_paint</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="n">set_color</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">arg</span><span class="p">);</span>
+  <span class="n">cairo_paint</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">fill</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="n">set_color</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">arg</span><span class="p">);</span>
+  <span class="n">cairo_fill_preserve</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">stroke</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="n">set_color</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">arg</span><span class="p">);</span>
+  <span class="n">cairo_stroke_preserve</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">weight</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">w</span> <span class="o">=</span> <span class="n">strtod</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">cairo_device_to_user_distance</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">w</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span>
+  <span class="n">cairo_set_line_width</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">w</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">letter_spacing</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">PangoAttribute</span> <span class="o">*</span><span class="n">spacing</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">spacing</span> <span class="o">=</span> <span class="n">pango_attr_letter_spacing_new</span><span class="p">(</span><span class="n">atoi</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">*</span> <span class="n">PANGO_SCALE</span><span class="p">)))</span> <span class="k">return</span><span class="p">;</span>
+
+  <span class="n">PangoLayout</span> <span class="o">*</span><span class="n">layout</span> <span class="o">=</span> <span class="n">ct</span><span class="p">;</span>
+  <span class="n">PangoAttrList</span> <span class="o">*</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">pango_layout_get_attributes</span><span class="p">(</span><span class="n">layout</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">attrs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">pango_attr_list_new</span><span class="p">()))</span> <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">pango_attr_list_ref</span><span class="p">(</span><span class="n">attrs</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="n">pango_attr_list_insert</span><span class="p">(</span><span class="n">attrs</span><span class="p">,</span> <span class="n">spacing</span><span class="p">);</span>
+  <span class="n">pango_layout_set_attributes</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">attrs</span><span class="p">);</span>
+  <span class="n">pango_attr_list_unref</span><span class="p">(</span><span class="n">attrs</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">simplet_styledef_t</span> <span class="n">styleTable</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">{</span> <span class="s">&quot;fill&quot;</span><span class="p">,</span>             <span class="n">fill</span>                    <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;stroke&quot;</span><span class="p">,</span>           <span class="n">stroke</span>                  <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;weight&quot;</span><span class="p">,</span>           <span class="n">weight</span>                  <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;line-cap&quot;</span><span class="p">,</span>         <span class="n">line_cap</span>                <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;color&quot;</span><span class="p">,</span>            <span class="n">fill</span>                    <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;text-halo-color&quot;</span><span class="p">,</span>  <span class="n">stroke</span>                  <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;text-halo-weight&quot;</span><span class="p">,</span> <span class="n">weight</span>                  <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;letter-spacing&quot;</span><span class="p">,</span>   <span class="n">letter_spacing</span>          <span class="p">},</span>
+  <span class="p">{</span> <span class="s">&quot;paint&quot;</span><span class="p">,</span>            <span class="n">simplet_style_paint</span>     <span class="p">},</span> <span class="c1">//used by map</span>
+  <span class="p">{</span> <span class="s">&quot;line-join&quot;</span><span class="p">,</span>        <span class="n">simplet_style_line_join</span> <span class="p">}</span>  <span class="c1">//used by map</span>
+  <span class="cm">/* radius and seamless are special styles */</span>
+<span class="p">};</span>
+
+<span class="k">const</span> <span class="kt">int</span> <span class="n">STYLES_LENGTH</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">styleTable</span><span class="p">)</span> <span class="o">/</span> <span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">styleTable</span><span class="p">);</span>
+
+<span class="n">simplet_style_t</span><span class="o">*</span>
+<span class="n">simplet_style_new</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">simplet_style_t</span><span class="o">*</span> <span class="n">style</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">style</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">style</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">style</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+  <span class="n">style</span><span class="o">-&gt;</span><span class="n">arg</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">arg</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">style</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">&amp;&amp;</span> <span class="n">style</span><span class="o">-&gt;</span><span class="n">arg</span><span class="p">)){</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">style</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">style</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_style_vfree</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">style</span><span class="p">){</span>
+  <span class="n">simplet_style_free</span><span class="p">(</span><span class="n">style</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_style_free</span><span class="p">(</span><span class="n">simplet_style_t</span><span class="o">*</span> <span class="n">style</span><span class="p">){</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">style</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">);</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">style</span><span class="o">-&gt;</span><span class="n">arg</span><span class="p">);</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">style</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">simplet_styledef_t</span><span class="o">*</span>
+<span class="n">lookup_styledef</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">){</span>
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">STYLES_LENGTH</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">styleTable</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">key</span><span class="p">))</span>
+      <span class="k">return</span> <span class="o">&amp;</span><span class="n">styleTable</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+  <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_apply_styles</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ct</span><span class="p">,</span> <span class="n">simplet_list_t</span><span class="o">*</span> <span class="n">styles</span><span class="p">,</span> <span class="p">...){</span>
+  <span class="kt">va_list</span> <span class="n">args</span><span class="p">;</span>
+  <span class="n">va_start</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">styles</span><span class="p">);</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">key</span><span class="p">;</span>
+  <span class="k">while</span><span class="p">((</span><span class="n">key</span> <span class="o">=</span> <span class="n">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">simplet_styledef_t</span><span class="o">*</span> <span class="n">def</span> <span class="o">=</span> <span class="n">lookup_styledef</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">def</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+      <span class="k">continue</span><span class="p">;</span>
+
+    <span class="n">simplet_style_t</span><span class="o">*</span> <span class="n">style</span> <span class="o">=</span> <span class="n">simplet_lookup_style</span><span class="p">(</span><span class="n">styles</span><span class="p">,</span> <span class="n">key</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">style</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+      <span class="k">continue</span><span class="p">;</span>
+
+    <span class="n">def</span><span class="o">-&gt;</span><span class="n">call</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">style</span><span class="o">-&gt;</span><span class="n">arg</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">va_end</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">simplet_style_t</span><span class="o">*</span>
+<span class="n">simplet_lookup_style</span><span class="p">(</span><span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">styles</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">){</span>
+  <span class="n">simplet_listiter_t</span><span class="o">*</span> <span class="n">iter</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">iter</span> <span class="o">=</span> <span class="n">simplet_get_list_iter</span><span class="p">(</span><span class="n">styles</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">simplet_style_t</span><span class="o">*</span> <span class="n">style</span><span class="p">;</span>
+  <span class="k">while</span><span class="p">((</span><span class="n">style</span> <span class="o">=</span> <span class="n">simplet_list_next</span><span class="p">(</span><span class="n">iter</span><span class="p">))){</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">strcmp</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">simplet_list_iter_free</span><span class="p">(</span><span class="n">iter</span><span class="p">);</span>
+      <span class="k">return</span> <span class="n">style</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>TODO: add oom to these which requires that styles be errorable.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kt">void</span>
+<span class="n">simplet_style_get_arg</span><span class="p">(</span><span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">arg</span><span class="p">){</span>
+  <span class="o">*</span><span class="n">arg</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">style</span><span class="o">-&gt;</span><span class="n">arg</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_style_get_key</span><span class="p">(</span><span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">key</span><span class="p">){</span>
+  <span class="o">*</span><span class="n">key</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">style</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_style_set_arg</span><span class="p">(</span><span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">arg</span><span class="p">){</span>
+  <span class="n">style</span><span class="o">-&gt;</span><span class="n">arg</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">arg</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_style_set_key</span><span class="p">(</span><span class="n">simplet_style_t</span> <span class="o">*</span><span class="n">style</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">key</span><span class="p">){</span>
+  <span class="n">style</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+<span class="p">}</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

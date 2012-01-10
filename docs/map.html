@@ -1,86 +1,287 @@
-<!DOCTYPE html>  <html> <head>   <title>map.h</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.h               </a>                                           <a class="source" href="error.html">                 error.h               </a>                                           <a class="source" href="filter.html">                 filter.h               </a>                                           <a class="source" href="init.html">                 init.h               </a>                                           <a class="source" href="layer.html">                 layer.h               </a>                                           <a class="source" href="list.html">                 list.h               </a>                                           <a class="source" href="map.html">                 map.h               </a>                                           <a class="source" href="simple_tiles.html">                 simple_tiles.h               </a>                                           <a class="source" href="style.html">                 style.h               </a>                                           <a class="source" href="text.html">                 text.h               </a>                                           <a class="source" href="types.html">                 types.h               </a>                                           <a class="source" href="user_data.html">                 user_data.h               </a>                                           <a class="source" href="util.html">                 util.h               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               map.h             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#ifndef _SIMPLE_TILES_MAP_H</span>
-<span class="cp">#define _SIMPLE_TILES_MAP_H</span>
+<!DOCTYPE html>  <html> <head>   <title>map.c</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="bounds.html">                 bounds.c               </a>                                           <a class="source" href="error.html">                 error.c               </a>                                           <a class="source" href="filter.html">                 filter.c               </a>                                           <a class="source" href="init.html">                 init.c               </a>                                           <a class="source" href="layer.html">                 layer.c               </a>                                           <a class="source" href="list.html">                 list.c               </a>                                           <a class="source" href="map.html">                 map.c               </a>                                           <a class="source" href="style.html">                 style.c               </a>                                           <a class="source" href="text.html">                 text.c               </a>                                           <a class="source" href="user_data.html">                 user_data.c               </a>                                           <a class="source" href="util.html">                 util.c               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               map.c             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="cp">#include &lt;stdlib.h&gt;</span>
+<span class="cp">#include &lt;stdio.h&gt;</span>
+<span class="cp">#include &lt;math.h&gt;</span>
+<span class="cp">#include &quot;init.h&quot;</span>
+<span class="cp">#include &quot;error.h&quot;</span>
+<span class="cp">#include &quot;map.h&quot;</span>
+<span class="cp">#include &quot;layer.h&quot;</span>
+<span class="cp">#include &quot;filter.h&quot;</span>
+<span class="cp">#include &quot;style.h&quot;</span>
+<span class="cp">#include &quot;util.h&quot;</span>
+<span class="cp">#include &quot;bounds.h&quot;</span>
+<span class="cp">#include &quot;text.h&quot;</span>
 
-<span class="cp">#include &quot;types.h&quot;</span>
-<span class="cp">#include &quot;user_data.h&quot;</span>
+<span class="cp">#define SIMPLET_SLIPPY_SIZE 256</span>
+<span class="cp">#define SIMPLET_MERC_LENGTH 40075016.68</span>
 
-<span class="cp">#ifdef __cplusplus</span>
-<span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
-<span class="cp">#endif</span>
+<span class="n">SIMPLET_HAS_USER_DATA</span><span class="p">(</span><span class="n">map</span><span class="p">)</span>
 
 <span class="n">simplet_map_t</span><span class="o">*</span>
-<span class="n">simplet_map_new</span><span class="p">();</span>
+<span class="n">simplet_map_new</span><span class="p">(){</span>
+  <span class="n">simplet_init</span><span class="p">();</span>
+  <span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">map</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">map</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">memset</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">map</span><span class="p">));</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span> <span class="o">=</span> <span class="n">simplet_list_new</span><span class="p">())){</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">map</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">simplet_bounds_new</span><span class="p">())){</span>
+    <span class="n">simplet_list_free</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">map</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">map</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">map</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="kt">void</span>
-<span class="n">simplet_map_free</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">);</span>
+<span class="n">simplet_map_free</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">)</span>
+    <span class="n">simplet_bounds_free</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">simplet_list_set_item_free</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">,</span> <span class="n">simplet_layer_vfree</span><span class="p">);</span>
+    <span class="n">simplet_list_free</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span><span class="p">)</span>
+    <span class="n">OSRRelease</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bgcolor</span><span class="p">)</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bgcolor</span><span class="p">);</span>
+
+  <span class="n">free</span><span class="p">(</span><span class="n">map</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">SIMPLET_ERROR_FUNC</span><span class="p">(</span><span class="n">map_t</span><span class="p">)</span>
 
 <span class="n">simplet_status_t</span>
-<span class="n">simplet_map_set_srs</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">proj</span><span class="p">);</span>
+<span class="n">simplet_map_set_srs</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">proj</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">simplet_bounds_t</span> <span class="o">*</span><span class="n">tmp</span> <span class="o">=</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">;</span>
+      <span class="kt">char</span> <span class="o">*</span><span class="n">s</span><span class="p">;</span>
+      <span class="n">simplet_map_get_srs</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">s</span><span class="p">);</span>
+      <span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">simplet_bounds_reproject</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">proj</span><span class="p">);</span>
+      <span class="n">free</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+      <span class="n">simplet_bounds_free</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">OSRRelease</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span><span class="p">);</span>
+  <span class="p">}</span>
 
-<span class="n">simplet_status_t</span>
-<span class="n">simplet_map_set_size</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">int</span> <span class="n">height</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span> <span class="o">=</span> <span class="n">OSRNewSpatialReference</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OGR_ERR</span><span class="p">,</span> <span class="s">&quot;could not assign spatial ref&quot;</span><span class="p">);</span>
 
-<span class="n">simplet_status_t</span>
-<span class="n">simplet_map_set_bounds</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">double</span> <span class="n">maxx</span><span class="p">,</span> <span class="kt">double</span> <span class="n">maxy</span><span class="p">,</span> <span class="kt">double</span> <span class="n">minx</span><span class="p">,</span> <span class="kt">double</span> <span class="n">miny</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">OSRSetFromUserInput</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span><span class="p">,</span> <span class="n">proj</span><span class="p">)</span> <span class="o">!=</span> <span class="n">OGRERR_NONE</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OGR_ERR</span><span class="p">,</span> <span class="s">&quot;bad projection string&quot;</span><span class="p">);</span>
 
-<span class="n">simplet_status_t</span>
-<span class="n">simplet_map_set_bgcolor</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">str</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="kt">void</span>
-<span class="n">simplet_map_get_bgcolor</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">str</span><span class="p">);</span>
+<span class="n">simplet_map_set_buffer</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">double</span> <span class="n">buffer</span><span class="p">){</span>
+  <span class="n">map</span><span class="o">-&gt;</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">buffer</span><span class="p">;</span>
+<span class="p">}</span>
 
-<span class="n">simplet_layer_t</span><span class="o">*</span>
-<span class="n">simplet_map_add_layer</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">datastring</span><span class="p">);</span>
+<span class="kt">double</span>
+<span class="n">simplet_map_get_buffer</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">){</span>
+  <span class="k">return</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">buffer</span><span class="p">;</span>
+<span class="p">}</span>
 
-<span class="n">simplet_layer_t</span><span class="o">*</span>
-<span class="n">simplet_map_add_layer_directly</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="n">simplet_layer_t</span> <span class="o">*</span><span class="n">layer</span><span class="p">);</span>
+<span class="kt">void</span>
+<span class="n">simplet_map_get_srs</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">srs</span><span class="p">){</span>
+  <span class="n">OSRExportToProj4</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span><span class="p">,</span> <span class="n">srs</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_map_init_matrix</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="n">cairo_matrix_t</span> <span class="o">*</span><span class="n">mat</span><span class="p">){</span>
+  <span class="n">cairo_matrix_init</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">cairo_matrix_translate</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">height</span> <span class="o">*</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">);</span>
+  <span class="n">cairo_matrix_scale</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">width</span> <span class="o">/</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="o">-&gt;</span><span class="n">width</span><span class="p">,</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">width</span> <span class="o">/</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="o">-&gt;</span><span class="n">width</span><span class="p">);</span>
+  <span class="n">cairo_matrix_translate</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="o">-</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="o">-&gt;</span><span class="n">nw</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="o">-&gt;</span><span class="n">se</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+<span class="p">}</span>
 
 <span class="n">simplet_status_t</span>
-<span class="n">simplet_map_get_status</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">);</span>
+<span class="n">simplet_map_set_size</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="kt">int</span> <span class="n">height</span><span class="p">){</span>
+  <span class="n">map</span><span class="o">-&gt;</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span><span class="p">;</span>
+  <span class="n">map</span><span class="o">-&gt;</span><span class="n">width</span>  <span class="o">=</span> <span class="n">width</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">simplet_status_t</span>
+<span class="n">simplet_map_set_bgcolor</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">str</span><span class="p">){</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bgcolor</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">((</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bgcolor</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">str</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OOM</span><span class="p">,</span> <span class="s">&quot;couldn&#39;t copy bgcolor&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">simplet_map_get_bgcolor</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">str</span><span class="p">){</span>
+  <span class="o">*</span><span class="n">str</span> <span class="o">=</span> <span class="n">simplet_copy_string</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bgcolor</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">simplet_status_t</span>
+<span class="n">simplet_map_set_bounds</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">double</span> <span class="n">maxx</span><span class="p">,</span> <span class="kt">double</span> <span class="n">maxy</span><span class="p">,</span> <span class="kt">double</span> <span class="n">minx</span><span class="p">,</span> <span class="kt">double</span> <span class="n">miny</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">)</span>
+    <span class="n">simplet_bounds_free</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">simplet_bounds_new</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OOM</span><span class="p">,</span> <span class="s">&quot;couldn&#39;t create bounds&quot;</span><span class="p">);</span>
+
+  <span class="n">simplet_bounds_extend</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">,</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span><span class="p">);</span>
+  <span class="n">simplet_bounds_extend</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">,</span> <span class="n">minx</span><span class="p">,</span> <span class="n">miny</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">simplet_status_t</span>
+<span class="n">simplet_map_set_slippy</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">z</span><span class="p">){</span>
+  <span class="n">simplet_map_set_size</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_SLIPPY_SIZE</span><span class="p">,</span> <span class="n">SIMPLET_SLIPPY_SIZE</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">simplet_map_set_srs</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_MERCATOR</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OGR_ERR</span><span class="p">,</span> <span class="s">&quot;couldn&#39;t set slippy projection&quot;</span><span class="p">);</span>
+
+  <span class="kt">double</span> <span class="n">zfactor</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">origin</span><span class="p">;</span>
+  <span class="n">zfactor</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">z</span><span class="p">);</span>
+  <span class="n">length</span>  <span class="o">=</span> <span class="n">SIMPLET_MERC_LENGTH</span> <span class="o">/</span> <span class="n">zfactor</span><span class="p">;</span>
+  <span class="n">origin</span>  <span class="o">=</span> <span class="n">SIMPLET_MERC_LENGTH</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">simplet_map_set_bounds</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span> <span class="o">-</span> <span class="n">origin</span><span class="p">,</span>
+                                  <span class="n">origin</span> <span class="o">-</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">length</span><span class="p">,</span>
+                                  <span class="n">x</span> <span class="o">*</span> <span class="n">length</span> <span class="o">-</span> <span class="n">origin</span><span class="p">,</span>
+                                  <span class="n">origin</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">length</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">simplet_error</span><span class="p">((</span><span class="n">simplet_errorable_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OOM</span><span class="p">,</span> <span class="s">&quot;out of memory setting bounds&quot;</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">simplet_layer_t</span><span class="o">*</span>
+<span class="n">simplet_map_add_layer</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">datastring</span><span class="p">){</span>
+  <span class="n">simplet_layer_t</span> <span class="o">*</span><span class="n">layer</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">layer</span> <span class="o">=</span> <span class="n">simplet_layer_new</span><span class="p">(</span><span class="n">datastring</span><span class="p">))){</span>
+    <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OOM</span><span class="p">,</span> <span class="s">&quot;couldn&#39;t create a layer&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">simplet_list_push</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">,</span> <span class="n">layer</span><span class="p">)){</span>
+    <span class="n">simplet_layer_free</span><span class="p">(</span><span class="n">layer</span><span class="p">);</span>
+    <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_OOM</span><span class="p">,</span> <span class="s">&quot;couldn&#39;t add any more layers&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">layer</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">simplet_layer_t</span><span class="o">*</span>
+<span class="n">simplet_map_add_layer_directly</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="n">simplet_layer_t</span> <span class="o">*</span><span class="n">layer</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">simplet_list_push</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">,</span> <span class="n">layer</span><span class="p">))</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">layer</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="n">simplet_status_t</span>
+<span class="n">simplet_map_get_status</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">){</span>
+  <span class="k">return</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">.</span><span class="n">status</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="k">const</span> <span class="kt">char</span><span class="o">*</span>
-<span class="n">simplet_map_status_to_string</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">);</span>
+<span class="n">simplet_map_status_to_string</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">){</span>
+  <span class="k">return</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">.</span><span class="n">msg</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="n">simplet_status_t</span>
-<span class="n">simplet_map_is_valid</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">);</span>
+<span class="n">simplet_map_is_valid</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SIMPLET_OK</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SIMPLET_ERR</span><span class="p">;</span>
 
-<span class="kt">void</span>
-<span class="n">simplet_map_render_to_png</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bounds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SIMPLET_ERR</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">proj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SIMPLET_ERR</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">height</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SIMPLET_ERR</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">width</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SIMPLET_ERR</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">simplet_list_head</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">SIMPLET_ERR</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">SIMPLET_OK</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">cairo_surface_t</span> <span class="o">*</span>
+<span class="n">build_surface</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">simplet_map_is_valid</span><span class="p">(</span><span class="n">map</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIMPLET_ERR</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">cairo_surface_t</span> <span class="o">*</span><span class="n">surface</span> <span class="o">=</span> <span class="n">cairo_image_surface_create</span><span class="p">(</span><span class="n">CAIRO_FORMAT_ARGB32</span><span class="p">,</span>
+      <span class="n">map</span><span class="o">-&gt;</span><span class="n">width</span><span class="p">,</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">height</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">cairo_surface_status</span><span class="p">(</span><span class="n">surface</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CAIRO_STATUS_SUCCESS</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">cairo_create</span><span class="p">(</span><span class="n">surface</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">bgcolor</span><span class="p">)</span> <span class="n">simplet_style_paint</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">map</span><span class="o">-&gt;</span><span class="n">bgcolor</span><span class="p">);</span>
+
+  <span class="n">simplet_listiter_t</span> <span class="o">*</span><span class="n">iter</span> <span class="o">=</span> <span class="n">simplet_get_list_iter</span><span class="p">(</span><span class="n">map</span><span class="o">-&gt;</span><span class="n">layers</span><span class="p">);</span>
+  <span class="n">simplet_layer_t</span> <span class="o">*</span><span class="n">layer</span><span class="p">;</span>
+  <span class="n">simplet_status_t</span> <span class="n">err</span><span class="p">;</span>
+
+  <span class="n">cairo_t</span> <span class="o">*</span><span class="n">litho_ctx</span> <span class="o">=</span> <span class="n">cairo_create</span><span class="p">(</span><span class="n">surface</span><span class="p">);</span>
+  <span class="n">simplet_lithograph_t</span> <span class="o">*</span><span class="n">litho</span> <span class="o">=</span> <span class="n">simplet_lithograph_new</span><span class="p">(</span><span class="n">litho_ctx</span><span class="p">);</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>defaults</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="n">simplet_style_line_join</span><span class="p">(</span><span class="n">litho_ctx</span><span class="p">,</span> <span class="s">&quot;round&quot;</span><span class="p">);</span>
+
+  <span class="k">while</span><span class="p">((</span><span class="n">layer</span> <span class="o">=</span> <span class="n">simplet_list_next</span><span class="p">(</span><span class="n">iter</span><span class="p">))){</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">simplet_layer_process</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">map</span><span class="p">,</span> <span class="n">litho</span><span class="p">,</span> <span class="n">ctx</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">err</span> <span class="o">!=</span> <span class="n">SIMPLET_OK</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">simplet_list_iter_free</span><span class="p">(</span><span class="n">iter</span><span class="p">);</span>
+      <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="s">&quot;error in rendering&quot;</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">simplet_lithograph_free</span><span class="p">(</span><span class="n">litho</span><span class="p">);</span>
+  <span class="n">cairo_destroy</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
+  <span class="n">cairo_destroy</span><span class="p">(</span><span class="n">litho_ctx</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">surface</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span>
+<span class="n">close_surface</span><span class="p">(</span><span class="n">cairo_surface_t</span> <span class="o">*</span><span class="n">surface</span><span class="p">){</span>
+  <span class="n">cairo_surface_destroy</span><span class="p">(</span><span class="n">surface</span><span class="p">);</span>
+<span class="p">}</span>
 
 <span class="kt">void</span>
 <span class="n">simplet_map_render_to_stream</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">stream</span><span class="p">,</span>
-  <span class="n">cairo_status_t</span> <span class="p">(</span><span class="o">*</span><span class="n">cb</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">closure</span><span class="p">,</span> <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">length</span><span class="p">));</span>
+  <span class="n">cairo_status_t</span> <span class="p">(</span><span class="o">*</span><span class="n">cb</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">closure</span><span class="p">,</span> <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">length</span><span class="p">)){</span>
+  <span class="n">cairo_surface_t</span> <span class="o">*</span><span class="n">surface</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">surface</span> <span class="o">=</span> <span class="n">build_surface</span><span class="p">(</span><span class="n">map</span><span class="p">)))</span> <span class="k">return</span><span class="p">;</span>
 
-<span class="n">simplet_status_t</span>
-<span class="n">simplet_map_bounds_to_wgs84_wkt</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">wkt</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">cairo_surface_write_to_png_stream</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">cb</span><span class="p">,</span> <span class="n">stream</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CAIRO_STATUS_SUCCESS</span><span class="p">)</span>
+    <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_CAIRO_ERR</span><span class="p">,</span> <span class="n">cairo_status_to_string</span><span class="p">(</span><span class="n">cairo_surface_status</span><span class="p">(</span><span class="n">surface</span><span class="p">)));</span>
 
-<span class="kt">void</span>
-<span class="n">simplet_map_scale</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_map_get_srs</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">srs</span><span class="p">);</span>
-
-<span class="n">simplet_status_t</span>
-<span class="n">simplet_map_set_slippy</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">z</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_map_add_placement</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="n">OGRFeatureH</span> <span class="n">feature</span><span class="p">,</span> <span class="n">OGRGeometryH</span> <span class="n">geom</span><span class="p">,</span> <span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">styles</span><span class="p">,</span> <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_map_init_matrix</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="n">cairo_matrix_t</span> <span class="o">*</span><span class="n">mat</span><span class="p">);</span>
-
-<span class="kt">double</span>
-<span class="n">simplet_map_get_buffer</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_map_set_buffer</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">double</span> <span class="n">buffer</span><span class="p">);</span>
-
-<span class="n">SIMPLET_HAS_USER_DATA_PROTOS</span><span class="p">(</span><span class="n">map</span><span class="p">)</span>
-
-<span class="cp">#ifdef __cplusplus</span>
+  <span class="n">close_surface</span><span class="p">(</span><span class="n">surface</span><span class="p">);</span>
 <span class="p">}</span>
-<span class="cp">#endif</span>
 
-<span class="cp">#endif</span>
+<span class="kt">void</span>
+<span class="n">simplet_map_render_to_png</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">){</span>
+  <span class="n">cairo_surface_t</span> <span class="o">*</span><span class="n">surface</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">surface</span> <span class="o">=</span> <span class="n">build_surface</span><span class="p">(</span><span class="n">map</span><span class="p">)))</span> <span class="k">return</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">cairo_surface_write_to_png</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="o">!=</span> <span class="n">CAIRO_STATUS_SUCCESS</span><span class="p">)</span>
+    <span class="n">set_error</span><span class="p">(</span><span class="n">map</span><span class="p">,</span> <span class="n">SIMPLET_CAIRO_ERR</span><span class="p">,</span> <span class="n">cairo_status_to_string</span><span class="p">(</span><span class="n">cairo_surface_status</span><span class="p">(</span><span class="n">surface</span><span class="p">)));</span>
+
+  <span class="n">close_surface</span><span class="p">(</span><span class="n">surface</span><span class="p">);</span>
+<span class="p">}</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

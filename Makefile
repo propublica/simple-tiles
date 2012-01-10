@@ -16,6 +16,5 @@ lint:
 
 docco:
 	docco src/*.c
-	docco src/*.h
 
 .PHONY: all test clean install lint
