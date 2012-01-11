@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Simple Tiles</title>
+    <style>
+      /* reset */
+      div, html, body {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        vertical-align: baseline;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      /* text styles */
+      body {
+        font-family: "Helvetica Nueue", Helvetica, sans-serif;
+        font-size: 14px;
+        line-height: 1.5em;
+        width: 600px;
+        margin-left: 220px;
+        padding: 20px;
+      }
+
+      h1, h2, h3 { text-rendering: optimizeLegibility; }
+
+      /* layout */
+      #sidebar {
+        top:0;
+        left:0;
+        bottom:0;
+        position:absolute;
+        overflow-y:scroll;
+        padding: 20px;
+        width: 180px;
+        box-shadow: 5px 0px 15px #efefef;
+      }
+
+      /* lion-roar scrolling */
+      #sidebar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        z-index: 999;
+      }
+
+      #sidebar::-webkit-scrollbar-button:start:decrement,
+      #sidebar::-webkit-scrollbar-button:end:increment {
+        display: block;
+        height:3px;
+      }
+
+      #sidebar::-webkit-scrollbar-thumb:vertical {
+        height: 20px;
+        background-color: rgba(0,0,0,0.3);
+        -webkit-border-radius: 5px;
+        -webkit-box-shadow: 0 1px 1px rgba(255,255,255,0.9);
+        padding-right:0px;
+      }
+
+      #sidebar::-webkit-scrollbar-track:enabled {
+        background-color: transparent;
+        width:10px;
+      }
+
+      #sidebar::-webkit-scrollbar-track-piece {
+        background-color: transparent;
+        border: none;
+        margin: 0 5px 0px 0;
+      }
+
+
+      h1, h2, h3 { margin-left: -5px; }
+    </style>
+  </head>
+
+  <body>
+    <div id="sidebar">
+      <p>hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+
+      </p>
+    </div>
+    <h1 id="banner">Simple Tiles</h1>
+    <h2>hello</h2>
+    <h3>hello</h3>
+    <p>hello hello hellohello hello hellohello hello hellohello hello hello
+    hello hello hellohello hello hellohello hello hellohello hello hello
+    hello hello hellohello hello hellohello hello hellohello hello hello
+    hello hello hellohello hello hellohello hello hellohello hello hello
+    hello hello hellohello hello hellohello hello hellohello hello hello
+    hello hello hellohello hello hellohello hello hellohello hello hello
+    hello hello hellohello hello hellohello hello hellohello hello hello
+    </p>
+
+    <div>
+      <p>hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      hello hello hellohello hello hellohello hello hellohello hello hello
+      </p>
+    </div>
+  </body>
+</html>
