@@ -23,7 +23,6 @@ typedef struct {
   double height;
 } simplet_bounds_t;
 
-
 typedef void (*simplet_user_data_free)(void *val);
 #define SIMPLET_USER_DATA \
   void *user_data;

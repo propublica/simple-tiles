@@ -1,7 +1,5 @@
 #include <stdlib.h>
 #include <assert.h>
-#include <unistd.h>
-#include <time.h>
 #include <simple-tiles/simple_tiles.h>
 #include <simple-tiles/filter.h>
 #include <simple-tiles/layer.h>

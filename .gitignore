@@ -2,7 +2,7 @@
 bin
 build
 *.o
-*.png
+test/*.png
 *.a
 *.dylib
 *.so
