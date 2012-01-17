@@ -32,8 +32,7 @@
         top:0;
         left:0;
         bottom:0;
-        position:absolute;
-        overflow-y:scroll;
+        position:fixed;
         padding: 20px;
         width: 180px;
         box-shadow: 5px 0px 15px #efefef;
@@ -85,25 +84,56 @@
     <div id="sidebar">
       <h4><a href="#dependencies">Dependencies</a></h4>
       <h4><a href="#installation">Installation</a></h4>
+      <h4><a href="#compilation">Compilation & Linking</a></h4>
     </div>
     <img src="docs/simple-tiles-logo.png">
     <p><a href="http://github.com/propublica/simple-tiles">Simple Tiles</a>
-    is an image generating library for spatial data written in C. At it's
+    is an image generation library for spatial data written in C. At it's
     core it is a thin wrapper on top of <a href="http://www.gdal.org/ogr">OGR</a>
     for spatial data and <a href="http://cairographics.org">Cairo</a>
     for image generation.</p>
     <p>The library's source is over at <a href="http://github.com/propublica/simple-tiles">github</a>
     and there is an <a href="docs/map.html">annotated version</a> available. Please report
     issues or ask questions in the
-    <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a></p>
+    <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a>.</p>
 
     <p>TKTKTK more here</p>
 
     <h2 id="dependencies">Dependencies</h2>
-    <p></p>
+    <p>Simple Tiles relies on GDAL and OGR for abstractions over geospatial data. You'll
+    need at least version 1.8.0 to use the library. On Ubuntu you can install
+    the library using the <a href="https://launchpad.net/~ubuntugis/+archive/ppa/">ubuntugis ppa</a>.
+    On OS X the version from homebrew works well.
+    </p>
+
+    <p>Simple Tiles uses <a href="http://cairographics.org">Cairo</a> and
+    <a href="http://developer.gnome.org/pango/stable/">Pango</a>  for the final
+    png output, you'll need an installed and working version of both. On Ubuntu
+    apt-get installs a perfectly fine version of both, and OS X users can use homebrew.
+    </p>
 
     <h2 id="installation">Installation</h2>
-    <p></p>
+    <p>To install Simple Tiles run:</p>
+    <pre>
+  $ git clone git@github.com:propublica/simple-tiles.git
+  $ cd simple-tiles
+  $ make && make install</pre>
+    <p>You'll probably also want to run:</p>
+    <pre>
+  $ make test</pre>
+    <p>to ensure the library and its dependencies are playing nice with one another.
+    </p>
+
+    <h2 id="compilation">Compilation and Linking</h2>
+    <p>Once you have a working copy of Simple Tiles, you'll want to use <b>pkg-config</b>
+    to link to the library. For example, to compile a file with Simple Tiles use:</p>
+    <pre>
+  cc `pkg-config --cflags simple-tiles` `gdal-config --cflags` -c -o main.o main.c
+  cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
+    </pre>
+    <p>And your program should be linked correctly.</p>
+
+
 
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>
