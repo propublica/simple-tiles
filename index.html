@@ -11,10 +11,8 @@
         vertical-align: baseline;
       }
 
-      ul {
-        list-style: none;
-      }
-
+      ul { list-style: none; padding-left: 10px;}
+      li { margin-bottom: 1em; }
       /* text styles */
       body {
         font-family: "Helvetica Nueue", Helvetica, sans-serif;
@@ -26,8 +24,18 @@
       }
 
       h1, h2, h3 { text-rendering: optimizeLegibility; }
+      a { color: black; }
+      a:hover { text-decoration: none; }
+      pre {
+        padding-left: 10px;
+        font-family: Monaco, monospace;
+        font-size: 12px;
+        border-left: 5px solid #efefef;
+      }
 
       /* layout */
+      h1, h2, h3, h4 { margin-left: -5px; }
+
       #sidebar {
         top:0;
         left:0;
@@ -37,6 +45,9 @@
         width: 180px;
         box-shadow: 5px 0px 15px #efefef;
       }
+      #sidebar li { margin-left: 5px; }
+      #sidebar a { font-weight: bold; }
+      #sidebar h4 { margin: 0.7em 0;}
 
       /* lion-roar scrolling */
       #sidebar::-webkit-scrollbar {
@@ -69,14 +80,6 @@
         border: none;
         margin: 0 5px 0px 0;
       }
-
-
-      h1, h2, h3, h4 { margin-left: -5px; }
-
-      #sidebar li { margin-left: 5px; }
-      #sidebar a { font-weight: bold; }
-      #sidebar h4 { margin: 0.7em 0;}
-      a { color: black; }
     </style>
   </head>
 
@@ -85,6 +88,7 @@
       <h4><a href="#dependencies">Dependencies</a></h4>
       <h4><a href="#installation">Installation</a></h4>
       <h4><a href="#compilation">Compilation & Linking</a></h4>
+      <h4><a href="#overview">Overview</a></h4>
     </div>
     <img src="docs/simple-tiles-logo.png">
     <p><a href="http://github.com/propublica/simple-tiles">Simple Tiles</a>
@@ -92,12 +96,14 @@
     core it is a thin wrapper on top of <a href="http://www.gdal.org/ogr">OGR</a>
     for spatial data and <a href="http://cairographics.org">Cairo</a>
     for image generation.</p>
+
     <p>The library's source is over at <a href="http://github.com/propublica/simple-tiles">github</a>
     and there is an <a href="docs/map.html">annotated version</a> available. Please report
     issues or ask questions in the
     <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a>.</p>
 
-    <p>TKTKTK more here</p>
+    <p>There are currently Ruby bindings in
+    <a href="http://github.com/propublica/simpler-tiles">Simpler Tiles</a>.</p>
 
     <h2 id="dependencies">Dependencies</h2>
     <p>Simple Tiles relies on GDAL and OGR for abstractions over geospatial data. You'll
@@ -114,26 +120,47 @@
 
     <h2 id="installation">Installation</h2>
     <p>To install Simple Tiles run:</p>
-    <pre>
-  $ git clone git@github.com:propublica/simple-tiles.git
-  $ cd simple-tiles
-  $ make && make install</pre>
+<pre>
+$ git clone git@github.com:propublica/simple-tiles.git
+$ cd simple-tiles
+$ make && make install
+</pre>
     <p>You'll probably also want to run:</p>
-    <pre>
-  $ make test</pre>
-    <p>to ensure the library and its dependencies are playing nice with one another.
-    </p>
+<pre>
+$ make test
+</pre>
+    <p>to ensure the library and its dependencies are playing nice with one another.</p>
 
     <h2 id="compilation">Compilation and Linking</h2>
     <p>Once you have a working copy of Simple Tiles, you'll want to use <b>pkg-config</b>
     to link to the library. For example, to compile a file with Simple Tiles use:</p>
-    <pre>
-  cc `pkg-config --cflags simple-tiles` `gdal-config --cflags` -c -o main.o main.c
-  cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
-    </pre>
+<pre>
+cc `pkg-config --cflags simple-tiles` `gdal-config --cflags` -c -o main.o main.c
+cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
+</pre>
     <p>And your program should be linked correctly.</p>
 
+    <h2 id="overview">Overview</h2>
+    <p>Simple Tiles is written in an object oriented fashion with thin data structures.
+      The heirarchy of <a href="docs/types.html">structures</a> consists of:
+      <ul>
+      <li>
+        <b>simplet_map_t</b>: Each <b>simplet_map_t</b> stores the projection,
+        bounds, the width and height of the desired image, and a list of
+        <b>simplet_layer_t</b> instances.
+      </li>
+      <li>
+        <b>simplet_layer_t</b>: Each <b>simplet_layer_t</b> contains an
+        <a href="http://www.gdal.org/ogr/ogr_formats.html">OGR</a> compatible
+        datasource string, and stores a list of <b>simplet_filter_t</b> instances.
+        Layers define access to spatial storage either from physical files or
+        databases.
+      </li>
+      <li>
+      </li>
+      </ul>
 
+    </p>
 
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>
