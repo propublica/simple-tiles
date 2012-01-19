@@ -37,27 +37,36 @@ documentation layout inspired by backbone and underscore, obvs
       body {
         font-family: "Helvetica Nueue", Helvetica, sans-serif;
         font-size: 14px;
-        line-height: 1.5em;
+        line-height: 1.7em;
         width: 600px;
         margin-left: 220px;
         padding: 20px;
       }
+      p { margin: 0px 0px 1em; }
 
       h1, h2, h3 {
         text-rendering: optimizeLegibility;
         margin-left: -5px;
       }
       h4 {
+        margin: 0px;
         margin-left: -4px;
         font-weight: normal;
       }
-      code, pre { font-family: Monaco, monospace; }
+      code, pre, tt { font-family: Monaco, monospace; font-size: 12px; }
+      tt { border:1px solid #cdcdcd; padding: 2px;}
       a { color: black; }
       a:hover { text-decoration: none; }
       pre {
         padding-left: 10px;
         font-size: 12px;
         border-left: 5px solid #efefef;
+      }
+
+      hr {
+        border: 0;
+        border-top: 1px solid #efefef;
+        height: 1px;
       }
 
       /* layout */
@@ -83,6 +92,7 @@ documentation layout inspired by backbone and underscore, obvs
       #sidebar li {
         font-size: 12px;
         margin-left: 5px;
+        margin-bottom: 0;
       }
 
       #sidebar h4 { margin: 0.7em 0;}
@@ -127,9 +137,12 @@ documentation layout inspired by backbone and underscore, obvs
       <h4><a href="#installation">Installation</a></h4>
       <h4><a href="#compilation">Compilation & Linking</a></h4>
       <h4><a href="#overview">Overview</a></h4>
+      <hr>
       <h4><a href="#simplet_map_t">Maps</a></h4>
       <ul>
-        <li><a href="simplet_map_new">simplet_map_new</a></li>
+        <li><a href="#simplet_map_new">simplet_map_new</a></li>
+        <li><a href="#simplet_map_free">simplet_map_free</a></li>
+        <li><a href="#simplet_map_set_srs">simplet_map_set_srs</a></li>
       </ul>
     </div>
     <img src="docs/simple-tiles-logo.png">
@@ -187,25 +200,25 @@ cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
       The heirarchy of <a href="docs/types_h.html">structures</a> consists of:</p>
     <ul>
       <li>
-        <b>simplet_map_t</b>: Each <b>simplet_map_t</b> stores the projection,
+        <tt>simplet_map_t</tt>: Each <tt>simplet_map_t</tt> stores the projection,
         bounds, the width and height of the desired image, and a list of
-        <b>simplet_layer_t</b> instances.
+        <tt>simplet_layer_t</tt> instances.
       </li>
       <li>
-        <b>simplet_layer_t</b>: Each <b>simplet_layer_t</b> contains an
+        <tt>simplet_layer_t</tt>: Each <tt>simplet_layer_t</tt> contains an
         <a href="http://www.gdal.org/ogr/ogr_formats.html">OGR</a> compatible
-        datasource string, and stores a list of <b>simplet_filter_t</b> instances.
+        datasource string, and stores a list of <tt>simplet_filter_t</tt> instances.
         Layers define access to spatial storage either from physical files or
-        databases. Each contains a list of <b>simplet_filter_t</b> structures.
+        databases. Each contains a list of <tt>simplet_filter_t</tt> structures.
       </li>
       <li>
-        <b>simplet_filter_t</b>: A <b>simplet_filter_t</b> instance stores
+        <tt>simplet_filter_t</tt>: A <tt>simplet_filter_t</tt> instance stores
         <a href="http://www.gdal.org/ogr/ogr_sql.html">ogrsql</a>
-        to filter the data on its parent's <b>simplet_layer_t</b> datasource.
-        Each filter contains a list of <b>simplet_style_t</b> structures.
+        to filter the data on its parent's <tt>simplet_layer_t</tt> datasource.
+        Each filter contains a list of <tt>simplet_style_t</tt> structures.
       </li>
       <li>
-        <b>simplet_style_t</b>: A <b>simplet_style_t</b> instance stores information
+        <tt>simplet_style_t</tt>: A <tt>simplet_style_t</tt> instance stores information
         on how to style and display each data row returned from filters.
       </li>
     </ul>
@@ -241,15 +254,27 @@ main(){
       file.
     </p>
 
-    <h2 id="map">simplet_map_t</h2>
+    <h2 id="map">Maps</h2>
     <p>
-      The map structure is the root of the heirarchy and has methods that set
-      and get information on the final output.
+      The <tt>simplet_map_t</tt> structure is the root of the Simple Tiles heirarchy
+      and has methods that set and get information on the final output.
     </p>
-    <h4 id="simplet_map_new"><b>new:</b> <code>simplet_map_t* simplet_map_new()</code></h4>
-    <p>
 
+    <h4 id="simplet_map_new"><code>simplet_map_t* simplet_map_new()</code></h4>
+    <p>
+      Allocates and returns a pointer to a new instance of <tt>simplet_map_t</tt>.
+      Returns <tt>NULL</tt> or the instance; the new instance should be freed
+      with <tt>simplet_map_free</tt>.
     </p>
+
+    <h4 id="simplet_map_free"><code>void simplet_map_free(simplet_map_t *map)</code></h4>
+    <p>
+      Deallocates the memory allocated for a particular <tt>simplet_map_t</tt>,
+      and its child structures. This should be the only deallocation function
+      you should need.
+    </p>
+
+    <h4 id="simplet_map_set_srs"><code>simplet_status_t simplet_map_set_srs(simplet_map_t *map, const char *proj)</code></h4>
 
 
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
