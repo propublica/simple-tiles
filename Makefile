@@ -19,4 +19,10 @@ docco:
 	docco src/*.h src/*.c
 	perl tools/rename.pl 's/_h.h/.h/' src/*.h
 
+
+publish:
+	git checkout gh-pages
+	git merge master
+	git push
+
 .PHONY: all test clean install lint

@@ -38,21 +38,31 @@ documentation layout inspired by backbone and underscore, obvs
         font-family: "Helvetica Nueue", Helvetica, sans-serif;
         font-size: 14px;
         line-height: 1.7em;
-        width: 600px;
         margin-left: 220px;
         padding: 20px;
       }
-      p { margin: 0px 0px 1em; }
+      p, li {
+        width: 600px;
+        margin: 0px 0px 1em;
+      }
 
       h1, h2, h3 {
         text-rendering: optimizeLegibility;
         margin-left: -5px;
       }
+
       h4 {
         margin: 0px;
-        margin-left: -4px;
+        margin-top: 30px;
+        margin-left: -5px;
         font-weight: normal;
       }
+
+      h4 code {
+        padding: 4px;
+        background-color: #e6f3ff;
+      }
+
       code, pre, tt { font-family: Monaco, monospace; font-size: 12px; }
       tt { border:1px solid #cdcdcd; padding: 2px;}
       a { color: black; }
@@ -144,6 +154,8 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_map_free">simplet_map_free</a></li>
         <li><a href="#simplet_map_set_srs">simplet_map_set_srs</a></li>
         <li><a href="#simplet_map_set_size">simplet_map_set_size</a></li>
+        <li><a href="#simplet_map_set_bounds">simplet_map_set_bounds</a></li>
+        <li><a href="#simplet_map_set_slippy">simplet_map_set_slippy</a></li>
       </ul>
     </div>
     <img src="docs/simple-tiles-logo.png">
@@ -156,7 +168,8 @@ documentation layout inspired by backbone and underscore, obvs
     <p>The library's source is over at <a href="http://github.com/propublica/simple-tiles">github</a>
     and there is an <a href="docs/map.html">annotated version</a> available. Please report
     issues or ask questions in the
-    <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a>.</p>
+    <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a>,
+    or head on over to <tt>#newsapps</tt> or <tt>#propublica</tt> on Freenode IRC.</p>
 
     <p>There are currently Ruby bindings in
     <a href="http://github.com/propublica/simpler-tiles">Simpler Tiles</a>.</p>
@@ -280,13 +293,25 @@ main(){
       Creates and assigns a particular projection to the map you may use any
       projection string that <a href="http://www.gdal.org/ogr/classOGRSpatialReference.html#ec3c6a49533fe457ddc763d699ff8796">
       <tt>OGRSpatialReference::SetFromUserInput</tt></a> understands. Returns
-      a <a href="#status"><tt>simplet_status_t</tt></a> object.
+      a <a href="#status"><tt>simplet_status_t</tt></a> object. If you set a
+      new srs and you have set the map's bounds in a previous projection, they
+      will be updated for you.
     </p>
 
     <h4 id="simplet_map_set_size"><code>simplet_status_t simplet_map_set_size(simplet_map_t *map, int width, int height)</code></h4>
     <p>
-
+      Sets the physical size of the output image. For tile generation you'll want to use
+      <tt>simplet_map_set_slippy</tt> to set this automatically for web mercator.
     </p>
+
+    <h4 id="simplet_map_set_bounds"><code>simplet_status_t simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny)</code></h4>
+    <p>
+      Sets the boundary of the map in the current projection. Again, <tt>simplet_map_set_slippy</tt>
+      is an easy way to set this for tiled maps.
+    </p>
+
+    <h4 id="simplet_map_set_slippy"><code>simplet_status_t simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z)</code></h4>
+
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>
 </html>
