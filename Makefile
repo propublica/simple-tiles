@@ -24,5 +24,6 @@ publish:
 	git checkout gh-pages
 	git merge master
 	git push
+	git checkout master
 
 .PHONY: all test clean install lint
