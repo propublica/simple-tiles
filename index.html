@@ -143,6 +143,7 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_map_new">simplet_map_new</a></li>
         <li><a href="#simplet_map_free">simplet_map_free</a></li>
         <li><a href="#simplet_map_set_srs">simplet_map_set_srs</a></li>
+        <li><a href="#simplet_map_set_size">simplet_map_set_size</a></li>
       </ul>
     </div>
     <img src="docs/simple-tiles-logo.png">
@@ -275,8 +276,17 @@ main(){
     </p>
 
     <h4 id="simplet_map_set_srs"><code>simplet_status_t simplet_map_set_srs(simplet_map_t *map, const char *proj)</code></h4>
+    <p>
+      Creates and assigns a particular projection to the map you may use any
+      projection string that <a href="http://www.gdal.org/ogr/classOGRSpatialReference.html#ec3c6a49533fe457ddc763d699ff8796">
+      <tt>OGRSpatialReference::SetFromUserInput</tt></a> understands. Returns
+      a <a href="#status"><tt>simplet_status_t</tt></a> object.
+    </p>
 
+    <h4 id="simplet_map_set_size"><code>simplet_status_t simplet_map_set_size(simplet_map_t *map, int width, int height)</code></h4>
+    <p>
 
+    </p>
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>
 </html>
