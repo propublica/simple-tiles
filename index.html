@@ -2,6 +2,26 @@
 <html>
   <head>
     <title>Simple Tiles</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<!--
++-----------------------------+
+|^^^^                      / ~|
+|^^^            ----------   /|
+|^^   Simple  /    ---------  |
+|            / ~ / **         |
+|           /   / ****        |
+|      ----  ~ / ******       |
+|     / ~~  -- *******        |
+|    /    /    *****          |
+|   /    /                    |
+|  / ~~ /       Tiles   ^^^^ ^|
+|-     /                ^^^ ^^|
+| ~~~ /                 ^^ ^^^|
++-----------------------------+
+
+documentation layout inspired by backbone and underscore, obvs
+-->
     <style>
       /* reset */
       div, html, body {
@@ -23,19 +43,24 @@
         padding: 20px;
       }
 
-      h1, h2, h3 { text-rendering: optimizeLegibility; }
+      h1, h2, h3 {
+        text-rendering: optimizeLegibility;
+        margin-left: -5px;
+      }
+      h4 {
+        margin-left: -4px;
+        font-weight: normal;
+      }
+      code, pre { font-family: Monaco, monospace; }
       a { color: black; }
       a:hover { text-decoration: none; }
       pre {
         padding-left: 10px;
-        font-family: Monaco, monospace;
         font-size: 12px;
         border-left: 5px solid #efefef;
       }
 
       /* layout */
-      h1, h2, h3, h4 { margin-left: -5px; }
-
       #sidebar {
         top:0;
         left:0;
@@ -43,10 +68,23 @@
         position:fixed;
         padding: 20px;
         width: 180px;
-        box-shadow: 5px 0px 15px #efefef;
+        border-right: 1px solid #efefef;
       }
-      #sidebar li { margin-left: 5px; }
+
       #sidebar a { font-weight: bold; }
+
+      #sidebar li a {
+        font-weight: normal;
+        text-decoration:none;
+      }
+
+      #sidebar li a:hover { text-decoration: underline; }
+
+      #sidebar li {
+        font-size: 12px;
+        margin-left: 5px;
+      }
+
       #sidebar h4 { margin: 0.7em 0;}
 
       /* lion-roar scrolling */
@@ -89,6 +127,10 @@
       <h4><a href="#installation">Installation</a></h4>
       <h4><a href="#compilation">Compilation & Linking</a></h4>
       <h4><a href="#overview">Overview</a></h4>
+      <h4><a href="#simplet_map_t">Maps</a></h4>
+      <ul>
+        <li><a href="simplet_map_new">simplet_map_new</a></li>
+      </ul>
     </div>
     <img src="docs/simple-tiles-logo.png">
     <p><a href="http://github.com/propublica/simple-tiles">Simple Tiles</a>
@@ -142,8 +184,8 @@ cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
 
     <h2 id="overview">Overview</h2>
     <p>Simple Tiles is written in an object oriented fashion with thin data structures.
-      The heirarchy of <a href="docs/types.html">structures</a> consists of:
-      <ul>
+      The heirarchy of <a href="docs/types_h.html">structures</a> consists of:</p>
+    <ul>
       <li>
         <b>simplet_map_t</b>: Each <b>simplet_map_t</b> stores the projection,
         bounds, the width and height of the desired image, and a list of
@@ -154,13 +196,61 @@ cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
         <a href="http://www.gdal.org/ogr/ogr_formats.html">OGR</a> compatible
         datasource string, and stores a list of <b>simplet_filter_t</b> instances.
         Layers define access to spatial storage either from physical files or
-        databases.
+        databases. Each contains a list of <b>simplet_filter_t</b> structures.
       </li>
       <li>
+        <b>simplet_filter_t</b>: A <b>simplet_filter_t</b> instance stores
+        <a href="http://www.gdal.org/ogr/ogr_sql.html">ogrsql</a>
+        to filter the data on its parent's <b>simplet_layer_t</b> datasource.
+        Each filter contains a list of <b>simplet_style_t</b> structures.
       </li>
-      </ul>
+      <li>
+        <b>simplet_style_t</b>: A <b>simplet_style_t</b> instance stores information
+        on how to style and display each data row returned from filters.
+      </li>
+    </ul>
+
+    <p>
+      For a real-world example on how this all fits together, here is
+      a demo that draws the map in the Simple Tiles logo:
+    </p>
+<pre>
+#include &lt;simple-tiles/simple_tiles.h&gt;
+#include &lt;simple-tiles/filter.h&gt;
+#include &lt;simple-tiles/layer.h&gt;
+
+int
+main(){
+  simplet_map_t *map = simplet_map_new();
+  simplet_map_set_srs(map, "EPSG:3083");
+  simplet_map_set_bgcolor(map, "#ffffff");
+  simplet_map_set_bounds(map, -585080.885134, 6849466.721081, 4161303.603672, 9587780.816356);
+  simplet_map_set_size(map, 423, 260);
+  simplet_layer_t *layer = simplet_map_add_layer(map, "PG:dbname=simple_tiles_roads");
+  simplet_filter_t *filter = simplet_layer_add_filter(layer, "select * from roads");
+  simplet_filter_add_style(filter, "stroke", "#11111166");
+  simplet_filter_add_style(filter, "line-join", "round");
+  simplet_filter_add_style(filter, "weight", "0.1");
+
+  simplet_map_render_to_png(map, "./out.png");
+  simplet_map_free(map);
+}
+</pre>
+    <p>
+      Another example is the repo's <a href="https://github.com/propublica/simple-tiles/blob/master/test/api.c">test/api.c</a>
+      file.
+    </p>
+
+    <h2 id="map">simplet_map_t</h2>
+    <p>
+      The map structure is the root of the heirarchy and has methods that set
+      and get information on the final output.
+    </p>
+    <h4 id="simplet_map_new"><b>new:</b> <code>simplet_map_t* simplet_map_new()</code></h4>
+    <p>
 
     </p>
+
 
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>

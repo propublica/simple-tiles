@@ -15,6 +15,8 @@ lint:
 	CC=scan-build $(MAKE)
 
 docco:
-	docco src/*.c
+	perl tools/rename.pl 's/\.h/_h.h/' src/*.h
+	docco src/*.h src/*.c
+	perl tools/rename.pl 's/_h.h/.h/' src/*.h
 
 .PHONY: all test clean install lint
