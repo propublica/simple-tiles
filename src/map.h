@@ -51,12 +51,6 @@ void
 simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length));
 
-simplet_status_t
-simplet_map_bounds_to_wgs84_wkt(simplet_map_t *map, char **wkt);
-
-void
-simplet_map_scale(simplet_map_t *map);
-
 void
 simplet_map_get_srs(simplet_map_t *map, char **srs);
 

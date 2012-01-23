@@ -148,14 +148,26 @@ documentation layout inspired by backbone and underscore, obvs
       <h4><a href="#compilation">Compilation & Linking</a></h4>
       <h4><a href="#overview">Overview</a></h4>
       <hr>
-      <h4><a href="#simplet_map_t">Maps</a></h4>
+      <h4><a href="#maps">Maps</a></h4>
       <ul>
         <li><a href="#simplet_map_new">simplet_map_new</a></li>
         <li><a href="#simplet_map_free">simplet_map_free</a></li>
         <li><a href="#simplet_map_set_srs">simplet_map_set_srs</a></li>
+        <li><a href="#simplet_map_get_srs">simplet_map_get_srs</a></li>
         <li><a href="#simplet_map_set_size">simplet_map_set_size</a></li>
         <li><a href="#simplet_map_set_bounds">simplet_map_set_bounds</a></li>
         <li><a href="#simplet_map_set_slippy">simplet_map_set_slippy</a></li>
+        <li><a href="#simplet_map_set_bgcolor">simplet_map_set_bgcolor</a></li>
+        <li><a href="#simplet_map_get_bgcolor">simplet_map_get_bgcolor</a></li>
+        <li><a href="#simplet_map_add_layer">simplet_map_add_layer</a></li>
+        <li><a href="#simplet_map_add_layer_directly">simplet_map_add_layer_directly</a></li>
+        <li><a href="#simplet_map_get_status">simplet_map_get_status</a></li>
+        <li><a href="#simplet_map_status_to_string">simplet_map_status_to_string</a></li>
+        <li><a href="#simplet_map_is_valid">simplet_map_is_valid</a></li>
+        <li><a href="#simplet_map_render_to_png">simplet_map_render_to_png</a></li>
+        <li><a href="#simplet_map_render_to_stream">simplet_map_render_to_stream</a></li>
+        <li><a href="#simplet_map_set_buffer">simplet_map_set_buffer</a></li>
+        <li><a href="#simplet_map_get_buffer">simplet_map_get_buffer</a></li>
       </ul>
     </div>
     <img src="docs/simple-tiles-logo.png">
@@ -268,7 +280,7 @@ main(){
       file.
     </p>
 
-    <h2 id="map">Maps</h2>
+    <h2 id="maps">Maps</h2>
     <p>
       The <tt>simplet_map_t</tt> structure is the root of the Simple Tiles heirarchy
       and has methods that set and get information on the final output.
@@ -298,6 +310,12 @@ main(){
       will be updated for you.
     </p>
 
+    <h4 id="simplet_map_get_srs"><code>void simplet_map_get_srs(simplet_map_t *map, char **srs)</code></h4>
+    <p>
+      Sets <tt>srs</tt> to the <tt>map</tt>'s srs, will allocate space for <tt>srs</tt>
+      and <tt>srs</tt> should be deallocated with <tt>free</tt>.
+    </p>
+
     <h4 id="simplet_map_set_size"><code>simplet_status_t simplet_map_set_size(simplet_map_t *map, int width, int height)</code></h4>
     <p>
       Sets the physical size of the output image. For tile generation you'll want to use
@@ -311,6 +329,90 @@ main(){
     </p>
 
     <h4 id="simplet_map_set_slippy"><code>simplet_status_t simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z)</code></h4>
+    <p>
+      Takes a series of google map tile coordinates and sets the bounds, projection
+      width and height of the <tt>simplet_map_t</tt> instance accordingly.
+    </p>
+
+    <h4 id="simplet_map_set_bgcolor"><code>simplet_status_t simplet_map_set_bgcolor(simplet_map_t *map, const char *str)</code></h4>
+    <p>
+      Stores a copy of <tt>str</tt> as the map's background color in <tt>#ffffffAA</tt>
+      format <tt>AA</tt> is the alpha index of the color.
+    </p>
+
+    <h4 id="simplet_map_get_bgcolor"><code>simplet_status_t simplet_map_set_bgcolor(simplet_map_t *map, const char *str)</code></h4>
+    <p>
+      Stores a copy of the <tt>map</tt>'s background color in <tt>str</tt>. <tt>str</tt>
+      is then owned by the caller and should be <tt>free</tt>'d.
+    </p>
+
+    <h4 id="simplet_map_add_layer"><code>simplet_layer_t* simplet_map_add_layer(simplet_map_t *map, const char *datastring)</code></h4>
+    <p>
+      Adds a layer to the maps layer's list. <tt>datastring</tt> represents a
+      resource that is readable by <a href="http://www.gdal.org/ogr/ogr_formats.html">OGR</a>,
+      and is owned by the returned <tt>simplet_layer_t</tt>. Returns <tt>NULL</tt>
+      on failure.
+    </p>
+
+    <h4 id="simplet_map_add_layer_directly"><code>simplet_layer_t* simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer)</code></h4>
+    <p>
+      Add a layer object created by <tt>simplet_layer_new</tt> directly the
+      <tt>map</tt>'s list of layers.
+    </p>
+
+    <h4 id="simplet_map_get_status"><code>simplet_status_t simplet_map_get_status(simplet_map_t *map)</code></h4>
+    <p>
+      Returns the current status of the <tt>map</tt> object. Status codes are:
+<pre>
+typedef enum {
+  SIMPLET_OK = 0,    // OK
+  SIMPLET_ERR,       // Generic error
+  SIMPLET_OOM,       // Out of memory for allocation
+  SIMPLET_CAIRO_ERR, // Cairo error
+  SIMPLET_OGR_ERR,   // OGR Error
+} simplet_status_t;
+</pre>
+    </p>
+
+    <h4 id="simplet_map_status_to_string"><code>const char* simplet_map_status_to_string(simplet_map_t *map)</code></h4>
+    <p>
+      Returns a pointer to an internal english version of the <tt>map</tt>'s
+      status. Useful for error reporting.
+    </p>
+
+    <h4 id="simplet_map_is_valid"><code>simplet_status_t simplet_map_is_valid(simplet_map_t *map)</code></h4>
+    <p>
+      Returns a <tt>simplet_status_t</tt> of the current state of the <tt>map</tt>
+      that indicates if the requirements for successfully rendering the map are
+      met. In other words, if a <tt>map</tt> has bounds, width and height, projection
+      and at least one <tt>layer</tt>.
+    </p>
+
+    <h4 id="simplet_map_render_to_png"><code>void simplet_map_render_to_png(simplet_map_t *map, const char *path)</code></h4>
+    <p>
+      Renders a png to the <tt>path</tt> based on the specification defined in
+      <tt>map</tt>.
+    </p>
+
+    <h4 id="simplet_map_render_to_stream"><code>void simplet_map_render_to_stream(simplet_map_t *map, void *stream, cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length))</code></h4>
+    <p>
+      Renders the <tt>map</tt> to a png stream by repeatedly calling the <tt>closure</tt>.
+      The <tt>closure</tt> is a <a href="http://cairographics.org/manual/cairo-PNG-Support.html#cairo-write-func-t">
+      <tt>cairo_write_func_t</tt></a> and must conform to that API.
+    </p>
+
+    <h4 id="simplet_map_set_buffer"><code>void simplet_map_set_buffer(simplet_map_t *map, double buffer)</code></h4>
+    <p>
+      Sets the buffer on the <tt>map</tt>. Buffers are a kind of overprinting
+      where you can include more shapes in rendering in order to set type correctly.
+      Michal Migurski has a good <a href="http://mike.teczno.com/notes/mapnik.html">post</a>
+      on why this is useful.
+    </p>
+
+    <h4 id="simplet_map_get_buffer"><code>double simplet_map_get_buffer(simplet_map_t *map)</code></h4>
+    <p>
+      Returns the <tt>map</tt>'s buffer.
+    </p>
 
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>

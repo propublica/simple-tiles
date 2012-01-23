@@ -50,11 +50,11 @@ typedef struct simplet_listiter_t {
 
 /* errors */
 typedef enum {
-  SIMPLET_ERR = 0,
-  SIMPLET_OOM,
-  SIMPLET_CAIRO_ERR,
-  SIMPLET_OGR_ERR,
-  SIMPLET_OK
+  SIMPLET_OK = 0,    // OK
+  SIMPLET_ERR,       // Generic error
+  SIMPLET_OOM,       // Out of memory for allocation
+  SIMPLET_CAIRO_ERR, // Cairo error
+  SIMPLET_OGR_ERR,   // OGR Error
 } simplet_status_t;
 
 #define SIMPLET_ERROR_FIELDS \
