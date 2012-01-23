@@ -138,6 +138,11 @@ documentation layout inspired by backbone and underscore, obvs
         border: none;
         margin: 0 5px 0px 0;
       }
+
+      :target code {
+        background-color: #d8f7ee;
+        border: 1px solid #ababab;
+      }
     </style>
   </head>
 
@@ -456,6 +461,11 @@ typedef enum {
     </p>
 
     <h2 id="filters">Filters</h2>
+    <p>
+      Each contains <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>
+      to filter the data in its parent layer. Like layers they are drawn in
+      order on the map canvas.
+    </p>
 
     <h2 id="styles">Styles</h2>
 
