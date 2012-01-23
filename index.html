@@ -169,6 +169,18 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_map_set_buffer">simplet_map_set_buffer</a></li>
         <li><a href="#simplet_map_get_buffer">simplet_map_get_buffer</a></li>
       </ul>
+      <hr>
+      <h4><a href="#layers">Layers</a></h4>
+      <ul>
+        <li><a href="#simplet_layer_new">simplet_layer_new</a></li>
+        <li><a href="#simplet_layer_free">simplet_layer_free</a></li>
+        <li><a href="#simplet_layer_set_source">simplet_set_source</a></li>
+        <li><a href="#simplet_layer_get_source">simplet_get_source</a></li>
+      </ul>
+      <hr>
+      <h4><a href="#filters">Filters</a></h4>
+      <hr>
+      <h4><a href="#styles">Styles</a></h4>
     </div>
     <img src="docs/simple-tiles-logo.png">
     <p><a href="http://github.com/propublica/simple-tiles">Simple Tiles</a>
@@ -297,7 +309,7 @@ main(){
     <p>
       Deallocates the memory allocated for a particular <tt>simplet_map_t</tt>,
       and its child structures. This should be the only deallocation function
-      you should need.
+      you'll need.
     </p>
 
     <h4 id="simplet_map_set_srs"><code>simplet_status_t simplet_map_set_srs(simplet_map_t *map, const char *proj)</code></h4>
@@ -340,7 +352,7 @@ main(){
       format <tt>AA</tt> is the alpha index of the color.
     </p>
 
-    <h4 id="simplet_map_get_bgcolor"><code>simplet_status_t simplet_map_set_bgcolor(simplet_map_t *map, const char *str)</code></h4>
+    <h4 id="simplet_map_get_bgcolor"><code>void simplet_map_get_bgcolor(simplet_map_t *map, char **str)</code></h4>
     <p>
       Stores a copy of the <tt>map</tt>'s background color in <tt>str</tt>. <tt>str</tt>
       is then owned by the caller and should be <tt>free</tt>'d.
@@ -350,8 +362,8 @@ main(){
     <p>
       Adds a layer to the maps layer's list. <tt>datastring</tt> represents a
       resource that is readable by <a href="http://www.gdal.org/ogr/ogr_formats.html">OGR</a>,
-      and is owned by the returned <tt>simplet_layer_t</tt>. Returns <tt>NULL</tt>
-      on failure.
+      and returns a <tt>simplet_layer_t</tt> which is owned by the <tt>map</tt>
+      and will be freed when the map is. Returns <tt>NULL</tt> on failure.
     </p>
 
     <h4 id="simplet_map_add_layer_directly"><code>simplet_layer_t* simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer)</code></h4>
@@ -391,7 +403,8 @@ typedef enum {
     <h4 id="simplet_map_render_to_png"><code>void simplet_map_render_to_png(simplet_map_t *map, const char *path)</code></h4>
     <p>
       Renders a png to the <tt>path</tt> based on the specification defined in
-      <tt>map</tt>.
+      <tt>map</tt>. Layers are painted on the image in order of insertion, that
+      is the oldest layers are drawn first.
     </p>
 
     <h4 id="simplet_map_render_to_stream"><code>void simplet_map_render_to_stream(simplet_map_t *map, void *stream, cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length))</code></h4>
@@ -414,6 +427,41 @@ typedef enum {
       Returns the <tt>map</tt>'s buffer.
     </p>
 
+    <h2 id="layers">Layers</h2>
+    <p>
+      Each layer maps to a OGR datasource, and contains a list of filters to
+      run against that source.
+    </p>
+
+    <h4 id="simplet_layer_new"><code>simplet_layer_t* simplet_layer_new(const char *datastring)</code></h4>
+    <p>
+      Create a new <tt>simplet_layer_t</tt> returns <tt>NULL</tt> on failure.
+    </p>
+
+    <h4 id="simplet_layer_free"><code>void simplet_layer_free(simplet_layer_t *layer)</code></h4>
+    <p>
+      Deallocate the <tt>simplet_layer_t</tt>.
+    </p>
+
+    <h4 id="simplet_layer_set_source"><code>void simplet_layer_set_source(simplet_layer_t *layer, char *source)</code></h4>
+    <p>
+      Set the <tt>layer</tt>'s source attribute. <tt>source</tt> needs to be a
+      string pointing to an OGR readable <a href="http://www.gdal.org/ogr/ogr_formats.html">resource</a>.
+    </p>
+
+    <h4 id="simplet_layer_get_source"><code>void simplet_layer_get_source(simplet_layer_t *layer, char **source)</code></h4>
+    <p>
+      Stores a copy of the <tt>layer</tt>'s in <tt>source</tt>, and allocates
+      space for the copy. <tt>source</tt> should be freed when no longer needed.
+    </p>
+
+    <h2 id="filters">Filters</h2>
+
+    <h2 id="styles">Styles</h2>
+
+    <h2 id="demo">Demo</h2>
+
+    <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/512/845/11.png">
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>
 </html>
