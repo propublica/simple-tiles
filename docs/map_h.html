@@ -51,20 +51,11 @@
 <span class="n">simplet_map_render_to_stream</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">stream</span><span class="p">,</span>
   <span class="n">cairo_status_t</span> <span class="p">(</span><span class="o">*</span><span class="n">cb</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">closure</span><span class="p">,</span> <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">length</span><span class="p">));</span>
 
-<span class="n">simplet_status_t</span>
-<span class="n">simplet_map_bounds_to_wgs84_wkt</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">wkt</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_map_scale</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">);</span>
-
 <span class="kt">void</span>
 <span class="n">simplet_map_get_srs</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">srs</span><span class="p">);</span>
 
 <span class="n">simplet_status_t</span>
 <span class="n">simplet_map_set_slippy</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">y</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">z</span><span class="p">);</span>
-
-<span class="kt">void</span>
-<span class="n">simplet_map_add_placement</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="n">OGRFeatureH</span> <span class="n">feature</span><span class="p">,</span> <span class="n">OGRGeometryH</span> <span class="n">geom</span><span class="p">,</span> <span class="n">simplet_list_t</span> <span class="o">*</span><span class="n">styles</span><span class="p">,</span> <span class="n">cairo_t</span> <span class="o">*</span><span class="n">ctx</span><span class="p">);</span>
 
 <span class="kt">void</span>
 <span class="n">simplet_map_init_matrix</span><span class="p">(</span><span class="n">simplet_map_t</span> <span class="o">*</span><span class="n">map</span><span class="p">,</span> <span class="n">cairo_matrix_t</span> <span class="o">*</span><span class="n">mat</span><span class="p">);</span>

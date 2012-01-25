@@ -50,11 +50,11 @@
 
 <span class="cm">/* errors */</span>
 <span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
-  <span class="n">SIMPLET_ERR</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-  <span class="n">SIMPLET_OOM</span><span class="p">,</span>
-  <span class="n">SIMPLET_CAIRO_ERR</span><span class="p">,</span>
-  <span class="n">SIMPLET_OGR_ERR</span><span class="p">,</span>
-  <span class="n">SIMPLET_OK</span>
+  <span class="n">SIMPLET_ERR</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>   <span class="c1">// Generic error</span>
+  <span class="n">SIMPLET_OOM</span><span class="p">,</span>       <span class="c1">// Out of memory for allocation</span>
+  <span class="n">SIMPLET_CAIRO_ERR</span><span class="p">,</span> <span class="c1">// Cairo error</span>
+  <span class="n">SIMPLET_OGR_ERR</span><span class="p">,</span>   <span class="c1">// OGR Error</span>
+  <span class="n">SIMPLET_OK</span>         <span class="c1">// OK</span>
 <span class="p">}</span> <span class="n">simplet_status_t</span><span class="p">;</span>
 
 <span class="cp">#define SIMPLET_ERROR_FIELDS \</span>
