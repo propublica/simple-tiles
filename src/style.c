@@ -102,16 +102,16 @@ letter_spacing(void *ct, const char *arg){
 }
 
 simplet_styledef_t styleTable[] = {
-  { "fill",             fill                    },
-  { "stroke",           stroke                  },
-  { "weight",           weight                  },
-  { "line-cap",         line_cap                },
-  { "color",            fill                    },
-  { "text-halo-color",  stroke                  },
-  { "text-halo-weight", weight                  },
-  { "letter-spacing",   letter_spacing          },
-  { "paint",            simplet_style_paint     }, //used by map
-  { "line-join",        simplet_style_line_join }  //used by map
+  { "fill",                fill                    },
+  { "stroke",              stroke                  },
+  { "weight",              weight                  },
+  { "line-cap",            line_cap                },
+  { "color",               fill                    },
+  { "text-outline-color",  stroke                  },
+  { "text-outline-weight", weight                  },
+  { "letter-spacing",      letter_spacing          },
+  { "paint",               simplet_style_paint     }, //used by map
+  { "line-join",           simplet_style_line_join }  //used by map
   /* radius and seamless are special styles */
 };
 

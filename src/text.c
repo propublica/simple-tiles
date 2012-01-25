@@ -108,7 +108,7 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
     pango_cairo_layout_path(litho->ctx, placement->layout);
     placement->placed = 1;
   }
-  simplet_apply_styles(litho->ctx, styles, "text-halo-weight", "text-halo-color", "color",  NULL);
+  simplet_apply_styles(litho->ctx, styles, "text-outline-weight", "text-outline-color", "color",  NULL);
   cairo_restore(litho->ctx);
 }
 

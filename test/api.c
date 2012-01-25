@@ -28,8 +28,8 @@ main(){
   simplet_filter_add_style(filter2, "text-field", "NAME");
   simplet_filter_add_style(filter2, "font", "Lucida Grande, Regular 12");
   simplet_filter_add_style(filter2, "color", "#444444ff");
-  simplet_filter_add_style(filter2, "text-halo-color", "#ffffffcc");
-  simplet_filter_add_style(filter2, "text-halo-weight", "2");
+  simplet_filter_add_style(filter2, "text-outline-color", "#ffffffcc");
+  simplet_filter_add_style(filter2, "text-outline-weight", "2");
   simplet_filter_add_style(filter2, "letter-spacing", "1");
 
   if(simplet_map_is_valid(map))

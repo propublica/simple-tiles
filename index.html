@@ -65,6 +65,7 @@ documentation layout inspired by backbone and underscore, obvs
 
       code, pre, tt { font-family: Monaco, monospace; font-size: 12px; }
       tt { border:1px solid #cdcdcd; padding: 2px;}
+      dd { margin-left: 1em; }
       a { color: black; }
       a:hover { text-decoration: none; }
       pre {
@@ -153,7 +154,7 @@ documentation layout inspired by backbone and underscore, obvs
       <h4><a href="#compilation">Compilation & Linking</a></h4>
       <h4><a href="#overview">Overview</a></h4>
       <hr>
-      <h4><a href="#maps">Maps</a></h4>
+      <h4><a href="#maps">Maps</a> map.h</h4>
       <ul>
         <li><a href="#simplet_map_new">simplet_map_new</a></li>
         <li><a href="#simplet_map_free">simplet_map_free</a></li>
@@ -175,17 +176,21 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_map_get_buffer">simplet_map_get_buffer</a></li>
       </ul>
       <hr>
-      <h4><a href="#layers">Layers</a></h4>
+      <h4><a href="#layers">Layers</a> layer.h</h4>
       <ul>
         <li><a href="#simplet_layer_new">simplet_layer_new</a></li>
         <li><a href="#simplet_layer_free">simplet_layer_free</a></li>
-        <li><a href="#simplet_layer_set_source">simplet_set_source</a></li>
-        <li><a href="#simplet_layer_get_source">simplet_get_source</a></li>
+        <li><a href="#simplet_layer_set_source">simplet_layer_set_source</a></li>
+        <li><a href="#simplet_layer_get_source">simplet_layer_get_source</a></li>
+        <li><a href="#simplet_layer_add_filter">simplet_layer_add_filter</a></li>
+        <li><a href="#simplet_layer_add_filter_directly">simplet_layer_add_filter_directly</a></li>
       </ul>
       <hr>
-      <h4><a href="#filters">Filters</a></h4>
+      <h4><a href="#filters">Filters</a> filter.h</h4>
       <hr>
-      <h4><a href="#styles">Styles</a></h4>
+      <h4><a href="#styles">Styles</a> style.h</h4>
+      <hr>
+      <h4><a href="#license">License</a></h4>
     </div>
     <img src="docs/simple-tiles-logo.png">
     <p><a href="http://github.com/propublica/simple-tiles">Simple Tiles</a>
@@ -200,12 +205,15 @@ documentation layout inspired by backbone and underscore, obvs
     <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a>,
     or head on over to <tt>#newsapps</tt> or <tt>#propublica</tt> on Freenode IRC.</p>
 
-    <p>There are currently Ruby bindings in
-    <a href="http://github.com/propublica/simpler-tiles">Simpler Tiles</a>.</p>
+    <!--<p>There are currently Ruby bindings in
+    <a href="http://github.com/propublica/simpler-tiles">Simpler Tiles</a>.</p>-->
+    <p>Ruby bindings to Simple Tiles will be released soon.
+    Contact <a href="mailto:jeff.larson@propublica.org">Jeff Larson</a> if you
+    want early access.</p>
 
     <h2 id="dependencies">Dependencies</h2>
     <p>Simple Tiles relies on GDAL and OGR for abstractions over geospatial data. You'll
-    need at least version 1.8.0 to use the library. On Ubuntu you can install
+    need at least version 1.8.0 of GDAL to use Simple Tiles. On Ubuntu you can install
     the library using the <a href="https://launchpad.net/~ubuntugis/+archive/ppa/">ubuntugis ppa</a>.
     On OS X the version from homebrew works well.
     </p>
@@ -456,22 +464,125 @@ typedef enum {
 
     <h4 id="simplet_layer_get_source"><code>void simplet_layer_get_source(simplet_layer_t *layer, char **source)</code></h4>
     <p>
-      Stores a copy of the <tt>layer</tt>'s in <tt>source</tt>, and allocates
+      Stores a copy of the <tt>layer</tt>'s source attribute in <tt>source</tt>, and allocates
       space for the copy. <tt>source</tt> should be freed when no longer needed.
+    </p>
+
+    <h4 id="simplet_layer_add_filter"><code>simplet_filter_t* simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql)</code></h4>
+    <p>
+      Creates and adds a filter to the <tt>layer</tt>'s filter list. The returned
+      filter is owned by the <tt>layer</tt> and should not be freed with <a href="simplet_filter_free">simplet_filter_free</a>.
+      <tt>ogrsql</tt> should be a query to filter the <tt>layer</tt>'s
+      data source using <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>.
+      Returns <tt>NULL</tt> on failure.
+    </p>
+
+    <h4 id="simplet_layer_add_filter_directly"><code>simplet_filter_t* simplet_layer_add_filter_directly(simplet_layer_t *layer, simplet_filter_t *filter)</code></h4>
+    <p>
+      Adds a previously initialized <tt>filter</tt> to the <tt>layer</tt>'s filter list.
+      The returned filter is then owned by the <tt>layer</tt> and should not
+      be freed with <a href="simplet_filter_free">simplet_filter_free</a>.
     </p>
 
     <h2 id="filters">Filters</h2>
     <p>
-      Each contains <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>
+      Each <tt>simplet_filter_t</tt> contains <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>
       to filter the data in its parent layer. Like layers they are drawn in
-      order on the map canvas.
+      order of insertion on the map canvas.
+    </p>
+
+    <h4 id="simplet_filter_new"><code>simplet_filter_t* simplet_filter_new(const char *sqlquery)</code></h4>
+    <p>
+      Creates and returns a new <tt>simplet_filter_t</tt>. Returns <tt>NULL</tt>
+      on failure. <tt>sqlquery</tt> should be <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>.
+    </p>
+
+    <h4 id="simplet_filter_free"><code>void simplet_filter_free(simplet_filter_t *filter)</code></h4>
+    <p>
+      Frees the passed in <tt>filter</tt>. If the <tt>filter</tt> has been added
+      to a <tt>layer</tt> you shouldn't use this function.
+    </p>
+
+    <h4 id="simplet_filter_set_query"><code>simplet_status_t simplet_filter_set_query(simplet_filter_t *filter, const char *query)</code></h4>
+    <p>
+      Sets the query on <tt>filter</tt>. <tt>query</tt> should be
+      <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>.
+    </p>
+
+    <h4 id="simplet_filter_get_query"><code>simplet_status_t simplet_filter_get_query(simplet_filter_t *filter, char **query)</code></h4>
+    <p>
+      Stores a copy of the <tt>filter</tt>'s query attribute in <tt>query</tt>, and allocates
+      space for the copy. <tt>query</tt> should be freed when no longer needed.
+    </p>
+
+    <h4 id="simplet_filter_add_style"><code>simplet_style_t* simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *arg)</code></h4>
+    <p>
+      Creates and returns a new <tt>simplet_style_t</tt>. Returns <tt>NULL</tt>
+      on failure. <a href="#styles">key</a> should be a style name, and
+      <a href="#styles">value</a> should be a corresponding value.
     </p>
 
     <h2 id="styles">Styles</h2>
+    <p>
+      Styles are where you'll define the visual appearance of the data emitted
+      by the <tt>simplet_filter_t</tt>. They mimic CSS in that they operate on
+      individual data elements in the spatial source. All colors are in 8 digit
+      hex format with the last 2 digits defining the Alpha value of the color
+      (e.g. <tt>#fffffaa</tt>). These are the styles, and there are planned additions:
+
+      <dl>
+        <dt><tt>fill</tt></dt>
+        <dd>The fill color for each shape.</dd>
+        <dt><tt>stroke</tt></dt>
+        <dd>The stroke color for each line.</dd>
+        <dt><tt>weight</tt></dt>
+        <dd>The width of each line in pixels.</dd>
+        <dt><tt>line-cap</tt></dt>
+        <dd>How lines are ended, one of: "butt", "round", "square"</dd>
+        <dt><tt>line-join</tt></dt>
+        <dd>How lines are joined together, one of: "miter", "round", "bevel"</dd>
+        <dt><tt>text-field</tt></dt>
+        <dd>The field to grab labels from.</dd>
+        <dt><tt>text-outline-color</tt></dt>
+        <dd>Color for the outline of the text labels.</dd>
+        <dt><tt>text-outline-weight</tt></dt>
+        <dd>The size of the outline fo the text labels.</dd>
+        <dt><tt>font</tt></dt>
+        <dd>
+          A font description that <a href="http://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string">pango</a> can read to set labels in.
+          (ex. "Helvetica 12px")
+        </dd>
+        <dt><tt>letter-spacing</tt></dt>
+        <dd>How far apart to space the letters in labels.</dd>
+      </dl>
+    </p>
 
     <h2 id="demo">Demo</h2>
-
     <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/512/845/11.png">
+
+    <h2 id="license">License</h2>
+<pre>
+Copyright (c) 2012, ProPublica
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is furnished
+to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
+</pre>
+
     <p><em>Simple Tiles is a project of ProPublica.</em></p>
   </body>
 </html>
