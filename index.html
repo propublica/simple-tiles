@@ -390,11 +390,11 @@ main(){
       Returns the current status of the <tt>map</tt> object. Status codes are:
 <pre>
 typedef enum {
-  SIMPLET_OK = 0,    // OK
-  SIMPLET_ERR,       // Generic error
+  SIMPLET_ERR = 0,   // Generic error
   SIMPLET_OOM,       // Out of memory for allocation
   SIMPLET_CAIRO_ERR, // Cairo error
   SIMPLET_OGR_ERR,   // OGR Error
+  SIMPLET_OK         // OK
 } simplet_status_t;
 </pre>
     </p>
