@@ -38,7 +38,7 @@ documentation layout inspired by backbone and underscore, obvs
         font-family: "Helvetica Nueue", Helvetica, sans-serif;
         font-size: 14px;
         line-height: 1.7em;
-        margin-left: 220px;
+        margin-left: 240px;
         padding: 20px;
       }
       p, li {
@@ -87,8 +87,10 @@ documentation layout inspired by backbone and underscore, obvs
         bottom:0;
         position:fixed;
         padding: 20px;
-        width: 180px;
+        width: 200px;
         border-right: 1px solid #efefef;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
 
       #sidebar a { font-weight: bold; }
@@ -109,36 +111,7 @@ documentation layout inspired by backbone and underscore, obvs
       #sidebar h4 { margin: 0.7em 0;}
 
       /* lion-roar scrolling */
-      #sidebar::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-        z-index: 999;
-      }
 
-      #sidebar::-webkit-scrollbar-button:start:decrement,
-      #sidebar::-webkit-scrollbar-button:end:increment {
-        display: block;
-        height:3px;
-      }
-
-      #sidebar::-webkit-scrollbar-thumb:vertical {
-        height: 20px;
-        background-color: rgba(0,0,0,0.3);
-        -webkit-border-radius: 5px;
-        -webkit-box-shadow: 0 1px 1px rgba(255,255,255,0.9);
-        padding-right:0px;
-      }
-
-      #sidebar::-webkit-scrollbar-track:enabled {
-        background-color: transparent;
-        width:10px;
-      }
-
-      #sidebar::-webkit-scrollbar-track-piece {
-        background-color: transparent;
-        border: none;
-        margin: 0 5px 0px 0;
-      }
 
       :target code {
         background-color: #d8f7ee;
@@ -187,8 +160,24 @@ documentation layout inspired by backbone and underscore, obvs
       </ul>
       <hr>
       <h4><a href="#filters">Filters</a> filter.h</h4>
+      <ul>
+        <li><a href="#simplet_filter_new">simplet_filter_new</a></li>
+        <li><a href="#simplet_filter_free">simplet_filter_free</a></li>
+        <li><a href="#simplet_filter_set_query">simplet_filter_set_query</a></li>
+        <li><a href="#simplet_filter_get_query">simplet_filter_get_query</a></li>
+        <li><a href="#simplet_filter_add_style">simplet_filter_add_style</a></li>
+        <li><a href="#simplet_filter_add_style_directly">simplet_filter_add_style_directly</a></li>
+      </ul>
       <hr>
       <h4><a href="#styles">Styles</a> style.h</h4>
+      <ul>
+        <li><a href="#simplet_style_new">simplet_style_new</a></li>
+        <li><a href="#simplet_style_free">simplet_style_free</a></li>
+        <li><a href="#simplet_style_set_key">simplet_style_set_key</a></li>
+        <li><a href="#simplet_style_set_arg">simplet_style_set_arg</a></li>
+        <li><a href="#simplet_style_get_key">simplet_style_get_key</a></li>
+        <li><a href="#simplet_style_get_arg">simplet_style_get_arg</a></li>
+      </ul>
       <hr>
       <h4><a href="#license">License</a></h4>
     </div>
@@ -549,16 +538,46 @@ typedef enum {
         <dd>The size of the outline fo the text labels.</dd>
         <dt><tt>font</tt></dt>
         <dd>
-          A font description that <a href="http://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string">pango</a> can read to set labels in.
-          (ex. "Helvetica 12px")
+          A font description that <a href="http://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string">pango</a>
+          can read to set labels in (i.e. "Helvetica 12px").
         </dd>
         <dt><tt>letter-spacing</tt></dt>
         <dd>How far apart to space the letters in labels.</dd>
       </dl>
     </p>
 
-    <h2 id="demo">Demo</h2>
-    <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/512/845/11.png">
+    <h4 id="simplet_style_new"><code>simplet_style_t* simplet_style_new(const char *key, const char *arg)</code></h4>
+    <p>
+      Returns a new <tt>simplet_style_t</tt> or <tt>NULL</tt> on failure. <tt>key</tt>
+      and <tt>arg</tt> define the style according to the list of <a href="#styles">styles</a>.
+    </p>
+
+    <h4 id="simplet_style_free"><code>void simplet_style_free(simplet_style_t* style)</code></h4>
+    <p>
+      Frees the memory associated with the <tt>style</tt>.
+    </p>
+
+    <h4 id="simplet_style_set_key"><code>void simplet_style_set_key(simplet_style_t *style, char *key)</code></h4>
+    <p>
+      Makes a copy of <tt>key</tt> to store in the <tt>style</tt>.
+    </p>
+
+    <h4 id="simplet_style_set_arg"><code>void simplet_style_set_arg(simplet_style_t *style, char *arg)</code></h4>
+    <p>
+      Makes a copy of <tt>arg</tt> to store in the <tt>style</tt>.
+    </p>
+
+    <h4 id="simplet_style_get_key"><code>void simplet_style_get_key(simplet_style_t* style, char **key)</code></h4>
+    <p>
+      Allocates and stores a copy of the <tt>style</tt>'s key in <tt>key</tt>.
+      <tt>key</tt> should be freed when no longer needed.
+    </p>
+
+    <h4 id="simplet_style_get_arg"><code>void simplet_style_get_arg(simplet_style_t* style, char **arg)</code></h4>
+    <p>
+      Allocates and stores a copy of the <tt>style</tt>'s arg in <tt>arg</tt>.
+      <tt>arg</tt> should be freed when no longer needed.
+    </p>
 
     <h2 id="license">License</h2>
 <pre>
