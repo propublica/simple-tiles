@@ -179,6 +179,15 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_style_get_arg">simplet_style_get_arg</a></li>
       </ul>
       <hr>
+      <h4><a href="#license">User Data Interface</a></h4>
+      <ul>
+        <li><a href="#simplet_set_user_data">simplet_##type##_set_user_data</a></li>
+        <li><a href="#simplet_get_user_data">simplet_##type##_get_user_data</a></li>
+        <li><a href="#simplet_free_user_data">simplet_##type##_free_user_data</a></li>
+      </ul>
+      <hr>
+
+      <h4><a href="#demo">Demo</a></h4>
       <h4><a href="#license">License</a></h4>
     </div>
     <img src="docs/simple-tiles-logo.png">
@@ -577,6 +586,29 @@ typedef enum {
     <p>
       Allocates and stores a copy of the <tt>style</tt>'s arg in <tt>arg</tt>.
       <tt>arg</tt> should be freed when no longer needed.
+    </p>
+
+    <h2 id="user_data">User Data Interface</h2>
+    <p>
+      Each of the above structures implements an interface for storing user data.
+      This is useful for storing references in language bindings.
+    </p>
+
+    <h4 id="#simplet_set_user_data"><code>void simplet_##type##_set_user_data(simplet_##type##_t *obj, void *data)</code></h4>
+    <p>
+      Sets the user data on <tt>obj</tt>.
+    </p>
+
+    <h4 id="#simplet_get_user_data"><code>void * simplet_##type##_get_user_data(simplet_##type##_t *obj)</code></h4>
+    <p>
+      Returns the user data pointer associated with <tt>obj</tt>.
+    </p>
+
+    <h4 id="#simplet_free_user_data"><code>void simplet_##type##_free_user_data(simplet_##type##_t *obj, simplet_user_data_free free)</code></h4>
+    <p>
+      Accepts a function pointer <tt>free</tt>, type:
+      <tt>void (*simplet_user_data_free)(void *val)</tt>, that will free the
+      user data stored in the object, and frees the user data.
     </p>
 
     <h2 id="license">License</h2>

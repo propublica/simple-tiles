@@ -13,4 +13,5 @@ simplet_get_user_data(simplet_with_user_data_t *obj){
 void
 simplet_free_user_data(simplet_with_user_data_t *obj, simplet_user_data_free free_data){
   free_data(obj->user_data);
+  obj->user_data = NULL;
 }
