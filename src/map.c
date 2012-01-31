@@ -11,11 +11,16 @@
 #include "bounds.h"
 #include "text.h"
 
+// Output size of a slippy tile.
 #define SIMPLET_SLIPPY_SIZE 256
+
+// Size of the earth in mercator meters.
 #define SIMPLET_MERC_LENGTH 40075016.68
 
+// Add user\_data methods to <code>simplet\_map\_t</code>.
 SIMPLET_HAS_USER_DATA(map)
 
+// Create and return a new <code>simplet\_map\_t</code>.
 simplet_map_t*
 simplet_map_new(){
   simplet_init();
@@ -41,6 +46,7 @@ simplet_map_new(){
   return map;
 }
 
+// Free the memory associated with a <code>simplet\_map\_t</code>.
 void
 simplet_map_free(simplet_map_t *map){
   if(map->bounds)
@@ -60,10 +66,14 @@ simplet_map_free(simplet_map_t *map){
   free(map);
 }
 
+// Add error reporting to <code>simplet\_map\_t</code>. Macro defined in <b>error.h</b>
 SIMPLET_ERROR_FUNC(map_t)
 
+// Set the projection on the map.
 simplet_status_t
 simplet_map_set_srs(simplet_map_t *map, const char *proj){
+  // If this <code>map</code> has a projection and bounds already,
+  // it needs to reproject the bounds to the new srs.
   if(map->proj) {
     if(map->bounds) {
       simplet_bounds_t *tmp = map->bounds;
@@ -85,21 +95,26 @@ simplet_map_set_srs(simplet_map_t *map, const char *proj){
   return SIMPLET_OK;
 }
 
+// Set the overprinting buffer on the <code>map</code>.
 void
 simplet_map_set_buffer(simplet_map_t *map, double buffer){
   map->buffer = buffer;
 }
 
+// Return the current overprinting buffer on the <code>map</code>.
 double
 simplet_map_get_buffer(simplet_map_t *map){
   return map->buffer;
 }
 
+// Store the proj4 string representation of the <code>map</code> in <code>srs</code>
 void
 simplet_map_get_srs(simplet_map_t *map, char **srs){
   OSRExportToProj4(map->proj, srs);
 }
 
+// Initialize the transformation matrix for transforming data source coordinates
+// into cairo coordinates.
 void
 simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
   cairo_matrix_init(mat, 1, 0, 0, -1, 0, 0);
@@ -108,6 +123,7 @@ simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
   cairo_matrix_translate(mat, -map->bounds->nw.x, -map->bounds->se.y);
 }
 
+// Set the <code>width</code> and <code>height</code> of the map.
 simplet_status_t
 simplet_map_set_size(simplet_map_t *map, int width, int height){
   map->height = height;
@@ -115,6 +131,7 @@ simplet_map_set_size(simplet_map_t *map, int width, int height){
   return SIMPLET_OK;
 }
 
+// Set the background color of the map to a copy of <code>str</code>.
 simplet_status_t
 simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
   free(map->bgcolor);
@@ -123,11 +140,13 @@ simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
   return set_error(map, SIMPLET_OOM, "couldn't copy bgcolor");
 }
 
+// Return a copy of the <code>map</code>'s background color.
 void
 simplet_map_get_bgcolor(simplet_map_t *map, char **str){
   *str = simplet_copy_string(map->bgcolor);
 }
 
+// Set the bounds of the map.
 simplet_status_t
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny){
   if(map->bounds)
@@ -141,6 +160,8 @@ simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx
   return SIMPLET_OK;
 }
 
+// Sets the bounds and correct size for a map tile, uses
+// [tile coordinates](http://code.google.com/apis/maps/documentation/javascript/maptypes.html#CustomMapTypes)
 simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
@@ -162,6 +183,7 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
   return SIMPLET_OK;
 }
 
+// Add a new child layer to the <code>map</code>
 simplet_layer_t*
 simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   simplet_layer_t *layer;
@@ -179,51 +201,64 @@ simplet_map_add_layer(simplet_map_t *map, const char *datastring){
   return layer;
 }
 
+// Add a previously initialized layer to the <code>map</code>.
 simplet_layer_t*
 simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer){
   if(!simplet_list_push(map->layers, layer)) return NULL;
   return layer;
 }
 
-
+// Check the error status of the <code>map</code>.
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
   return map->error.status;
 }
 
+// Return a human readable reference to the error message stored on the <code>map</code>.
 const char*
 simplet_map_status_to_string(simplet_map_t *map){
   return (const char*) map->error.msg;
 }
 
+// Check if the map is valid for rendering
 simplet_status_t
 simplet_map_is_valid(simplet_map_t *map){
+  // Does it have a previously set error.
   if(!map->error.status == SIMPLET_OK)
     return SIMPLET_ERR;
 
+  // Does it have a bounds?
   if(!map->bounds)
     return SIMPLET_ERR;
 
+  // Does it have a projection?
   if(!map->proj)
     return SIMPLET_ERR;
 
+  // Does it have a height?
   if(!map->height)
     return SIMPLET_ERR;
 
+  // ...and width?
   if(!map->width)
     return SIMPLET_ERR;
 
+  // Does it have at least one layer?
   if(!simplet_list_head(map->layers))
     return SIMPLET_ERR;
 
+  // Then we are good to go.
   return SIMPLET_OK;
 }
 
+// Build a rendering context to draw the map on.
 static cairo_surface_t *
 build_surface(simplet_map_t *map){
+  // Check if the map is valid.
   if(simplet_map_is_valid(map) == SIMPLET_ERR)
     return NULL;
 
+  // Create a cairo surface to draw on.
   cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
       map->width, map->height);
 
@@ -232,6 +267,7 @@ build_surface(simplet_map_t *map){
 
   cairo_t *ctx = cairo_create(surface);
 
+  // Paint the background color.
   if(map->bgcolor) simplet_style_paint(ctx, map->bgcolor);
 
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
@@ -239,11 +275,14 @@ build_surface(simplet_map_t *map){
   simplet_status_t err;
 
   cairo_t *litho_ctx = cairo_create(surface);
+
+  // Set up a map-wide text structure.
   simplet_lithograph_t *litho = simplet_lithograph_new(litho_ctx);
 
-  // defaults
+  // Set a sensible default.
   simplet_style_line_join(litho_ctx, "round");
 
+  // Iterate through and draw all the layers on the cairo context.
   while((layer = simplet_list_next(iter))){
     err = simplet_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
@@ -259,11 +298,13 @@ build_surface(simplet_map_t *map){
   return surface;
 }
 
+// Free the surface we've created.
 static void
 close_surface(cairo_surface_t *surface){
   cairo_surface_destroy(surface);
 }
 
+// Render the <code>map</code> and emit a stream of chunks to <code>closure</code>
 void
 simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
@@ -276,6 +317,7 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   close_surface(surface);
 }
 
+// Render the <code>map</code> to a file on disk.
 void
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
   cairo_surface_t *surface;

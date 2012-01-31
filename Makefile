@@ -14,12 +14,6 @@ clean:
 lint:
 	CC=scan-build $(MAKE)
 
-docco:
-	perl tools/rename.pl 's/\.h/_h.h/' src/*.h
-	docco src/*.h src/*.c
-	perl tools/rename.pl 's/_h.h/.h/' src/*.h
-
-
 publish:
 	git checkout gh-pages
 	git merge master

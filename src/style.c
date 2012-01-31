@@ -5,14 +5,36 @@
 #include "style.h"
 #include "util.h"
 
+// Small structure to track callbacks by key.
 typedef struct simplet_styledef_t {
   const char *key;
   void (*call)(void *ct, const char *arg);
 } simplet_styledef_t;
 
+// List of defined styles.
+simplet_styledef_t styleTable[] = {
+  { "fill",                fill                    },
+  { "stroke",              stroke                  },
+  { "weight",              weight                  },
+  { "line-cap",            line_cap                },
+  { "color",               fill                    },
+  { "text-outline-color",  stroke                  },
+  { "text-outline-weight", weight                  },
+  { "letter-spacing",      letter_spacing          },
+  { "paint",               simplet_style_paint     }, //used by map
+  { "line-join",           simplet_style_line_join }  //used by map
+  /* radius and seamless are special styles */
+};
+const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
+
+// Set up user data functions on <code>simplet_style_t</code>.
 SIMPLET_HAS_USER_DATA(style)
 
+// Style Callbacks
+// ===============
 
+// Set the current drawing color for the <code>ctx</code>. Accepts either
+// #xxxxxx or #xxxxxxaa formatted colors.
 static void
 set_color(void *ct, const char *arg){
   cairo_t *ctx = ct;
@@ -31,6 +53,7 @@ set_color(void *ct, const char *arg){
   }
 }
 
+// Set the line join on the <code>ct</code>.
 void
 simplet_style_line_join(void *ct, const char *arg){
   cairo_t *ctx = ct;
@@ -42,6 +65,7 @@ simplet_style_line_join(void *ct, const char *arg){
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_BEVEL);
 }
 
+// Set the ending line cap on the <code>ct</code>.
 static void
 line_cap(void *ct, const char *arg){
   cairo_t *ctx = ct;
@@ -53,6 +77,7 @@ line_cap(void *ct, const char *arg){
     cairo_set_line_cap(ctx, CAIRO_LINE_CAP_SQUARE);
 }
 
+// Paint an overlay color on the <code>ct</code>.
 void
 simplet_style_paint(void *ct, const char *arg){
   cairo_t *ctx = ct;
@@ -60,6 +85,7 @@ simplet_style_paint(void *ct, const char *arg){
   cairo_paint(ctx);
 }
 
+// Fill the current path in <code>ct</code>.
 static void
 fill(void *ct, const char *arg){
   cairo_t *ctx = ct;
@@ -67,6 +93,7 @@ fill(void *ct, const char *arg){
   cairo_fill_preserve(ctx);
 }
 
+// Draw the current path in <code>ct</code> with color <code>arg</codee>
 static void
 stroke(void *ct, const char *arg){
   cairo_t *ctx = ct;
@@ -101,21 +128,7 @@ letter_spacing(void *ct, const char *arg){
   pango_attr_list_unref(attrs);
 }
 
-simplet_styledef_t styleTable[] = {
-  { "fill",                fill                    },
-  { "stroke",              stroke                  },
-  { "weight",              weight                  },
-  { "line-cap",            line_cap                },
-  { "color",               fill                    },
-  { "text-outline-color",  stroke                  },
-  { "text-outline-weight", weight                  },
-  { "letter-spacing",      letter_spacing          },
-  { "paint",               simplet_style_paint     }, //used by map
-  { "line-join",           simplet_style_line_join }  //used by map
-  /* radius and seamless are special styles */
-};
 
-const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);
 
 simplet_style_t*
 simplet_style_new(const char *key, const char *arg){
