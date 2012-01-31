@@ -110,8 +110,20 @@ documentation layout inspired by backbone and underscore, obvs
 
       #sidebar h4 { margin: 0.7em 0;}
 
-      /* lion-roar scrolling */
+      #map {
+        width: 768px;
+        height:1%;
+        overflow:auto;
+      }
 
+      #map img {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        float: left;
+        width: 256px;
+        height: 256px;
+      }
 
       :target code {
         background-color: #d8f7ee;
@@ -179,7 +191,7 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_style_get_arg">simplet_style_get_arg</a></li>
       </ul>
       <hr>
-      <h4><a href="#license">User Data Interface</a></h4>
+      <h4><a href="#user_data">User Data Interface</a></h4>
       <ul>
         <li><a href="#simplet_set_user_data">simplet_##type##_set_user_data</a></li>
         <li><a href="#simplet_get_user_data">simplet_##type##_get_user_data</a></li>
@@ -594,22 +606,39 @@ typedef enum {
       This is useful for storing references in language bindings.
     </p>
 
-    <h4 id="#simplet_set_user_data"><code>void simplet_##type##_set_user_data(simplet_##type##_t *obj, void *data)</code></h4>
+    <h4 id="simplet_set_user_data"><code>void simplet_##type##_set_user_data(simplet_##type##_t *obj, void *data)</code></h4>
     <p>
       Sets the user data on <tt>obj</tt>.
     </p>
 
-    <h4 id="#simplet_get_user_data"><code>void * simplet_##type##_get_user_data(simplet_##type##_t *obj)</code></h4>
+    <h4 id="simplet_get_user_data"><code>void * simplet_##type##_get_user_data(simplet_##type##_t *obj)</code></h4>
     <p>
       Returns the user data pointer associated with <tt>obj</tt>.
     </p>
 
-    <h4 id="#simplet_free_user_data"><code>void simplet_##type##_free_user_data(simplet_##type##_t *obj, simplet_user_data_free free)</code></h4>
+    <h4 id="simplet_free_user_data"><code>void simplet_##type##_free_user_data(simplet_##type##_t *obj, simplet_user_data_free free)</code></h4>
     <p>
       Accepts a function pointer <tt>free</tt>, type:
       <tt>void (*simplet_user_data_free)(void *val)</tt>, that will free the
       user data stored in the object, and frees the user data.
     </p>
+    <h2 id="demo">Demo</h2>
+    <p>
+      Here is a small demo of the area surrounding New Orleans built with
+      <a href="http://www.census.gov/geo/www/tiger/">Tiger/Line</a> data from
+      the U.S. Census.
+    </p>
+
+    <div id="map">
+      <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/1023/1689/12.png">
+      <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/1024/1689/12.png">
+      <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/1025/1689/12.png">
+      <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/1023/1690/12.png">
+      <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/1024/1690/12.png">
+      <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/1025/1690/12.png">
+    </div>
+
+
 
     <h2 id="license">License</h2>
 <pre>
