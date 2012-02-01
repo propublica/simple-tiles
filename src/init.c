@@ -16,6 +16,7 @@ cleanup(){
 void
 simplet_init(){
   if(initialized) return;
+  simplet_error_init();
   OGRRegisterAll();
   atexit(cleanup);
   initialized = 1;
