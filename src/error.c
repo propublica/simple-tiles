@@ -1,9 +1,11 @@
 #include <cpl_error.h>
 #include "error.h"
 
+
+// The OGR handler to silence ogr errors
 static void
 ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
-  (void)eclass, (void)err_no, (void)msg; // silence ogr errors
+  (void)eclass, (void)err_no, (void)msg;
 }
 
 void

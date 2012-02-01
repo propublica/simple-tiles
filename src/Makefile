@@ -23,7 +23,6 @@ LDLIBS = -lm $(shell pkg-config --libs pangocairo) \
 OBJ = list.o bounds.o style.o map.o util.o filter.o layer.o error.o init.o text.o user_data.o
 PKG_CF = simple-tiles.pc
 
-
 all: $(OBJ)
 
 $(DYLIBNAME): $(OBJ)

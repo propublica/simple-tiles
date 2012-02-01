@@ -4,6 +4,7 @@
 #include "bounds.h"
 #include <math.h>
 
+// A storage structure that holds the current state of the layout.
 typedef struct {
   PangoLayout *layout;
   double x;
@@ -12,6 +13,7 @@ typedef struct {
   simplet_bounds_t *bounds;
 } placement_t;
 
+// Create and return a new lithograph, returns NULL on failure.
 simplet_lithograph_t *
 simplet_lithograph_new(cairo_t *ctx){
   simplet_lithograph_t *litho;
@@ -32,6 +34,7 @@ simplet_lithograph_new(cairo_t *ctx){
   return litho;
 }
 
+// Free a placement.
 void
 placement_vfree(void *placement){
   placement_t *plc = placement;
@@ -40,6 +43,7 @@ placement_vfree(void *placement){
   free(plc);
 }
 
+// Free a lithograph and unref the stored ctx.
 void
 simplet_lithograph_free(simplet_lithograph_t *litho){
   cairo_destroy(litho->ctx);
@@ -49,6 +53,7 @@ simplet_lithograph_free(simplet_lithograph_t *litho){
   free(litho);
 }
 
+// Create and return a new placement.
 placement_t *
 placement_new(PangoLayout *layout, simplet_bounds_t *bounds){
   placement_t *placement;
@@ -63,16 +68,21 @@ placement_new(PangoLayout *layout, simplet_bounds_t *bounds){
   return placement;
 }
 
+// Before placing a new label we need to see if the label overlaps over
+// previously placed labels. This algorithm will be refactored a bit to try
+// NE SE SW NW placements in the future.
 void
-try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double y){
+try_and_insert_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double y){
   int width, height;
+  // Find the computed width and height of a layout in image pixels
   pango_layout_get_pixel_size(layout, &width, &height);
   simplet_bounds_t *bounds = simplet_bounds_new();
   if(!bounds) return;
-
+  // Create a bounds to test for intersection
   simplet_bounds_extend(bounds, floor(x - width / 2), floor(y - height / 2));
   simplet_bounds_extend(bounds, floor(x + width / 2), floor(y + height / 2));
 
+  // Iterate through the list of already placed labels and check for overlaps.
   simplet_listiter_t *iter = simplet_get_list_iter(litho->placements);
   placement_t *placement;
   while((placement = (placement_t *) simplet_list_next(iter))){
@@ -84,7 +94,7 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
     }
   }
 
-  // if we get here we can create and insert a new placement;
+  // If we get here we can create and insert a new placement.
   placement_t *plc = placement_new(layout, bounds);
   if(!plc) {
     simplet_bounds_free(bounds);
@@ -96,7 +106,7 @@ try_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double
 }
 
 
-
+// Apply the labels to the map.
 void
 simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
   simplet_listiter_t *iter = simplet_get_list_iter(litho->placements);
@@ -105,13 +115,17 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
   while((placement = (placement_t *) simplet_list_next(iter))){
     if(placement->placed) continue;
     cairo_move_to(litho->ctx, placement->bounds->nw.x, placement->bounds->se.y);
+    // Draw the placement
     pango_cairo_layout_path(litho->ctx, placement->layout);
     placement->placed = 1;
   }
+  // Apply and draw various outline options.
   simplet_apply_styles(litho->ctx, styles, "text-outline-weight", "text-outline-color", "color",  NULL);
   cairo_restore(litho->ctx);
 }
 
+// Create and add a placement to the current lithograph if it doesn't overlap
+// with current labels.
 void
 simplet_lithograph_add_placement(simplet_lithograph_t *litho,
   OGRFeatureH feature, simplet_list_t *styles, cairo_t *proj_ctx) {
@@ -125,7 +139,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
   int idx = OGR_FD_GetFieldIndex(defn, (const char*) field->arg);
   if(idx < 0) return;
 
-
+  // Find the largest sub geometry of a particular multi-geometry.
   OGRGeometryH super = OGR_F_GetGeometryRef(feature);
   OGRGeometryH geom = super;
   double area = 0.0;
@@ -146,6 +160,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
       ;
   }
 
+  // Find the center of our geometry.
   OGRGeometryH center;
   if(!(center = OGR_G_CreateGeometry(wkbPoint))) return;
   if(OGR_G_Centroid(geom, center) == OGRERR_FAILURE) {
@@ -153,23 +168,24 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
     return;
   }
 
-  // turn hinting off
+  // Turn font hinting off
   cairo_font_options_t *opts;
   if(!(opts = cairo_font_options_create())){
     OGR_G_DestroyGeometry(center);
     return;
   }
-
   cairo_font_options_set_hint_style(opts, CAIRO_HINT_STYLE_NONE);
   cairo_font_options_set_hint_metrics(opts, CAIRO_HINT_METRICS_OFF);
   pango_cairo_context_set_font_options(litho->pango_ctx, opts);
   cairo_font_options_destroy(opts);
 
+  // Get the field containing the text for the label.
   char *txt = simplet_copy_string(OGR_F_GetFieldAsString(feature, idx));
   PangoLayout *layout = pango_layout_new(litho->pango_ctx);
   pango_layout_set_text(layout, txt, -1);
   free(txt);
 
+  // Grab the font to use and apply tracking.
   simplet_style_t *font = simplet_lookup_style(styles, "font");
   simplet_apply_styles(layout, styles, "letter-spacing", NULL);
 
@@ -186,6 +202,8 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
 
   double x = OGR_G_GetX(center, 0), y = OGR_G_GetY(center, 0);
   cairo_user_to_device(proj_ctx, &x, &y);
-  try_placement(litho, layout, x, y);
+
+  // Finally try the placement and test for overlaps.
+  try_and_insert_placement(litho, layout, x, y);
   OGR_G_DestroyGeometry(center);
 }

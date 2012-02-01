@@ -7,7 +7,7 @@ static int initialized = 0;
 static void
 cleanup(){
 	for(int i = 0; i < OGRGetOpenDSCount(); i++)
-    while(OGR_DS_GetRefCount(OGRGetOpenDS(i))) //ughh
+    while(OGRGetOpenDS(i) && OGR_DS_GetRefCount(OGRGetOpenDS(i))) //ughh
       OGRReleaseDataSource(OGRGetOpenDS(i));
   assert(!OGRGetOpenDSCount());
   OGRCleanupAll();
@@ -16,8 +16,8 @@ cleanup(){
 void
 simplet_init(){
   if(initialized) return;
-  OGRRegisterAll();
   simplet_error_init();
+  OGRRegisterAll();
   atexit(cleanup);
   initialized = 1;
 };
