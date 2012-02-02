@@ -16,9 +16,6 @@ typedef struct simplet_styledef_t {
 // Set up user data functions on simplet_style_t.
 SIMPLET_HAS_USER_DATA(style)
 
-// Style Callbacks
-// ===============
-
 // Set the current drawing color for the ctx. Accepts either
 // #xxxxxx or #xxxxxxaa formatted colors.
 static void

@@ -160,7 +160,8 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
       ;
   }
 
-  // Find the center of our geometry.
+  // Find the center of our geometry. This sometimes throws an invalid geometry
+  // error, so there is a slight bug here somehow.
   OGRGeometryH center;
   if(!(center = OGR_G_CreateGeometry(wkbPoint))) return;
   if(OGR_G_Centroid(geom, center) == OGRERR_FAILURE) {

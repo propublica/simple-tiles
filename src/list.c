@@ -1,6 +1,7 @@
 #include "list.h"
 #include <stdlib.h>
 
+// Create a new list, returns NULL on failure.
 simplet_list_t*
 simplet_list_new(){
   simplet_list_t* list;
@@ -12,6 +13,7 @@ simplet_list_new(){
   return list;
 }
 
+// Push a void pointer on the the end of the list.
 void*
 simplet_list_push(simplet_list_t *list, void* val){
   simplet_node_t *node;
@@ -34,21 +36,25 @@ simplet_list_push(simplet_list_t *list, void* val){
   return val;
 }
 
+// Get the length of the list.
 int
 simplet_list_get_length(simplet_list_t *list){
   return list->length;
 }
 
+// Get the last element on the list.
 void*
 simplet_list_tail(simplet_list_t *list){
   return list->tail->user_data;
 }
 
+// Get the first element of the list.
 void*
 simplet_list_head(simplet_list_t *list){
   return list->head->user_data;
 }
 
+// Remove and return the last element of the list.
 void*
 simplet_list_pop(simplet_list_t *list){
   if(!list->tail)
@@ -69,6 +75,7 @@ simplet_list_pop(simplet_list_t *list){
   return val;
 }
 
+// Get an element at idx.
 void*
 simplet_list_get(simplet_list_t* list, unsigned int idx){
   if(idx > list->length) return NULL;
@@ -79,6 +86,8 @@ simplet_list_get(simplet_list_t* list, unsigned int idx){
   return NULL;
 }
 
+// Free a list and call the previously set free function for eaxh element in the
+// list.
 void
 simplet_list_free(simplet_list_t *list){
   void* val;
@@ -87,16 +96,20 @@ simplet_list_free(simplet_list_t *list){
   free(list);
 }
 
+// Set the free function for a list.
 void
 simplet_list_set_item_free(simplet_list_t *list, simplet_user_data_free destroy){
   list->free = destroy;
 }
 
+// Free a list iterator.
 void
 simplet_list_iter_free(simplet_listiter_t* iter){
   free(iter);
 }
 
+// Return a list iterator. TODO: this doesn't really need to be on the heap,
+// we should switch to stack allocation perhaps?
 simplet_listiter_t*
 simplet_get_list_iter(simplet_list_t *list){
   simplet_listiter_t* iter;
@@ -106,6 +119,7 @@ simplet_get_list_iter(simplet_list_t *list){
   return iter;
 }
 
+// Return the next value of the list via the list iterator.
 void*
 simplet_list_next(simplet_listiter_t* iter){
   if(!iter) return NULL;

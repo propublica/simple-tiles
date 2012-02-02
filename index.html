@@ -161,6 +161,11 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_map_get_buffer">simplet_map_get_buffer</a></li>
       </ul>
       <hr>
+      <h4><a href="#bounds">Bounds</a> bounds.h</h4>
+      <ul>
+
+      </ul>
+      <hr>
       <h4><a href="#layers">Layers</a> layer.h</h4>
       <ul>
         <li><a href="#simplet_layer_new">simplet_layer_new</a></li>
@@ -449,6 +454,19 @@ typedef enum {
       Returns the <tt>map</tt>'s buffer.
     </p>
 
+    <h2 id="bounds">Bounds</h2>
+    <p>
+      Bounds store the boundary of map data. Mostly the <tt>simplet_map_t</tt>
+      functions handle the bounds, but <tt>simplet_bounds_to_wkt</tt>  is useful
+      to limit queries in postgresql.
+    </p>
+
+    <h4 id="simplet_bounds_new"><code></code></h4>
+    <p>
+      Creat a new <tt>simplet_bounds_t</tt>, returns <tt>NULL</tt> on failure.
+    </p>
+
+
     <h2 id="layers">Layers</h2>
     <p>
       Each layer maps to a OGR datasource, and contains a list of filters to
@@ -457,7 +475,7 @@ typedef enum {
 
     <h4 id="simplet_layer_new"><code>simplet_layer_t* simplet_layer_new(const char *datastring)</code></h4>
     <p>
-      Create a new <tt>simplet_layer_t</tt> returns <tt>NULL</tt> on failure.
+      Create a new <tt>simplet_layer_t</tt>, returns <tt>NULL</tt> on failure.
     </p>
 
     <h4 id="simplet_layer_free"><code>void simplet_layer_free(simplet_layer_t *layer)</code></h4>
@@ -563,6 +581,8 @@ typedef enum {
         </dd>
         <dt><tt>letter-spacing</tt></dt>
         <dd>How far apart to space the letters in labels.</dd>
+        <dt><tt>radius</tt></dt>
+        <dd>For point rendering only, the radius in pixels of the circle.</dd>
       </dl>
     </p>
 
@@ -601,7 +621,8 @@ typedef enum {
 
     <h2 id="user_data">User Data Interface</h2>
     <p>
-      Each of the above structures implements an interface for storing user data.
+      <tt>simplet_map_t</tt>, <tt>simplet_layer_t</tt>, <tt>simplet_filter_t</tt> and
+      <tt>simplet_style_t</tt> each implement an interface for storing user data.
       This is useful for storing references in language bindings.
     </p>
 
