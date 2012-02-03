@@ -163,7 +163,10 @@ documentation layout inspired by backbone and underscore, obvs
       <hr>
       <h4><a href="#bounds">Bounds</a> bounds.h</h4>
       <ul>
-
+        <li><a href="#simplet_bounds_new">simplet_layer_new</a></li>
+        <li><a href="#simplet_bounds_free">simplet_bounds_free</a></li>
+        <li><a href="#simplet_bounds_extend">simplet_bounds_extend</a></li>
+        <li><a href="#simplet_bounds_to_wkt">simplet_bounds_to_wkt</a></li>
       </ul>
       <hr>
       <h4><a href="#layers">Layers</a> layer.h</h4>
@@ -461,11 +464,26 @@ typedef enum {
       to limit queries in postgresql.
     </p>
 
-    <h4 id="simplet_bounds_new"><code></code></h4>
+    <h4 id="simplet_bounds_new"><code>simplet_bounds_t* simplet_bounds_new()</code></h4>
     <p>
-      Creat a new <tt>simplet_bounds_t</tt>, returns <tt>NULL</tt> on failure.
+      Create a new <tt>simplet_bounds_t</tt>, returns <tt>NULL</tt> on failure.
     </p>
 
+    <h4 id="simplet_bounds_free"><code>void simplet_bounds_free(simplet_bounds_t *bounds)</code></h4>
+    <p>
+      Free the <tt>bounds</tt>.
+    </p>
+
+    <h4 id="simplet_bounds_extend"><code>void simplet_bounds_extend(simplet_bounds_t *bounds, double x, double y)</code></h4>
+    <p>
+      Extend the <tt>bounds</tt> to include the point <tt>x</tt>, <tt>y</tt>.
+    </p>
+
+    <h4 id="simplet_bounds_to_wkt"><code>simplet_status_t simplet_bounds_to_wkt(simplet_bounds_t *bounds, char **wkt)</code></h4>
+    <p>
+      Store a Well Known Text representation of the bounds in the string pointing to <tt>wkt</tt>.
+      Returns <tt>SIMPLET_ERROR</tt> on failure.
+    </p>
 
     <h2 id="layers">Layers</h2>
     <p>
