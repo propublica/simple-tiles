@@ -14,3 +14,8 @@
 |-     /                ⌂⌂⌂ ⌂⌂|
 | ~~~ /                 ⌂⌂ ⌂⌂⌂|
 +-----------------------------+
+
+Simple Tiles is a library for generating images from geo spatial data sources.
+
+Documentation: http://propublica.github.com/simple-tiles/
+Issues or questions: https://github.com/propublica/simple-tiles/issues
