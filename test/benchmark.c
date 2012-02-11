@@ -114,8 +114,8 @@ bench_text(void *ctx){
   simplet_filter_add_style(filter, "text-field", "ABBREV");
   simplet_filter_add_style(filter, "font", "Futura Medium 8");
   simplet_filter_add_style(filter, "color", "#226688");
-  simplet_filter_add_style(filter, "text-halo-color", "#ffffff88");
-  simplet_filter_add_style(filter, "text-halo-weight", "1");
+  simplet_filter_add_style(filter, "text-stroke-color", "#ffffff88");
+  simplet_filter_add_style(filter, "text-stroke-weight", "1");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));

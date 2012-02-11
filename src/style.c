@@ -124,7 +124,7 @@ simplet_styledef_t styleTable[] = {
   { "line-cap",            line_cap                },
   { "color",               fill                    },
   { "text-stroke-color",   stroke                  },
-  { "text-stroke-width",   weight                  },
+  { "text-stroke-weight",   weight                  },
   { "letter-spacing",      letter_spacing          },
   { "paint",               simplet_style_paint     }, //used by map
   { "line-join",           simplet_style_line_join }  //used by map
