@@ -120,7 +120,7 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
     placement->placed = 1;
   }
   // Apply and draw various outline options.
-  simplet_apply_styles(litho->ctx, styles, "text-outline-weight", "text-outline-color", "color",  NULL);
+  simplet_apply_styles(litho->ctx, styles, "text-stroke-weight", "text-stroke-color", "color",  NULL);
   cairo_restore(litho->ctx);
 }
 
