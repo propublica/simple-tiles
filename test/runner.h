@@ -3,6 +3,7 @@
 
 #include "test.h"
 
+// an entry in our task runner
 #define TASK_ENTRY(name) \
   { &run_task_##name, #name },
 

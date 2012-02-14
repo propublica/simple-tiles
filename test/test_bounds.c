@@ -40,4 +40,5 @@ test_buffer(){
 
 TASK(bounds){
   test(intersects);
+  test(buffer);
 }
