@@ -8,7 +8,7 @@ else
 	DEFINES = -D_BSD_SOURCE -D_GNU_SOURCE
 	CC = libtool --mode=compile gcc
 	DYLIBNAME?=libsimple-tiles.la
-	DYLIB_MAKE?=libtool --mode=link gcc -rpath /usr/local/lib -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) $(OBJ:.o=.lo)
+	DYLIB_MAKE?=libtool --mode=link gcc -rpath /usr/local/lib -o $(DYLIBNAME) $(LDLIBS) $(DEBUG) $(OBJ:.o=.lo)
 	INSTALL?=libtool --mode=install install -c
 	AFTER = ldconfig
 endif
