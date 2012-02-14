@@ -1,8 +1,8 @@
 ifeq ($(shell uname -s),Darwin)
-  DYLIBNAME?=libsimple-tiles.dylib
-  DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDLIBS) $(DEBUG) - $(OBJ)
-  STLIBNAME?=libsimple-tiles.a
-  STLIB_MAKE?=libtool -static -o $(STLIBNAME) - $(OBJ)
+	DYLIBNAME?=libsimple-tiles.dylib
+	DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDLIBS) $(DEBUG) - $(OBJ)
+	STLIBNAME?=libsimple-tiles.a
+	STLIB_MAKE?=libtool -static -o $(STLIBNAME) - $(OBJ)
 	INSTALL?=cp -a
 else
 	DEFINES = -D_BSD_SOURCE -D_GNU_SOURCE

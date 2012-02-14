@@ -26,13 +26,13 @@ data:
 
 run_tests: data runner
 	./runner
+	python test-ctypes.py # test to see if ctypes works for bindings
 
 run_benchmark: data benchmark
 	./benchmark
 
 run_api: api
 	time ./api
-
 
 GLIB_OPTS = G_SLICE=always-malloc G_DEBUG=gc-friendly
 MEM_OPTS = --leak-resolution=high --leak-check=full --suppressions=./suppressions.txt
