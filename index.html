@@ -548,16 +548,16 @@ typedef enum {
       to a <tt>layer</tt> you shouldn't use this function.
     </p>
 
-    <h4 id="simplet_query_set_query"><code>simplet_status_t simplet_query_set_query(simplet_query_t *query, const char *query)</code></h4>
+    <h4 id="simplet_query_set"><code>simplet_status_t simplet_query_set(simplet_query_t *query, const char *sql)</code></h4>
     <p>
-      Sets the query on <tt>query</tt>. <tt>query</tt> should be
+      Sets the sql on <tt>query</tt>. <tt>sql</tt> should be
       <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>.
     </p>
 
-    <h4 id="simplet_query_get_query"><code>simplet_status_t simplet_query_get_query(simplet_query_t *query, char **query)</code></h4>
+    <h4 id="simplet_query_get"><code>simplet_status_t simplet_query_get(simplet_query_t *query, char **sql)</code></h4>
     <p>
-      Stores a copy of the <tt>query</tt>'s query attribute in <tt>query</tt>, and allocates
-      space for the copy. <tt>query</tt> should be freed when no longer needed.
+      Stores a copy of the <tt>query</tt>'s sql attribute in <tt>sql</tt>, and allocates
+      space for the copy. <tt>sql</tt> should be freed when no longer needed.
     </p>
 
     <h4 id="simplet_query_add_style"><code>simplet_style_t* simplet_query_add_style(simplet_query_t *query, const char *key, const char *arg)</code></h4>
