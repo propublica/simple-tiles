@@ -23,10 +23,10 @@ simplet_query_t*
 simplet_query_new(const char *sqlquery);
 
 simplet_status_t
-simplet_query_set_query(simplet_query_t *query, const char *query);
+simplet_query_set(simplet_query_t *query, const char *sql);
 
 simplet_status_t
-simplet_query_get_query(simplet_query_t *query, char **query);
+simplet_query_get(simplet_query_t *query, char **sql);
 
 simplet_style_t*
 simplet_query_add_style(simplet_query_t *query, const char *key, const char *arg);

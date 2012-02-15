@@ -52,21 +52,21 @@ simplet_query_free(simplet_query_t *query){
 // Add an error function.
 SIMPLET_ERROR_FUNC(query_t)
 
-// Set the OGR SQL query on this query.
+// Set the OGR SQL on this query.
 simplet_status_t
-simplet_query_set_query(simplet_query_t *query, const char* query){
-  free(query->ogrsql);
-  if(!(query->ogrsql = simplet_copy_string(query)))
-    return set_error(query, SIMPLET_OOM, "Out of memory setting query query");
+simplet_query_set(simplet_query_t *query, const char *sql){
+  if(query->ogrsql) free(query->ogrsql);
+  if(!(query->ogrsql = simplet_copy_string(sql)))
+    return set_error(query, SIMPLET_OOM, "Out of memory setting query sql");
   return SIMPLET_OK;
 }
 
-// Set query to a copy of the current query defined on query.
+// Get current sql defined on query.
 simplet_status_t
-simplet_query_get_query(simplet_query_t *query, char** query){
-  if(!(*query = simplet_copy_string(query->ogrsql))){
-    query = NULL;
-    return set_error(query, SIMPLET_OOM, "Out of memory copying query");
+simplet_query_get(simplet_query_t *query, char **sql){
+  if(!(*sql = simplet_copy_string(query->ogrsql))){
+    sql = NULL;
+    return set_error(query, SIMPLET_OOM, "Out of memory copying sql");
   }
   return SIMPLET_OK;
 }
