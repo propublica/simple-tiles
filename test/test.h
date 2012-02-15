@@ -16,7 +16,7 @@
 
 TASK(list);
 TASK(layer);
-TASK(filter);
+TASK(query);
 TASK(style);
 TASK(map);
 TASK(integration);

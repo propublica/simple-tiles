@@ -1,5 +1,5 @@
 #include "layer.h"
-#include "filter.h"
+#include "query.h"
 #include "util.h"
 #include "error.h"
 #include <cpl_error.h>
@@ -19,7 +19,7 @@ simplet_layer_new(const char *datastring){
   layer->source = simplet_copy_string(datastring);
   layer->error.status = SIMPLET_OK;
 
-  if(!(layer->filters = simplet_list_new())){
+  if(!(layer->queries = simplet_list_new())){
     free(layer);
     return NULL;
   }
@@ -39,32 +39,32 @@ simplet_layer_vfree(void *layer){
 // Free a layer object, and associated layers.
 void
 simplet_layer_free(simplet_layer_t *layer){
-  simplet_list_set_item_free(layer->filters, simplet_filter_vfree);
-  simplet_list_free(layer->filters);
+  simplet_list_set_item_free(layer->queries, simplet_query_vfree);
+  simplet_list_free(layer->queries);
   free(layer->source);
   free(layer);
 }
 
-// Creat and append a filter to the layer's filters.
-simplet_filter_t*
-simplet_layer_add_filter(simplet_layer_t *layer, const char *ogrsql){
-  simplet_filter_t* filter;
-  if(!(filter = simplet_filter_new(ogrsql)))
+// Creat and append a query to the layer's queries.
+simplet_query_t*
+simplet_layer_add_query(simplet_layer_t *layer, const char *ogrsql){
+  simplet_query_t* query;
+  if(!(query = simplet_query_new(ogrsql)))
     return NULL;
 
-  if(!simplet_list_push(layer->filters, filter)){
-    simplet_filter_free(filter);
+  if(!simplet_list_push(layer->queries, query)){
+    simplet_query_free(query);
     return NULL;
   }
 
-  return filter;
+  return query;
 }
 
-// Add a previously initialized filter to the layer.
-simplet_filter_t*
-simplet_layer_add_filter_directly(simplet_layer_t *layer, simplet_filter_t *filter){
-  if(!simplet_list_push(layer->filters, filter)) return NULL;
-  return filter;
+// Add a previously initialized query to the layer.
+simplet_query_t*
+simplet_layer_add_query_directly(simplet_layer_t *layer, simplet_query_t *query){
+  if(!simplet_list_push(layer->queries, query)) return NULL;
+  return query;
 }
 
 // Process a layer and add labels.
@@ -77,16 +77,16 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithog
   // Retain the datasource because we want to cache open connections to a
   // data source like postgres.
   if(OGR_DS_GetRefCount(source) == 1) OGR_DS_Reference(source);
-  if(!(iter = simplet_get_list_iter(layer->filters))){
+  if(!(iter = simplet_get_list_iter(layer->queries))){
     OGRReleaseDataSource(source);
     return set_error(layer, SIMPLET_OOM, "out of memory getting list iterator");
   }
 
-  // Loop through the layer's filters and process them.
-  simplet_filter_t *filter;
+  // Loop through the layer's queries and process them.
+  simplet_query_t *query;
   simplet_status_t status = SIMPLET_OK;
-  while((filter = simplet_list_next(iter))) {
-    status = simplet_filter_process(filter, map, source, litho, ctx);
+  while((query = simplet_list_next(iter))) {
+    status = simplet_query_process(query, map, source, litho, ctx);
 
     if(status != SIMPLET_OK){
       simplet_list_iter_free(iter);
@@ -94,7 +94,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithog
       return status;
     }
 
-    simplet_lithograph_apply(litho, filter->styles);
+    simplet_lithograph_apply(litho, query->styles);
   }
   OGRReleaseDataSource(source);
   return SIMPLET_OK;

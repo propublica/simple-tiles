@@ -92,7 +92,7 @@ typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
   char           *source;
-  simplet_list_t *filters;
+  simplet_list_t *queries;
 } simplet_layer_t;
 
 typedef struct {
@@ -100,7 +100,7 @@ typedef struct {
   SIMPLET_USER_DATA
   char *ogrsql;
   simplet_list_t *styles;
-} simplet_filter_t;
+} simplet_query_t;
 
 typedef struct {
   SIMPLET_ERROR_FIELDS

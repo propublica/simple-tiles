@@ -2,7 +2,7 @@
 #include <cpl_error.h>
 
 #include "style.h"
-#include "filter.h"
+#include "query.h"
 #include "util.h"
 #include "list.h"
 #include "map.h"
@@ -11,72 +11,72 @@
 #include "error.h"
 
 // Set up some user data functions.
-SIMPLET_HAS_USER_DATA(filter)
+SIMPLET_HAS_USER_DATA(query)
 
-// Create and initialize a filter.
-simplet_filter_t *
-simplet_filter_new(const char *sqlquery){
-  simplet_filter_t *filter;
-  if(!(filter = malloc(sizeof(*filter))))
+// Create and initialize a query.
+simplet_query_t *
+simplet_query_new(const char *sqlquery){
+  simplet_query_t *query;
+  if(!(query = malloc(sizeof(*query))))
     return NULL;
 
-  memset(filter, 0, sizeof(*filter));
+  memset(query, 0, sizeof(*query));
 
-  if(!(filter->styles = simplet_list_new())){
-    free(filter);
+  if(!(query->styles = simplet_list_new())){
+    free(query);
     return NULL;
   }
 
-  filter->error.status = SIMPLET_OK;
-  filter->ogrsql       = simplet_copy_string(sqlquery);
-  return filter;
+  query->error.status = SIMPLET_OK;
+  query->ogrsql       = simplet_copy_string(sqlquery);
+  return query;
 }
 
-// Free a void pointer pointing to a filter.
+// Free a void pointer pointing to a query.
 void
-simplet_filter_vfree(void *filter){
-  simplet_filter_free(filter);
+simplet_query_vfree(void *query){
+  simplet_query_free(query);
 }
 
 
-// Free a layer and associated filters.
+// Free a layer and associated queries.
 void
-simplet_filter_free(simplet_filter_t *filter){
-  simplet_list_t* styles = filter->styles;
+simplet_query_free(simplet_query_t *query){
+  simplet_list_t* styles = query->styles;
   simplet_list_set_item_free(styles, simplet_style_vfree);
   simplet_list_free(styles);
-  free(filter->ogrsql);
-  free(filter);
+  free(query->ogrsql);
+  free(query);
 }
 
 // Add an error function.
-SIMPLET_ERROR_FUNC(filter_t)
+SIMPLET_ERROR_FUNC(query_t)
 
-// Set the OGR SQL query on this filter.
+// Set the OGR SQL query on this query.
 simplet_status_t
-simplet_filter_set_query(simplet_filter_t *filter, const char* query){
-  free(filter->ogrsql);
-  if(!(filter->ogrsql = simplet_copy_string(query)))
-    return set_error(filter, SIMPLET_OOM, "Out of memory setting filter query");
+simplet_query_set_query(simplet_query_t *query, const char* query){
+  free(query->ogrsql);
+  if(!(query->ogrsql = simplet_copy_string(query)))
+    return set_error(query, SIMPLET_OOM, "Out of memory setting query query");
   return SIMPLET_OK;
 }
 
-// Set query to a copy of the current query defined on filter.
+// Set query to a copy of the current query defined on query.
 simplet_status_t
-simplet_filter_get_query(simplet_filter_t *filter, char** query){
-  if(!(*query = simplet_copy_string(filter->ogrsql))){
+simplet_query_get_query(simplet_query_t *query, char** query){
+  if(!(*query = simplet_copy_string(query->ogrsql))){
     query = NULL;
-    return set_error(filter, SIMPLET_OOM, "Out of memory copying query");
+    return set_error(query, SIMPLET_OOM, "Out of memory copying query");
   }
   return SIMPLET_OK;
 }
 
 // Plot a part of a geometry on the ctx.
 static void
-plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
+plot_part(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   // Look up whether we should be rendering a seamless path, if so we won't
   // simplify the points to protect against holes.
-  simplet_style_t *seamless = simplet_lookup_style(filter->styles, "seamless");
+  simplet_style_t *seamless = simplet_lookup_style(query->styles, "seamless");
   double x, y, last_x, last_y;
   OGR_G_GetPoint(geom, 0, &x, &y, NULL);
   last_x = x;
@@ -88,7 +88,7 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
     double dy = last_y - y;
     cairo_user_to_device_distance(ctx, &dx, &dy);
     // If we've moved a half a pixel and we aren't seamless we can plot the
-    // line, this is a significant speed up vs no filtering.
+    // line, this is a significant speed up vs no querying.
     if(seamless || (fabs(dx) >= 0.5 || fabs(dy) >= 0.5)){
       cairo_line_to(ctx, x, y);
       last_x = x;
@@ -102,7 +102,7 @@ plot_part(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
 
 // Plot a polygon.
 static void
-plot_polygon(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
+plot_polygon(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   cairo_save(ctx);
   cairo_new_path(ctx);
   //  Split the polygon into sub polygons.
@@ -113,18 +113,18 @@ plot_polygon(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
 
     // If the sub polygon has more child polygons recurse.
     if(OGR_G_GetGeometryCount(subgeom) > 0) {
-      plot_polygon(subgeom, filter, ctx);
+      plot_polygon(subgeom, query, ctx);
       continue;
     }
 
     // Otherwise, plot the sub polygon.
-    plot_part(subgeom, filter, ctx);
+    plot_part(subgeom, query, ctx);
     cairo_close_path(ctx);
   }
   cairo_close_path(ctx);
 
   // Apply the styles to the current path.
-  simplet_apply_styles(ctx, filter->styles,
+  simplet_apply_styles(ctx, query->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
   cairo_clip(ctx);
   cairo_restore(ctx);
@@ -132,11 +132,11 @@ plot_polygon(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
 
 // Plot a point as a circle on the path.
 static void
-plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
+plot_point(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
 	cairo_save(ctx);
   double x, y;
 
-  simplet_style_t *style = simplet_lookup_style(filter->styles, "radius");
+  simplet_style_t *style = simplet_lookup_style(query->styles, "radius");
   if(style == NULL)
     return;
 
@@ -151,18 +151,18 @@ plot_point(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
     cairo_close_path(ctx);
   }
   // Apply some styles.
-  simplet_apply_styles(ctx, filter->styles,
+  simplet_apply_styles(ctx, query->styles,
                        "line-join", "line-cap", "weight", "fill", "stroke", NULL);
   cairo_restore(ctx);
 }
 
 // Plot a linestring.
 static void
-plot_line(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
+plot_line(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   cairo_save(ctx);
   cairo_new_path(ctx);
-  plot_part(geom, filter, ctx);
-  simplet_apply_styles(ctx, filter->styles,
+  plot_part(geom, query, ctx);
+  simplet_apply_styles(ctx, query->styles,
                         "line-join", "line-cap", "weight", "stroke", NULL);
   cairo_close_path(ctx);
   cairo_restore(ctx);
@@ -170,17 +170,17 @@ plot_line(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
 
 // Dispatch to the individual functions for rendering based on geometry type.
 static void
-dispatch(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
+dispatch(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   switch(wkbFlatten(OGR_G_GetGeometryType(geom))) {
     case wkbPolygon:
-      plot_polygon(geom, filter, ctx);
+      plot_polygon(geom, query, ctx);
       break;
     case wkbLinearRing:
     case wkbLineString:
-      plot_line(geom, filter, ctx);
+      plot_line(geom, query, ctx);
       break;
     case wkbPoint:
-      plot_point(geom, filter, ctx);
+      plot_point(geom, query, ctx);
       break;
 
     // For geometry collections, recurse into the individual members and
@@ -193,7 +193,7 @@ dispatch(OGRGeometryH geom, simplet_filter_t *filter, cairo_t *ctx){
         OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
         if(subgeom == NULL)
           continue;
-        dispatch(subgeom, filter, ctx);
+        dispatch(subgeom, query, ctx);
       }
       break;
     default:
@@ -212,17 +212,17 @@ set_seamless(simplet_list_t *styles, cairo_t *ctx){
 // sources, perform transformation, add labels to the lithograph,
 // and plot the individual geometries.
 simplet_status_t
-simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
+simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx){
 
   // Grab a layer in order to suss out the srs
   OGRLayerH olayer;
-  if(!(olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, NULL, NULL))){
+  if(!(olayer = OGR_DS_ExecuteSQL(source, query->ogrsql, NULL, NULL))){
     int err = CPLGetLastErrorNo();
     if(!err)
       return SIMPLET_OK;
     else
-      return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+      return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
   }
 
   // Try and figure out the srs.
@@ -233,7 +233,7 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
     if(!err)
       return SIMPLET_OK;
     else
-      return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+      return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
   }
 
   // If the map has a buffer we need to grow the bounds a bit to grab more
@@ -263,25 +263,25 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
   OGR_DS_ReleaseResultSet(source, olayer);
 
   // Execute the SQL and limit it to returning only the bounds set on the map.
-  olayer = OGR_DS_ExecuteSQL(source, filter->ogrsql, bounds, NULL);
+  olayer = OGR_DS_ExecuteSQL(source, query->ogrsql, bounds, NULL);
   OGR_G_DestroyGeometry(bounds);
   if(!olayer)
-    return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+    return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   // Create a transorm to use in rendering later.
   OGRCoordinateTransformationH transform;
   if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
-    return set_error(filter, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+    return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   // Copy the original surface so we don't muss about with defaults.
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(ctx),
                                   CAIRO_CONTENT_COLOR_ALPHA, map->width, map->height);
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-    return set_error(filter, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
+    return set_error(query, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
 
   // Setup seamless rendering.
   cairo_t *sub_ctx = cairo_create(surface);
-  set_seamless(filter->styles, sub_ctx);
+  set_seamless(query->styles, sub_ctx);
 
   // Initialize the transformation matrix.
   cairo_matrix_t mat;
@@ -298,10 +298,10 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
       continue;
     }
 
-    dispatch(geom, filter, sub_ctx);
+    dispatch(geom, query, sub_ctx);
 
     // Add feature labels, this is another loop, but it should be fast enough/
-    simplet_lithograph_add_placement(litho, feature, filter->styles, sub_ctx);
+    simplet_lithograph_add_placement(litho, feature, query->styles, sub_ctx);
     OGR_F_Destroy(feature);
   }
 
@@ -315,14 +315,14 @@ simplet_filter_process(simplet_filter_t *filter, simplet_map_t *map,
   return SIMPLET_OK;
 }
 
-// Initialize and add a new style to this filter.
+// Initialize and add a new style to this query.
 simplet_style_t*
-simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *arg){
+simplet_query_add_style(simplet_query_t *query, const char *key, const char *arg){
   simplet_style_t *style;
   if(!(style = simplet_style_new(key, arg)))
     return NULL;
 
-  if(!simplet_list_push(filter->styles, style)){
+  if(!simplet_list_push(query->styles, style)){
     simplet_style_free(style);
     return NULL;
   }
@@ -332,8 +332,8 @@ simplet_filter_add_style(simplet_filter_t *filter, const char *key, const char *
 
 // Add a previously initialized style.
 simplet_style_t*
-simplet_filter_add_style_directly(simplet_filter_t *filter, simplet_style_t *style){
-  if(!simplet_list_push(filter->styles, style)) return NULL;
+simplet_query_add_style_directly(simplet_query_t *query, simplet_style_t *style){
+  if(!simplet_list_push(query->styles, style)) return NULL;
   return style;
 }
 

@@ -5,7 +5,7 @@
 #include "error.h"
 #include "map.h"
 #include "layer.h"
-#include "filter.h"
+#include "query.h"
 #include "style.h"
 #include "util.h"
 #include "bounds.h"

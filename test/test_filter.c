@@ -1,57 +1,57 @@
 #include "test.h"
-#include <simple-tiles/filter.h>
+#include <simple-tiles/query.h>
 #include <simple-tiles/style.h>
 
 static void
-test_filter(){
-  simplet_filter_t *filter;
+test_query(){
+  simplet_query_t *query;
   const char *query = "SELECT * FROM TEST";
-  if(!(filter = simplet_filter_new(query)))
+  if(!(query = simplet_query_new(query)))
     assert(0);
-  assert(!strcmp(query, filter->ogrsql));
-  simplet_filter_add_style(filter, "fill", "#CCCCCC");
+  assert(!strcmp(query, query->ogrsql));
+  simplet_query_add_style(query, "fill", "#CCCCCC");
   simplet_style_t *style;
-  style = simplet_list_tail(filter->styles);
+  style = simplet_list_tail(query->styles);
   assert(!strcmp(style->key, "fill"));
   assert(!strcmp(style->arg, "#CCCCCC"));
-  simplet_filter_free(filter);
+  simplet_query_free(query);
 }
 
 static void
 test_lookup(){
-  simplet_filter_t *filter;
-  if(!(filter = simplet_filter_new("SELECT * FROM TEST;")))
+  simplet_query_t *query;
+  if(!(query = simplet_query_new("SELECT * FROM TEST;")))
     assert(0);
-  simplet_filter_add_style(filter, "fill",     "#CCCCCC");
-  simplet_filter_add_style(filter, "stroke",   "#CCCCAA");
-  simplet_filter_add_style(filter, "line-cap", "round");
-  assert(simplet_list_get_length(filter->styles) == 3);
-  simplet_filter_free(filter);
+  simplet_query_add_style(query, "fill",     "#CCCCCC");
+  simplet_query_add_style(query, "stroke",   "#CCCCAA");
+  simplet_query_add_style(query, "line-cap", "round");
+  assert(simplet_list_get_length(query->styles) == 3);
+  simplet_query_free(query);
 }
 
 static void
 test_query(){
   const char* test = "SELECT * FROM TEST;";
-  simplet_filter_t *filter;
-  if(!(filter = simplet_filter_new(test)))
+  simplet_query_t *query;
+  if(!(query = simplet_query_new(test)))
     assert(0);
 
   char *tmp;
-  simplet_filter_get_query(filter, &tmp);
+  simplet_query_get_query(query, &tmp);
   assert(!strcmp(test, tmp));
   free(tmp);
 
   const char* t = "SELECT * FROM TEST2;";
-  simplet_filter_set_query(filter, t);
-  simplet_filter_get_query(filter, &tmp);
+  simplet_query_set_query(query, t);
+  simplet_query_get_query(query, &tmp);
   assert(!strcmp(t, tmp));
   free(tmp);
 
-  simplet_filter_free(filter);
+  simplet_query_free(query);
 }
 
-TASK(filter) {
-  test(filter);
+TASK(query) {
+  test(query);
   test(lookup);
   test(query);
 }
