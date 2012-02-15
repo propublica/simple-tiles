@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#define SIMPLE_TILES_VERSION "0.0.1"
+#define SIMPLE_TILES_VERSION "0.1.0"
 
 #ifdef __cplusplus
 }
