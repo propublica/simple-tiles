@@ -5,7 +5,6 @@ install:
 	cd src && $(MAKE) $@
 
 test run_api memcheck test-all: all
-	$(MAKE) install
 	cd test && $(MAKE) $@
 
 clean:
