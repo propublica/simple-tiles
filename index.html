@@ -259,6 +259,9 @@ $ make test
 </pre>
     <p>to ensure the library and its dependencies are playing nice with one another.</p>
 
+    <p>N.B. `make test` will rerun `make install` and install the library again
+     so that it tests the local installation.</p>
+
     <h2 id="compilation">Compilation and Linking</h2>
     <p>Once you have a working copy of Simple Tiles, you'll want to use <b>pkg-config</b>
     to link to the library. For example, to compile a file with Simple Tiles use:</p>

@@ -1,5 +1,5 @@
 OPTIMIZATION?=-O3
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings -I/usr/local/include\
+CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings \
 	$(ARCH) $(shell pkg-config --cflags simple-tiles pangocairo) \
 	$(shell gdal-config --cflags)
 LDLIBS = -L/usr/local/lib -lm $(shell pkg-config --libs simple-tiles pangocairo) \
