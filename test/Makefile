@@ -1,6 +1,6 @@
 OPTIMIZATION?=-O3
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings \
-	-I$(shell pwd)/../src/ \
+	-I$(shell pwd)/../ \
 	$(ARCH) $(shell pkg-config --cflags simple-tiles pangocairo) \
 	$(shell gdal-config --cflags)
 LDLIBS = -L/usr/local/lib -lm $(shell pkg-config --libs simple-tiles pangocairo) \
