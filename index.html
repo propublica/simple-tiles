@@ -146,6 +146,10 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_map_set_srs">simplet_map_set_srs</a></li>
         <li><a href="#simplet_map_get_srs">simplet_map_get_srs</a></li>
         <li><a href="#simplet_map_set_size">simplet_map_set_size</a></li>
+        <li><a href="#simplet_map_get_width">simplet_map_get_width</a></li>
+        <li><a href="#simplet_map_get_height">simplet_map_get_height</a></li>
+        <li><a href="#simplet_map_set_width">simplet_map_set_width</a></li>
+        <li><a href="#simplet_map_set_height">simplet_map_set_height</a></li>
         <li><a href="#simplet_map_set_bounds">simplet_map_set_bounds</a></li>
         <li><a href="#simplet_map_set_slippy">simplet_map_set_slippy</a></li>
         <li><a href="#simplet_map_set_bgcolor">simplet_map_set_bgcolor</a></li>
@@ -363,10 +367,32 @@ main(){
       and <tt>srs</tt> should be deallocated with <tt>free</tt>.
     </p>
 
-    <h4 id="simplet_map_set_size"><code>simplet_status_t simplet_map_set_size(simplet_map_t *map, int width, int height)</code></h4>
+    <h4 id="simplet_map_set_size"><code>simplet_status_t simplet_map_set_size(simplet_map_t *map, unsigned int width, unsigned int height)</code></h4>
     <p>
       Sets the physical size of the output image. For tile generation you'll want to use
       <tt>simplet_map_set_slippy</tt> to set this automatically for web mercator.
+    </p>
+
+    <h4 id="simplet_map_get_width"><code>unsigned int simplet_map_get_width(simplet_map_t *map)</code></h4>
+    <p>
+      Return the <tt>width</tt> of the map.
+    </p>
+
+
+    <h4 id="simplet_map_get_height"><code>unsigned int simplet_map_get_height(simplet_map_t *map)</code></h4>
+    <p>
+      Return the <tt>height</tt> of the map.
+    </p>
+
+    <h4 id="simplet_map_set_width"><code>simplet_status_t simplet_map_set_width(simplet_map_t *map, unsigned int width)</code></h4>
+    <p>
+      Set the <tt>width</tt> of the map.
+    </p>
+
+
+    <h4 id="simplet_map_set_height"><code>simplet_status_t simplet_map_get_height(simplet_map_t *map, unsigned int height)</code></h4>
+    <p>
+      Set the <tt>height</tt> of the map.
     </p>
 
     <h4 id="simplet_map_set_bounds"><code>simplet_status_t simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny)</code></h4>

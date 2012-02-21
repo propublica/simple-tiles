@@ -18,7 +18,7 @@ simplet_status_t
 simplet_map_set_srs(simplet_map_t *map, const char *proj);
 
 simplet_status_t
-simplet_map_set_size(simplet_map_t *map, int width, int height);
+simplet_map_set_size(simplet_map_t *map, unsigned int width, unsigned int height);
 
 simplet_status_t
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny);
@@ -65,6 +65,18 @@ simplet_map_get_buffer(simplet_map_t *map);
 
 void
 simplet_map_set_buffer(simplet_map_t *map, double buffer);
+
+unsigned int
+simplet_map_get_width(simplet_map_t *map);
+
+unsigned int
+simplet_map_get_height(simplet_map_t *map);
+
+simplet_status_t
+simplet_map_set_width(simplet_map_t *map, unsigned int width);
+
+simplet_status_t
+simplet_map_set_height(simplet_map_t *map, unsigned int height);
 
 SIMPLET_HAS_USER_DATA_PROTOS(map)
 

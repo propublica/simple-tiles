@@ -126,11 +126,38 @@ simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
 
 // Set the width and height of the map.
 simplet_status_t
-simplet_map_set_size(simplet_map_t *map, int width, int height){
-  map->height = height;
-  map->width  = width;
+simplet_map_set_size(simplet_map_t *map, unsigned int width, unsigned int height){
+  simplet_map_set_height(map, height);
+  simplet_map_set_width(map, width);
   return SIMPLET_OK;
 }
+
+// Get the width of the map
+unsigned int
+simplet_map_get_width(simplet_map_t *map){
+  return map->width;
+}
+
+// Get the height of the map
+unsigned int
+simplet_map_get_height(simplet_map_t *map){
+  return map->height;
+}
+
+// Set the width of the map
+simplet_status_t
+simplet_map_set_width(simplet_map_t *map, unsigned int width){
+  map->width = width;
+  return SIMPLET_OK;
+}
+
+// Set the height of the map
+simplet_status_t
+simplet_map_set_height(simplet_map_t *map, unsigned int height){
+  map->height = height;
+  return SIMPLET_OK;
+}
+
 
 // Set the background color of the map to a copy of str.
 simplet_status_t
