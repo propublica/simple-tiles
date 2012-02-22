@@ -16,7 +16,7 @@ task_wrap_t tasks[] = {
   TASK_ENTRY(list)
   TASK_ENTRY(bounds)
   TASK_ENTRY(layer)
-  TASK_ENTRY(filter)
+  TASK_ENTRY(query)
   TASK_ENTRY(style)
   TASK_ENTRY(map)
   TASK_ENTRY(integration)

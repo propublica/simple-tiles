@@ -1,5 +1,5 @@
 #include "test.h"
-#include <simple-tiles/filter.h>
+#include <simple-tiles/query.h>
 #include <simple-tiles/style.h>
 
 
@@ -15,25 +15,25 @@ test_style(){
 
 static void
 test_lookup(){
-  simplet_filter_t *filter;
-  if(!(filter = simplet_filter_new("SELECT * FROM TEST;")))
+  simplet_query_t *query;
+  if(!(query = simplet_query_new("SELECT * FROM TEST;")))
     assert(0);
-  simplet_filter_add_style(filter, "fill",     "#CCCCCC");
-  simplet_filter_add_style(filter, "stroke",   "#CCCCAA");
-  simplet_filter_add_style(filter, "line-cap", "round");
+  simplet_query_add_style(query, "fill",     "#CCCCCC");
+  simplet_query_add_style(query, "stroke",   "#CCCCAA");
+  simplet_query_add_style(query, "line-cap", "round");
 
-  assert(filter->styles->length == 3);
+  assert(query->styles->length == 3);
   simplet_style_t *style;
-  style = simplet_lookup_style(filter->styles, "fill");
+  style = simplet_lookup_style(query->styles, "fill");
   assert(!strcmp(style->key, "fill"));
   assert(!strcmp(style->arg, "#CCCCCC"));
-  style = simplet_lookup_style(filter->styles, "stroke");
+  style = simplet_lookup_style(query->styles, "stroke");
   assert(!strcmp(style->key, "stroke"));
   assert(!strcmp(style->arg, "#CCCCAA"));
-  style = simplet_lookup_style(filter->styles, "line-cap");
+  style = simplet_lookup_style(query->styles, "line-cap");
   assert(!strcmp(style->key, "line-cap"));
   assert(!strcmp(style->arg, "round"));
-  simplet_filter_free(filter);
+  simplet_query_free(query);
 }
 
 TASK(style) {

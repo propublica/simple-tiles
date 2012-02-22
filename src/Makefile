@@ -1,14 +1,14 @@
 ifeq ($(shell uname -s),Darwin)
-  DYLIBNAME?=libsimple-tiles.dylib
-  DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDLIBS) $(DEBUG) - $(OBJ)
-  STLIBNAME?=libsimple-tiles.a
-  STLIB_MAKE?=libtool -static -o $(STLIBNAME) - $(OBJ)
+	DYLIBNAME?=libsimple-tiles.dylib
+	DYLIB_MAKE?=libtool -dynamic -o $(DYLIBNAME) $(LDLIBS) $(DEBUG) - $(OBJ)
+	STLIBNAME?=libsimple-tiles.a
+	STLIB_MAKE?=libtool -static -o $(STLIBNAME) - $(OBJ)
 	INSTALL?=cp -a
 else
 	DEFINES = -D_BSD_SOURCE -D_GNU_SOURCE
 	CC = libtool --mode=compile gcc
 	DYLIBNAME?=libsimple-tiles.la
-	DYLIB_MAKE?=libtool --mode=link gcc -rpath /usr/local/lib -o $(DYLIBNAME) $(LDFLAGS) $(DEBUG) $(OBJ:.o=.lo)
+	DYLIB_MAKE?=libtool --mode=link gcc -rpath /usr/local/lib -o $(DYLIBNAME) $(LDLIBS) $(DEBUG) $(OBJ:.o=.lo)
 	INSTALL?=libtool --mode=install install -c
 	AFTER = ldconfig
 endif
@@ -20,7 +20,7 @@ CFLAGS ?= -fPIC -std=c99 $(OPTIMIZATION) $(DEFINES) $(DEBUG) -Wall -Werror -Wext
   $(shell gdal-config --cflags)
 LDLIBS = -lm $(shell pkg-config --libs pangocairo) \
   $(shell gdal-config --libs)
-OBJ = list.o bounds.o style.o map.o util.o filter.o layer.o error.o init.o text.o user_data.o
+OBJ = list.o bounds.o style.o map.o util.o query.o layer.o error.o init.o text.o user_data.o
 PKG_CF = simple-tiles.pc
 
 all: $(OBJ)
@@ -45,14 +45,14 @@ install: $(DYLIBNAME) $(STLIBNAME)
 
 bounds.o: bounds.c bounds.h types.h
 error.o: error.c error.h types.h
-filter.o: filter.c style.h types.h list.h user_data.h filter.h map.h \
+query.o: query.c style.h types.h list.h user_data.h query.h map.h \
   text.h util.h bounds.h error.h
 init.o: init.c error.h types.h
-layer.o: layer.c layer.h types.h text.h list.h user_data.h filter.h map.h \
+layer.o: layer.c layer.h types.h text.h list.h user_data.h query.h map.h \
   style.h util.h error.h
 list.o: list.c list.h types.h
 map.o: map.c init.h error.h types.h map.h user_data.h layer.h text.h \
-  list.h filter.h style.h util.h bounds.h
+  list.h query.h style.h util.h bounds.h
 style.o: style.c map.h types.h user_data.h style.h list.h util.h
 text.o: text.c text.h types.h list.h style.h user_data.h util.h bounds.h
 user_data.o: user_data.c user_data.h types.h

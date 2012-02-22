@@ -4,7 +4,7 @@
 #include <time.h>
 #include <simple-tiles/simple_tiles.h>
 #include <simple-tiles/list.h>
-#include <simple-tiles/filter.h>
+#include <simple-tiles/query.h>
 #include <simple-tiles/layer.h>
 #include <simple-tiles/error.h>
 
@@ -38,10 +38,10 @@ initialize_map(simplet_map_t *map){
   simplet_map_set_slippy(map, 0, 1, 2);
   simplet_layer_t  *layer  = simplet_map_add_layer(map,
       "../data/ne_10m_admin_0_countries.shp");
-  simplet_filter_t *filter = simplet_layer_add_filter(layer,
+  simplet_query_t *query = simplet_layer_add_query(layer,
       "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_filter_add_style(filter, "weight", "0.1");
-  simplet_filter_add_style(filter, "fill",   "#061F37ff");
+  simplet_query_add_style(query, "weight", "0.1");
+  simplet_query_add_style(query, "fill",   "#061F37ff");
 }
 
 static cairo_status_t
@@ -65,31 +65,31 @@ bench_seamless(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
   simplet_layer_t  *layer  = simplet_list_tail(map->layers);
-  simplet_filter_t *filter = simplet_list_tail(layer->filters);
-  simplet_filter_add_style(filter, "seamless", "true");
+  simplet_query_t *query = simplet_list_tail(layer->queries);
+  simplet_query_add_style(query, "seamless", "true");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
 }
 
 static void
-bench_many_filters(void *ctx){
+bench_many_queries(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
 
   simplet_layer_t *layer   = simplet_list_tail(map->layers);
-  simplet_filter_t *filter = simplet_layer_add_filter(layer,
+  simplet_query_t *query = simplet_layer_add_query(layer,
                                       "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_filter_add_style(filter, "weight", "0.1");
-  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+  simplet_query_add_style(query, "weight", "0.1");
+  simplet_query_add_style(query, "stroke", "#ffffffff");
 
-  filter = simplet_layer_add_filter(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_filter_add_style(filter, "weight", "0.1");
-  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+  query = simplet_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_query_add_style(query, "weight", "0.1");
+  simplet_query_add_style(query, "stroke", "#ffffffff");
 
-  filter = simplet_layer_add_filter(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
-  simplet_filter_add_style(filter, "weight", "0.1");
-  simplet_filter_add_style(filter, "stroke", "#ffffffff");
+  query = simplet_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_query_add_style(query, "weight", "0.1");
+  simplet_query_add_style(query, "stroke", "#ffffffff");
 
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
@@ -110,12 +110,12 @@ bench_text(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
   simplet_layer_t *layer   = simplet_list_tail(map->layers);
-  simplet_filter_t *filter = simplet_list_tail(layer->filters);
-  simplet_filter_add_style(filter, "text-field", "ABBREV");
-  simplet_filter_add_style(filter, "font", "Futura Medium 8");
-  simplet_filter_add_style(filter, "color", "#226688");
-  simplet_filter_add_style(filter, "text-stroke-color", "#ffffff88");
-  simplet_filter_add_style(filter, "text-stroke-weight", "1");
+  simplet_query_t *query = simplet_list_tail(layer->queries);
+  simplet_query_add_style(query, "text-field", "ABBREV");
+  simplet_query_add_style(query, "font", "Futura Medium 8");
+  simplet_query_add_style(query, "color", "#226688");
+  simplet_query_add_style(query, "text-stroke-color", "#ffffff88");
+  simplet_query_add_style(query, "text-stroke-weight", "1");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
@@ -159,7 +159,7 @@ bench_wrap_t benchmarks[] = {
   BENCH(map, text)
   BENCH(map, seamless)
   BENCH(map, empty)
-  BENCH(map, many_filters)
+  BENCH(map, many_queries)
   BENCH(list, list)
   { NULL, NULL, NULL, NULL, 0}
 };
