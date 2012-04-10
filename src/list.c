@@ -45,12 +45,14 @@ simplet_list_get_length(simplet_list_t *list){
 // Get the last element on the list.
 void*
 simplet_list_tail(simplet_list_t *list){
+  if(!list->tail) return NULL;
   return list->tail->user_data;
 }
 
 // Get the first element of the list.
 void*
 simplet_list_head(simplet_list_t *list){
+  if(!list->head) return NULL;
   return list->head->user_data;
 }
 
