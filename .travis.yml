@@ -5,8 +5,11 @@ before_install:
   - sudo apt-get -y update
   - sudo apt-get -y install libgdal-dev libcairo2-dev libpango1.0-dev
 
+after_install:
+
+
 script:
-  - make test
+  - "sudo make install && make test"
 
 notifications:
   email: false

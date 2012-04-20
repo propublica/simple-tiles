@@ -5,7 +5,6 @@ install:
 	cd src && $(MAKE) $@
 
 test run_api memcheck test-all: all
-	ln -s ./src ./simple-tiles
 	cd test && $(MAKE) $@
 
 clean:
