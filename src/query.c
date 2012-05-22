@@ -264,7 +264,6 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
 
   // Execute the SQL and limit it to returning only the bounds set on the map.
   olayer = OGR_DS_ExecuteSQL(source, query->ogrsql, bounds, NULL);
-  OGR_G_DestroyGeometry(bounds);
   if(!olayer)
     return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
@@ -298,10 +297,18 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
       continue;
     }
 
+    // OGRGeometryH geom_clipped = OGR_G_Intersection(geom, bounds);
+    // if(geom_clipped == NULL || OGR_G_IsEmpty(geom_clipped)) {
+    //   OGR_F_Destroy(feature);
+    //   OGR_G_DestroyGeometry(geom_clipped);
+    //   continue;
+    // }
+
     dispatch(geom, query, sub_ctx);
 
     // Add feature labels, this is another loop, but it should be fast enough/
     simplet_lithograph_add_placement(litho, feature, query->styles, sub_ctx);
+    //OGR_G_DestroyGeometry(geom_clipped);
     OGR_F_Destroy(feature);
   }
 
@@ -310,6 +317,7 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   cairo_paint(ctx);
   cairo_destroy(sub_ctx);
   cairo_surface_destroy(surface);
+  OGR_G_DestroyGeometry(bounds);
   OGR_DS_ReleaseResultSet(source, olayer);
   OCTDestroyCoordinateTransformation(transform);
   return SIMPLET_OK;
