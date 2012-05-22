@@ -3,7 +3,7 @@
 
 #include <ogr_api.h>
 #include <ogr_srs_api.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 #include <pango/pangocairo.h>
 
 #ifdef __cplusplus

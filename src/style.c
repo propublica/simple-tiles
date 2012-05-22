@@ -40,11 +40,11 @@ set_color(void *ct, const char *arg){
 void
 simplet_style_line_join(void *ct, const char *arg){
   cairo_t *ctx = ct;
-  if(!strcmp("miter", arg))
+  if(!strncmp("miter", arg, 5))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_MITER);
-  if(!strcmp("round", arg))
+  else if(!strncmp("round", arg, 5))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_ROUND);
-  if(!strcmp("bevel", arg))
+  else if(!strncmp("bevel", arg, 5))
     cairo_set_line_join(ctx, CAIRO_LINE_JOIN_BEVEL);
 }
 
@@ -52,11 +52,11 @@ simplet_style_line_join(void *ct, const char *arg){
 static void
 line_cap(void *ct, const char *arg){
   cairo_t *ctx = ct;
-  if(!strcmp("butt", arg))
+  if(!strncmp("butt", arg, 4))
     cairo_set_line_cap(ctx, CAIRO_LINE_CAP_BUTT);
-  if(!strcmp("round", arg))
+  else if(!strncmp("round", arg, 5))
     cairo_set_line_cap(ctx, CAIRO_LINE_CAP_ROUND);
-  if(!strcmp("square", arg))
+  else if(!strncmp("square", arg, 6))
     cairo_set_line_cap(ctx, CAIRO_LINE_CAP_SQUARE);
 }
 
@@ -115,6 +115,71 @@ letter_spacing(void *ct, const char *arg){
   pango_attr_list_unref(attrs);
 }
 
+static void
+blend(void *ct, const char *arg){
+  cairo_operator_t opt = CAIRO_OPERATOR_OVER;
+  if(!strncmp("clear", arg, 5))
+    opt = CAIRO_OPERATOR_CLEAR;
+  else if(!strncmp("source", arg, 6))
+    opt = CAIRO_OPERATOR_SOURCE;
+  else if(!strncmp("over", arg, 4))
+    opt = CAIRO_OPERATOR_OVER;
+  else if(!strncmp("in", arg, 2))
+    opt = CAIRO_OPERATOR_IN;
+  else if(!strncmp("out", arg, 3))
+    opt = CAIRO_OPERATOR_OUT;
+  else if(!strncmp("atop", arg, 4))
+    opt = CAIRO_OPERATOR_ATOP;
+  else if(!strncmp("dest", arg, 4))
+    opt = CAIRO_OPERATOR_DEST;
+  else if(!strncmp("dest over", arg, 9))
+    opt = CAIRO_OPERATOR_DEST_OVER;
+  else if(!strncmp("dest in", arg, 7))
+    opt = CAIRO_OPERATOR_DEST_IN;
+  else if(!strncmp("dest out", arg, 8))
+    opt = CAIRO_OPERATOR_DEST_OUT;
+  else if(!strncmp("dest atop", arg, 9))
+    opt = CAIRO_OPERATOR_DEST_ATOP;
+  else if(!strncmp("xor", arg, 3))
+    opt = CAIRO_OPERATOR_XOR;
+  else if(!strncmp("add", arg, 3))
+    opt = CAIRO_OPERATOR_ADD;
+  else if(!strncmp("saturate", arg, 8))
+    opt = CAIRO_OPERATOR_SATURATE;
+  else if(!strncmp("multiply", arg, 8))
+    opt = CAIRO_OPERATOR_MULTIPLY;
+  else if(!strncmp("screen", arg, 6))
+    opt = CAIRO_OPERATOR_SCREEN;
+  else if(!strncmp("overlay", arg, 7))
+    opt = CAIRO_OPERATOR_OVERLAY;
+  else if(!strncmp("darken", arg, 6))
+    opt = CAIRO_OPERATOR_DARKEN;
+  else if(!strncmp("lighten", arg, 7))
+    opt = CAIRO_OPERATOR_LIGHTEN;
+  else if(!strncmp("color dodge", arg, 11))
+    opt = CAIRO_OPERATOR_COLOR_DODGE;
+  else if(!strncmp("color burn", arg, 10))
+    opt = CAIRO_OPERATOR_COLOR_BURN;
+  else if(!strncmp("hard light", arg, 10))
+    opt = CAIRO_OPERATOR_HARD_LIGHT;
+  else if(!strncmp("soft light", arg, 10))
+    opt = CAIRO_OPERATOR_SOFT_LIGHT;
+  else if(!strncmp("difference", arg, 10))
+    opt = CAIRO_OPERATOR_DIFFERENCE;
+  else if(!strncmp("exclusion", arg, 9))
+    opt = CAIRO_OPERATOR_EXCLUSION;
+  else if(!strncmp("hsl hue", arg, 7))
+    opt = CAIRO_OPERATOR_HSL_HUE;
+  else if(!strncmp("hsl saturation", arg, 14))
+    opt = CAIRO_OPERATOR_HSL_SATURATION;
+  else if(!strncmp("hsl color", arg, 9))
+    opt = CAIRO_OPERATOR_HSL_COLOR;
+  else if(!strncmp("hsl luminosity", arg, 14))
+    opt = CAIRO_OPERATOR_HSL_LUMINOSITY;
+  printf("%i", opt);
+  cairo_set_operator(ct, opt);
+};
+
 
 // List of defined styles.
 simplet_styledef_t styleTable[] = {
@@ -124,10 +189,11 @@ simplet_styledef_t styleTable[] = {
   { "line-cap",            line_cap                },
   { "color",               fill                    },
   { "text-stroke-color",   stroke                  },
-  { "text-stroke-weight",   weight                  },
+  { "text-stroke-weight",  weight                  },
   { "letter-spacing",      letter_spacing          },
-  { "paint",               simplet_style_paint     }, //used by map
-  { "line-join",           simplet_style_line_join }  //used by map
+  { "blend",               blend                   },
+  { "paint",               simplet_style_paint     }, // used by map
+  { "line-join",           simplet_style_line_join }  // used by map
   /* radius and seamless are special styles */
 };
 const int STYLES_LENGTH = sizeof(styleTable) / sizeof(*styleTable);

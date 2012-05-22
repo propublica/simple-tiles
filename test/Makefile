@@ -1,10 +1,8 @@
 OPTIMIZATION?=-O3
 CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings \
-	-I$(shell pwd)/../ \
 	$(ARCH) $(shell pkg-config --cflags simple-tiles pangocairo) \
 	$(shell gdal-config --cflags)
 LDLIBS = -L/usr/local/lib -lm $(shell pkg-config --libs simple-tiles pangocairo) \
-	-L$(shell pwd)/../src/ \
 	$(shell gdal-config --libs)
 OBJ = test_list.o test_style.o test_query.o test_layer.o test_map.o test_integration.o test_bounds.o
 

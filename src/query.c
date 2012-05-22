@@ -282,6 +282,7 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   cairo_t *sub_ctx = cairo_create(surface);
   set_seamless(query->styles, sub_ctx);
 
+
   // Initialize the transformation matrix.
   cairo_matrix_t mat;
   simplet_map_init_matrix(map, &mat);
@@ -297,23 +298,16 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
       continue;
     }
 
-    // OGRGeometryH geom_clipped = OGR_G_Intersection(geom, bounds);
-    // if(geom_clipped == NULL || OGR_G_IsEmpty(geom_clipped)) {
-    //   OGR_F_Destroy(feature);
-    //   OGR_G_DestroyGeometry(geom_clipped);
-    //   continue;
-    // }
-
     dispatch(geom, query, sub_ctx);
 
     // Add feature labels, this is another loop, but it should be fast enough/
     simplet_lithograph_add_placement(litho, feature, query->styles, sub_ctx);
-    //OGR_G_DestroyGeometry(geom_clipped);
     OGR_F_Destroy(feature);
   }
 
   // Cleanup.
   cairo_set_source_surface(ctx, surface, 0, 0);
+  simplet_apply_styles(ctx, query->styles, "blend", NULL);
   cairo_paint(ctx);
   cairo_destroy(sub_ctx);
   cairo_surface_destroy(surface);
