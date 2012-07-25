@@ -13,13 +13,15 @@ main(){
   simplet_map_set_size(map, 1000, 1000);
   simplet_map_set_bgcolor(map, "#ddeeff");
 
-  simplet_layer_t *layer   = simplet_map_add_layer(map, "/Users/jlarson/dev/simple-tiles/data/ne_10m_admin_0_countries.shp");
+  simplet_layer_t *layer   = simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
   simplet_query_t *query = simplet_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "stroke", "#226688");
   simplet_query_add_style(query, "line-join", "round");
   simplet_query_add_style(query, "weight", "3");
 
   simplet_query_t *query2 = simplet_layer_add_query(layer, "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_query_add_style(query, "blend", "out");
+
   simplet_query_add_style(query2, "weight", "0.5");
   simplet_query_add_style(query2, "fill", "#d3e46f");
   simplet_query_add_style(query2, "stroke", "#ffffff");
@@ -32,8 +34,9 @@ main(){
   simplet_query_add_style(query2, "text-stroke-weight", "2");
   simplet_query_add_style(query2, "letter-spacing", "1");
 
+
   if(simplet_map_is_valid(map))
-    simplet_map_render_to_png(map, "/Users/jlarson/dev/simple-tiles/out.png");
+    simplet_map_render_to_png(map, "./out.png");
 
   simplet_map_free(map);
 }
