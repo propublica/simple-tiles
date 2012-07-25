@@ -82,7 +82,8 @@ plot_part(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   last_x = x;
   last_y = y;
   cairo_move_to(ctx, x, y);
-  for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
+  int count = OGR_G_GetPointCount(geom);
+  for(int j = 0; j < count; j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
     double dx = last_x - x;
     double dy = last_y - y;
@@ -96,7 +97,7 @@ plot_part(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
     }
   }
   // Ensure something is always drawn, might not be necessary.
-  OGR_G_GetPoint(geom, OGR_G_GetPointCount(geom) - 1, &x, &y, NULL);
+  OGR_G_GetPoint(geom, count - 1, &x, &y, NULL);
   cairo_line_to(ctx, x, y);
 }
 
@@ -106,7 +107,8 @@ plot_polygon(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   cairo_save(ctx);
   cairo_new_path(ctx);
   //  Split the polygon into sub polygons.
-  for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
+  int count = OGR_G_GetGeometryCount(geom);
+  for(int i = 0; i < count; i++){
     OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
       continue;
@@ -144,7 +146,8 @@ plot_point(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
 
   // Loop through the points in the geom and place them on the ctx.
   cairo_device_to_user_distance(ctx, &r, &dy);
-  for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
+  int count = OGR_G_GetPointCount(geom);
+  for(int i = 0; i < count; i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
     cairo_new_path(ctx);
     cairo_arc(ctx, x - r / 2, y - r / 2, r, 0., 2 * SIMPLET_PI);
@@ -189,11 +192,14 @@ dispatch(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
     case wkbMultiPolygon:
     case wkbMultiLineString:
     case wkbGeometryCollection:
-      for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
-        OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
-        if(subgeom == NULL)
-          continue;
-        dispatch(subgeom, query, ctx);
+      {
+        int count = OGR_G_GetGeometryCount(geom);
+        for(int i = 0; i < count; i++){
+          OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
+          if(subgeom == NULL)
+            continue;
+          dispatch(subgeom, query, ctx);
+        }
       }
       break;
     default:
