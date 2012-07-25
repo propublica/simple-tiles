@@ -176,7 +176,6 @@ blend(void *ct, const char *arg){
     opt = CAIRO_OPERATOR_HSL_COLOR;
   else if(!strncmp("hsl luminosity", arg, 14))
     opt = CAIRO_OPERATOR_HSL_LUMINOSITY;
-  printf("%i", opt);
   cairo_set_operator(ct, opt);
 };
 
