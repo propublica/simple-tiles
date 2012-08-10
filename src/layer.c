@@ -24,6 +24,7 @@ simplet_layer_new(const char *datastring){
     return NULL;
   }
 
+  simplet_retain((simplet_retainable_t *)layer);
   return layer;
 }
 

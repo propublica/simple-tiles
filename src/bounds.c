@@ -84,7 +84,7 @@ simplet_bounds_from_ogr(OGRGeometryH geom){
 // Free the memory associated with the bounds.
 void
 simplet_bounds_free(simplet_bounds_t *bounds){
-  free(bounds);
+  if(simplet_release((simplet_retainable_t *)bounds) == 0) free(bounds);
 }
 
 // Allocate and return a new simplet_bounds_t.
@@ -102,6 +102,7 @@ simplet_bounds_new(){
   bounds->se.x = -INFINITY;
   bounds->se.y = INFINITY;
 
+  simplet_retain((simplet_retainable_t *)bounds);
   return bounds;
 }
 

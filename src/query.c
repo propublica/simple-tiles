@@ -29,6 +29,8 @@ simplet_query_new(const char *sqlquery){
 
   query->error.status = SIMPLET_OK;
   query->ogrsql       = simplet_copy_string(sqlquery);
+
+  simplet_retain((simplet_retainable_t *)query);
   return query;
 }
 
@@ -42,6 +44,8 @@ simplet_query_vfree(void *query){
 // Free a layer and associated queries.
 void
 simplet_query_free(simplet_query_t *query){
+  if(simplet_release((simplet_retainable_t *)query) != 0) return;
+
   simplet_list_t* styles = query->styles;
   simplet_list_set_item_free(styles, simplet_style_vfree);
   simplet_list_free(styles);

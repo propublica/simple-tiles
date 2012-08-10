@@ -43,12 +43,15 @@ simplet_map_new(){
 
   map->error.status = SIMPLET_OK;
 
+  simplet_retain((simplet_retainable_t *)map);
   return map;
 }
 
 // Free the memory associated with a simplet_map_t.
 void
 simplet_map_free(simplet_map_t *map){
+  if(simplet_release((simplet_retainable_t *)map) != 0) return;
+
   if(map->bounds)
     simplet_bounds_free(map->bounds);
 

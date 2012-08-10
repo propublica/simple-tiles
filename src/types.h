@@ -66,6 +66,9 @@ typedef struct {
   char msg[SIMPLET_MAX_ERROR];
 } simplet_error_t;
 
+#define SIMPLET_RETAIN \
+  int refcount;
+
 /* map structures */
 typedef struct {
   SIMPLET_ERROR_FIELDS
@@ -79,6 +82,13 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
+} simplet_retainable_t;
+
+typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   simplet_bounds_t     *bounds;
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
@@ -91,6 +101,7 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   char           *source;
   simplet_list_t *queries;
 } simplet_layer_t;
@@ -98,6 +109,7 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   char *ogrsql;
   simplet_list_t *styles;
 } simplet_query_t;
@@ -105,6 +117,7 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   char *key;
   char *arg;
 } simplet_style_t;

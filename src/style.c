@@ -204,6 +204,8 @@ simplet_style_new(const char *key, const char *arg){
   if(!(style = malloc(sizeof(*style))))
     return NULL;
 
+  memset(style, 0, sizeof(*style));
+
   style->key = simplet_copy_string(key);
   style->arg = simplet_copy_string(arg);
 
@@ -212,6 +214,7 @@ simplet_style_new(const char *key, const char *arg){
     return NULL;
   }
 
+  simplet_retain((simplet_retainable_t *)style);
   return style;
 }
 
@@ -224,9 +227,11 @@ simplet_style_vfree(void *style){
 // Free a simplet_style_t
 void
 simplet_style_free(simplet_style_t* style){
-  free(style->key);
-  free(style->arg);
-  free(style);
+  if(simplet_release(style) == 0) {
+    free(style->key);
+    free(style->arg);
+    free(style);
+  }
 }
 
 // Find a styledef in the styleTable.

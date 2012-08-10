@@ -30,7 +30,7 @@ simplet_lithograph_new(cairo_t *ctx){
   litho->ctx = ctx;
   litho->pango_ctx = pango_cairo_create_context(ctx);
   cairo_reference(ctx);
-
+  simplet_retain((simplet_retainable_t *)litho);
   return litho;
 }
 
