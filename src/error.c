@@ -27,23 +27,23 @@ simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const cha
   switch(status){
     case SIMPLET_ERR:
       error->status = SIMPLET_ERR;
-      snprintf(error->error_msg, SIMPLET_MAX_ERROR, "simple tiles error: %s", msg);
+      snprintf(error->error_msg, SIMPLET_MAX_ERROR - 1, "simple tiles error: %s", msg);
       break;
     case SIMPLET_OOM:
       error->status = SIMPLET_OOM;
-      snprintf(error->error_msg, SIMPLET_MAX_ERROR, "out of memory for allocation, %s", msg);
+      snprintf(error->error_msg, SIMPLET_MAX_ERROR - 1, "out of memory for allocation, %s", msg);
       break;
     case SIMPLET_CAIRO_ERR:
       error->status = SIMPLET_CAIRO_ERR;
-      snprintf(error->error_msg, SIMPLET_MAX_ERROR, "cairo error: %s", msg);
+      snprintf(error->error_msg, SIMPLET_MAX_ERROR - 1, "cairo error: %s", msg);
       break;
     case SIMPLET_OGR_ERR:
       error->status = SIMPLET_OGR_ERR;
-      snprintf(error->error_msg, SIMPLET_MAX_ERROR, "OGR error: %s, %s", CPLGetLastErrorMsg(), msg);
+      snprintf(error->error_msg, SIMPLET_MAX_ERROR - 1, "OGR error: %s, %s", CPLGetLastErrorMsg(), msg);
       break;
     case SIMPLET_OK:
       error->status = SIMPLET_OK;
-      snprintf(error->error_msg, SIMPLET_MAX_ERROR, "%s", msg);
+      snprintf(error->error_msg, SIMPLET_MAX_ERROR - 1, "%s", msg);
   }
 }
 

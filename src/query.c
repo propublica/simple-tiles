@@ -269,7 +269,7 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
     bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   }
 
-  // Transform the OGR bounds to the sources srs.
+  // Transform the OGR bounds to the source's srs.
   OGR_G_TransformTo(bounds, srs);
   OGR_DS_ReleaseResultSet(source, olayer);
 

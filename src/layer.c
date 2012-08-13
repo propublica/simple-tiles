@@ -42,6 +42,8 @@ simplet_layer_vfree(void *layer){
 // Free a layer object, and associated layers.
 void
 simplet_layer_free(simplet_layer_t *layer){
+  if(simplet_release((simplet_retainable_t *)layer) > 0) return;
+
   simplet_list_set_item_free(layer->queries, simplet_query_vfree);
   simplet_list_free(layer->queries);
   free(layer->source);

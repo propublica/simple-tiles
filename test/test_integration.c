@@ -65,6 +65,7 @@ test_many_queries(){
 
   simplet_map_render_to_png(map, "./queries.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));
+
   simplet_map_free(map);
 }
 
