@@ -57,11 +57,10 @@ typedef enum {
   SIMPLET_OK         // OK
 } simplet_status_t;
 
-#define SIMPLET_MAX_ERROR 1024
 
 #define SIMPLET_ERROR_FIELDS \
   simplet_status_t status; \
-  char error_msg[SIMPLET_MAX_ERROR];
+  char *error_msg;
 
 #define SIMPLET_RETAIN \
   int refcount;
