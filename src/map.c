@@ -10,6 +10,7 @@
 #include "util.h"
 #include "bounds.h"
 #include "text.h"
+#include "memory.h"
 
 // Output size of a slippy tile.
 #define SIMPLET_SLIPPY_SIZE 256

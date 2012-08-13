@@ -21,7 +21,6 @@ simplet_list_push(simplet_list_t *list, void* val){
     return NULL;
 
   node->user_data = val;
-  simplet_retain((simplet_retainable_t *)node->user_data);
 
   if(!(list->head || list->tail)) {
     list->head = list->tail = node;
@@ -76,7 +75,6 @@ simplet_list_pop(simplet_list_t *list){
   free(node);
   list->length--;
 
-  simplet_release((simplet_retainable_t *)val);
   return val;
 }
 

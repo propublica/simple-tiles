@@ -20,7 +20,7 @@ CFLAGS ?= -fPIC -std=c99 $(OPTIMIZATION) $(DEFINES) $(DEBUG) -Wall -Werror -Wext
   $(shell gdal-config --cflags)
 LDLIBS = -lm $(shell pkg-config --libs pangocairo) \
   $(shell gdal-config --libs)
-OBJ = list.o bounds.o style.o map.o util.o query.o layer.o error.o init.o text.o user_data.o
+OBJ = memory.o list.o bounds.o style.o map.o util.o query.o layer.o error.o init.o text.o user_data.o
 PKG_CF = simple-tiles.pc
 
 all: $(OBJ)
@@ -43,20 +43,22 @@ install: $(DYLIBNAME) $(STLIBNAME)
 	cp $(PKG_CF) $(INSTALL_PKG)
 	$(AFTER)
 
-bounds.o: bounds.c bounds.h types.h
+bounds.o: bounds.c bounds.h types.h memory.h
 error.o: error.c error.h types.h
-query.o: query.c style.h types.h list.h user_data.h query.h map.h \
-  text.h util.h bounds.h error.h
 init.o: init.c error.h types.h
 layer.o: layer.c layer.h types.h text.h list.h user_data.h query.h map.h \
-  style.h util.h error.h
+  style.h util.h error.h memory.h
 list.o: list.c list.h types.h
 map.o: map.c init.h error.h types.h map.h user_data.h layer.h text.h \
-  list.h query.h style.h util.h bounds.h
-style.o: style.c map.h types.h user_data.h style.h list.h util.h
-text.o: text.c text.h types.h list.h style.h user_data.h util.h bounds.h
+  list.h query.h style.h util.h bounds.h memory.h
+memory.o: memory.c memory.h types.h
+query.o: query.c style.h types.h list.h user_data.h query.h map.h text.h \
+  util.h bounds.h error.h memory.h
+style.o: style.c map.h types.h user_data.h style.h list.h util.h memory.h
+text.o: text.c text.h types.h list.h style.h user_data.h util.h bounds.h \
+  memory.h
 user_data.o: user_data.c user_data.h types.h
-util.o: util.c util.h
+util.o: util.c util.h memory.h types.h
 
 dep:
 	@$(CC) -MM *.c

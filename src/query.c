@@ -9,6 +9,7 @@
 #include "bounds.h"
 #include "text.h"
 #include "error.h"
+#include "memory.h"
 
 // Set up some user data functions.
 SIMPLET_HAS_USER_DATA(query)

@@ -4,6 +4,8 @@
 #include "map.h"
 #include "style.h"
 #include "util.h"
+#include "memory.h"
+
 
 // Small structure to track callbacks by key.
 typedef struct simplet_styledef_t {
@@ -227,11 +229,10 @@ simplet_style_vfree(void *style){
 // Free a simplet_style_t
 void
 simplet_style_free(simplet_style_t* style){
-  if(simplet_release(style) == 0) {
-    free(style->key);
-    free(style->arg);
-    free(style);
-  }
+  if(simplet_release((simplet_retainable_t *)style) > 0) return;
+  free(style->key);
+  free(style->arg);
+  free(style);
 }
 
 // Find a styledef in the styleTable.

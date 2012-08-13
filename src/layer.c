@@ -3,6 +3,8 @@
 #include "util.h"
 #include "error.h"
 #include <cpl_error.h>
+#include "memory.h"
+
 
 // Set up user data.
 SIMPLET_HAS_USER_DATA(layer)

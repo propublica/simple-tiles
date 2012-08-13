@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "math.h"
 #include "bounds.h"
+#include "memory.h"
+
 
 
 // Extend the bounds to include the x, y point.
@@ -84,7 +86,7 @@ simplet_bounds_from_ogr(OGRGeometryH geom){
 // Free the memory associated with the bounds.
 void
 simplet_bounds_free(simplet_bounds_t *bounds){
-  if(simplet_release((simplet_retainable_t *)bounds) == 0) free(bounds);
+  if(simplet_release((simplet_retainable_t *)bounds) <= 0) free(bounds);
 }
 
 // Allocate and return a new simplet_bounds_t.

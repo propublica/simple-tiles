@@ -2,6 +2,7 @@
 #include "style.h"
 #include "util.h"
 #include "bounds.h"
+#include "memory.h"
 #include <math.h>
 
 // A storage structure that holds the current state of the layout.
@@ -46,6 +47,8 @@ placement_vfree(void *placement){
 // Free a lithograph and unref the stored ctx.
 void
 simplet_lithograph_free(simplet_lithograph_t *litho){
+  if(simplet_release((simplet_retainable_t *)litho) > 0) return;
+
   cairo_destroy(litho->ctx);
   simplet_list_set_item_free(litho->placements, placement_vfree);
   g_object_unref(litho->pango_ctx);

@@ -1,12 +1,12 @@
-#ifndef _SIMPLE_TILES_QUERY_H
-#define _SIMPLE_TILES_QUERY_H
+#ifndef _SIMPLE_TILES_MEMORY_H
+#define _SIMPLE_TILES_MEMORY_H
 
 #include "types.h"
 
 int
-simplet_retain(simplet_errorable_t *obj);
+simplet_retain(simplet_retainable_t *obj);
 
 int
-simplet_release(simplet_errorable_t *obj);
+simplet_release(simplet_retainable_t *obj);
 
 #endif

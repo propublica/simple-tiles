@@ -3,7 +3,6 @@
 // Set the user data on a generic obj.
 void
 simplet_set_user_data(simplet_with_user_data_t *obj, void *data){
-  simplet_retain(data);
   obj->user_data = data;
 }
 
