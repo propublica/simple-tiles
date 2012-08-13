@@ -14,7 +14,7 @@ set_error(simplet_##type *item, simplet_status_t status, const char *msg) { \
 }
 
 void
-simplet_set_error(simplet_error_t *error, simplet_status_t status, const char *msg);
+simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const char *msg);
 
 void
 simplet_error_init();

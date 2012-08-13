@@ -208,8 +208,8 @@ simplet_style_new(const char *key, const char *arg){
 
   memset(style, 0, sizeof(*style));
 
-  style->key = simplet_copy_string(key);
-  style->arg = simplet_copy_string(arg);
+  style->key   = simplet_copy_string(key);
+  style->arg   = simplet_copy_string(arg);
 
   if(!(style->key && style->arg)){
     free(style);

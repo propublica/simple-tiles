@@ -42,9 +42,9 @@ simplet_map_new(){
     return NULL;
   }
 
-  map->error.status = SIMPLET_OK;
+  map->status = SIMPLET_OK;
 
-  simplet_retain((simplet_retainable_t *)map);
+  //simplet_retain((simplet_retainable_t *)map);
   return map;
 }
 
@@ -243,20 +243,20 @@ simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer){
 // Check the error status of the map.
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
-  return map->error.status;
+  return map->status;
 }
 
 // Return a human readable reference to the error message stored on the map.
 const char*
 simplet_map_status_to_string(simplet_map_t *map){
-  return (const char*) map->error.msg;
+  return (const char*) map->error_msg;
 }
 
 // Check if the map is valid for rendering
 simplet_status_t
 simplet_map_is_valid(simplet_map_t *map){
   // Does it have a previously set error.
-  if(!map->error.status == SIMPLET_OK)
+  if(!map->status == SIMPLET_OK)
     return SIMPLET_ERR;
 
   // Does it have a bounds?

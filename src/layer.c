@@ -19,7 +19,7 @@ simplet_layer_new(const char *datastring){
   memset(layer, 0, sizeof(*layer));
 
   layer->source = simplet_copy_string(datastring);
-  layer->error.status = SIMPLET_OK;
+  layer->status = SIMPLET_OK;
 
   if(!(layer->queries = simplet_list_new())){
     free(layer);

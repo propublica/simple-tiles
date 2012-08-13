@@ -28,7 +28,7 @@ simplet_query_new(const char *sqlquery){
     return NULL;
   }
 
-  query->error.status = SIMPLET_OK;
+  query->status = SIMPLET_OK;
   query->ogrsql       = simplet_copy_string(sqlquery);
 
   simplet_retain((simplet_retainable_t *)query);

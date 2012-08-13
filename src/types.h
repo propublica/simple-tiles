@@ -57,14 +57,11 @@ typedef enum {
   SIMPLET_OK         // OK
 } simplet_status_t;
 
-#define SIMPLET_ERROR_FIELDS \
-  simplet_error_t error;
-
 #define SIMPLET_MAX_ERROR 1024
-typedef struct {
-  simplet_status_t status;
-  char msg[SIMPLET_MAX_ERROR];
-} simplet_error_t;
+
+#define SIMPLET_ERROR_FIELDS \
+  simplet_status_t status; \
+  char error_msg[SIMPLET_MAX_ERROR];
 
 #define SIMPLET_RETAIN \
   int refcount;
@@ -129,8 +126,8 @@ typedef struct {
 #define SIMPLET_PI M_PI
 #endif
 
-#define SIMPLET_MERCATOR "epsg:3785"
-#define SIMPLET_WGS84    "epsg:4326"
+#define SIMPLET_MERCATOR "EPSG:3785"
+#define SIMPLET_WGS84    "EPSG:4326"
 
 
 #ifdef __cplusplus
