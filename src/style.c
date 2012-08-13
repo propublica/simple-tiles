@@ -230,6 +230,8 @@ simplet_style_vfree(void *style){
 void
 simplet_style_free(simplet_style_t* style){
   if(simplet_release((simplet_retainable_t *)style) > 0) return;
+  if(style->error_msg) free(style->error_msg);
+
   free(style->key);
   free(style->arg);
   free(style);

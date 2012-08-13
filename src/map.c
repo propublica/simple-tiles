@@ -67,6 +67,9 @@ simplet_map_free(simplet_map_t *map){
   if(map->bgcolor)
     free(map->bgcolor);
 
+  if(map->error_msg)
+    free(map->error_msg);
+
   free(map);
 }
 

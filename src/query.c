@@ -45,7 +45,8 @@ simplet_query_vfree(void *query){
 // Free a layer and associated queries.
 void
 simplet_query_free(simplet_query_t *query){
-  if(simplet_release((simplet_retainable_t *)query) != 0) return;
+  if(simplet_release((simplet_retainable_t *)query) > 0) return;
+  if(query->error_msg) free(query->error_msg);
 
   simplet_list_t* styles = query->styles;
   simplet_list_set_item_free(styles, simplet_style_vfree);
