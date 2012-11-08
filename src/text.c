@@ -8,8 +8,6 @@
 // A storage structure that holds the current state of the layout.
 typedef struct {
   PangoLayout *layout;
-  double x;
-  double y;
   int placed;
   simplet_bounds_t *bounds;
 } placement_t;
@@ -30,6 +28,7 @@ simplet_lithograph_new(cairo_t *ctx){
 
   litho->ctx = ctx;
   litho->pango_ctx = pango_cairo_create_context(ctx);
+
   cairo_reference(ctx);
   simplet_retain((simplet_retainable_t *)litho);
   return litho;
@@ -67,6 +66,7 @@ placement_new(PangoLayout *layout, simplet_bounds_t *bounds){
 
   placement->layout = layout;
   placement->bounds = bounds;
+  placement->placed = FALSE;
 
   return placement;
 }
@@ -116,14 +116,17 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
   placement_t *placement;
   cairo_save(litho->ctx);
   while((placement = (placement_t *) simplet_list_next(iter))){
-    if(placement->placed) continue;
+    if(placement->placed == TRUE) continue;
     cairo_move_to(litho->ctx, placement->bounds->nw.x, placement->bounds->se.y);
+
     // Draw the placement
     pango_cairo_layout_path(litho->ctx, placement->layout);
-    placement->placed = 1;
+
+    placement->placed = TRUE;
   }
-  // Apply and draw various outline options.
   simplet_apply_styles(litho->ctx, styles, "text-stroke-weight", "text-stroke-color", "color",  NULL);
+
+  // Apply and draw various outline options.
   cairo_restore(litho->ctx);
 }
 

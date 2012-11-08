@@ -9,7 +9,6 @@ test_query(){
   if(!(query = simplet_query_new(sql)))
     assert(0);
 
-  printf("%i", query->refcount);
   assert(query->refcount == 1);
   assert(!strcmp(sql, query->ogrsql));
 

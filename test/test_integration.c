@@ -20,7 +20,7 @@ build_map(){
   simplet_query_add_style(query, "line-cap",  "square");
   simplet_query_add_style(query, "line-join", "round");
   simplet_query_add_style(query, "fill",      "#061F3799");
-  //simplet_query_add_style(query, "seamless",  "true");
+  simplet_query_add_style(query, "seamless",  "true");
   return map;
 }
 
