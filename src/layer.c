@@ -97,7 +97,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithog
     if(status != SIMPLET_OK){
       simplet_list_iter_free(iter);
       OGRReleaseDataSource(source);
-      return status;
+      return set_error(layer, query->status, query->error_msg);
     }
 
     simplet_lithograph_apply(litho, query->styles);

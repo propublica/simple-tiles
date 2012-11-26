@@ -44,14 +44,14 @@ simplet_map_new(){
 
   map->status = SIMPLET_OK;
 
-  //simplet_retain((simplet_retainable_t *)map);
+  simplet_retain((simplet_retainable_t *)map);
   return map;
 }
 
 // Free the memory associated with a simplet_map_t.
 void
 simplet_map_free(simplet_map_t *map){
-  if(simplet_release((simplet_retainable_t *)map) != 0) return;
+  if(simplet_release((simplet_retainable_t *)map) > 0) return;
 
   if(map->bounds)
     simplet_bounds_free(map->bounds);
@@ -322,7 +322,7 @@ build_surface(simplet_map_t *map){
     err = simplet_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
-      set_error(map, err, "error in rendering");
+      set_error(map, layer->status, layer->error_msg);
       break;
     }
   }

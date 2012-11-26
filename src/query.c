@@ -227,25 +227,24 @@ simplet_status_t
 simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx){
 
+
   // Grab a layer in order to suss out the srs
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_ExecuteSQL(source, query->ogrsql, NULL, NULL))){
     int err = CPLGetLastErrorNo();
-    if(!err)
+    if(!err) {
       return SIMPLET_OK;
-    else
+    } else {
       return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+    }
   }
+
 
   // Try and figure out the srs.
   OGRSpatialReferenceH srs;
   if(!(srs = OGR_L_GetSpatialRef(olayer))){
     OGR_DS_ReleaseResultSet(source, olayer);
-    int err = CPLGetLastErrorNo();
-    if(!err)
-      return SIMPLET_OK;
-    else
-      return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+    return set_error(query, SIMPLET_OGR_ERR, "Layer has no srs, try assigning one with st_setsrid.");
   }
 
   // If the map has a buffer we need to grow the bounds a bit to grab more
@@ -269,9 +268,7 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   } else {
     bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   }
-
   // Transform the OGR bounds to the source's srs.
-  OGR_G_TransformTo(bounds, srs);
   OGR_DS_ReleaseResultSet(source, olayer);
 
   // Execute the SQL and limit it to returning only the bounds set on the map.
