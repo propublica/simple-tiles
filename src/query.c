@@ -239,13 +239,8 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
     }
   }
 
-
-  // Try and figure out the srs.
-  OGRSpatialReferenceH srs;
-  if(!(srs = OGR_L_GetSpatialRef(olayer))){
-    OGR_DS_ReleaseResultSet(source, olayer);
-    return set_error(query, SIMPLET_OGR_ERR, "Layer has no srs, try assigning one with st_setsrid.");
-  }
+  // Grab an srs.
+  OGRSpatialReferenceH srs = OGR_L_GetSpatialRef(olayer);
 
   // If the map has a buffer we need to grow the bounds a bit to grab more
   // data from the data source.
@@ -277,9 +272,7 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
     return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   // Create a transorm to use in rendering later.
-  OGRCoordinateTransformationH transform;
-  if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
-    return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+  OGRCoordinateTransformationH transform = OCTNewCoordinateTransformation(srs, map->proj);
 
   // Copy the original surface so we don't muss about with defaults.
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(ctx),
@@ -302,7 +295,9 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
 
-    if(geom == NULL || OGR_G_Transform(geom, transform) != OGRERR_NONE){
+    if(transform) OGR_G_Transform(geom, transform);
+
+    if(geom == NULL){
       OGR_F_Destroy(feature);
       continue;
     }
