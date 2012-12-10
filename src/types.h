@@ -125,7 +125,7 @@ typedef struct {
 #define SIMPLET_PI M_PI
 #endif
 
-#define SIMPLET_MERCATOR "EPSG:3785"
+#define SIMPLET_MERCATOR "EPSG:3857"
 #define SIMPLET_WGS84    "EPSG:4326"
 
 

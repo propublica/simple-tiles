@@ -264,6 +264,7 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
     bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   }
   // Transform the OGR bounds to the source's srs.
+  OGR_G_TransformTo(bounds, srs);
   OGR_DS_ReleaseResultSet(source, olayer);
 
   // Execute the SQL and limit it to returning only the bounds set on the map.
@@ -303,7 +304,6 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
     }
 
     dispatch(geom, query, sub_ctx);
-
     // Add feature labels, this is another loop, but it should be fast enough/
     simplet_lithograph_add_placement(litho, feature, query->styles, sub_ctx);
     OGR_F_Destroy(feature);
