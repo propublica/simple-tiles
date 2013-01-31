@@ -22,28 +22,30 @@ simplet_error(simplet_errorable_t *errr, simplet_status_t err, const char *msg){
 }
 
 // Add a bit of debugging information to the error.
-void
+int
 simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const char *msg){
+  int res;
   switch(status){
     case SIMPLET_ERR:
       error->status = SIMPLET_ERR;
-      asprintf(&error->error_msg, "simple tiles error: %s", msg);
+      res = asprintf(&error->error_msg, "simple tiles error: %s", msg);
       break;
     case SIMPLET_OOM:
       error->status = SIMPLET_OOM;
-      asprintf(&error->error_msg,  "out of memory for allocation, %s", msg);
+      res = asprintf(&error->error_msg,  "out of memory for allocation, %s", msg);
       break;
     case SIMPLET_CAIRO_ERR:
       error->status = SIMPLET_CAIRO_ERR;
-      asprintf(&error->error_msg, "cairo error: %s", msg);
+      res = asprintf(&error->error_msg, "cairo error: %s", msg);
       break;
     case SIMPLET_OGR_ERR:
       error->status = SIMPLET_OGR_ERR;
-      asprintf(&error->error_msg, "OGR error: %s, %s", CPLGetLastErrorMsg(), msg);
+      res = asprintf(&error->error_msg, "OGR error: %s, %s", CPLGetLastErrorMsg(), msg);
       break;
     case SIMPLET_OK:
       error->status = SIMPLET_OK;
-      asprintf(&error->error_msg, "%s", msg);
+      res = asprintf(&error->error_msg, "%s", msg);
   }
+  return res;
 }
 
