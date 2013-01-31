@@ -24,7 +24,7 @@ simplet_error(simplet_errorable_t *errr, simplet_status_t err, const char *msg){
 // Add a bit of debugging information to the error.
 int
 simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const char *msg){
-  int res;
+  int res = 1;
   switch(status){
     case SIMPLET_ERR:
       error->status = SIMPLET_ERR;
