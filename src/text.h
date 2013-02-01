@@ -9,6 +9,9 @@ extern "C" {
 #endif
 
 typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   cairo_t *ctx;
   PangoContext *pango_ctx;
   simplet_list_t *placements;
