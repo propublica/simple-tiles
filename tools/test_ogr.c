@@ -25,6 +25,12 @@ int main(void) {
     puts("ohno");
   }
 
+  OGRSpatialReferenceH proj_from = OSRNewSpatialReference(NULL);
+  if(OSRSetFromUserInput(proj_from, from) != OGRERR_NONE) {
+    puts("ohno");
+    exit(1);
+  }
+
   OGR_G_DestroyGeometry(tmpLine);
   OGR_G_DestroyGeometry(ogrBounds);
 

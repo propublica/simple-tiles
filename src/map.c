@@ -201,7 +201,7 @@ simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
-  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
+  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR) == SIMPLET_OK)
     return set_error(map, SIMPLET_OGR_ERR, "couldn't set slippy projection");
 
   double zfactor, length, origin;
