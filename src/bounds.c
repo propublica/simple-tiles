@@ -29,17 +29,17 @@ simplet_bounds_to_ogr(simplet_bounds_t *bounds, OGRSpatialReferenceH proj) {
   OGR_G_AddPoint_2D(tmpLine, bounds->se.x, bounds->se.y);
   OGR_G_AddPoint_2D(tmpLine, bounds->nw.x, bounds->se.y);
   OGR_G_AddPoint_2D(tmpLine, bounds->se.x, bounds->nw.y);
-
+  OGRGeometryH tmpPoint = OGR_G_ForceToMultiPoint(tmpLine);
   // Calculate the Convex Hull
   OGRGeometryH ogrBounds;
-  if(!(ogrBounds = OGR_G_ConvexHull(tmpLine))){
+  if(!(ogrBounds = OGR_G_ConvexHull(tmpPoint))){
     OGR_G_DestroyGeometry(tmpLine);
     return NULL;
   }
 
   // And assign the projection.
   OGR_G_AssignSpatialReference(ogrBounds, proj);
-  OGR_G_DestroyGeometry(tmpLine);
+  OGR_G_DestroyGeometry(tmpPoint);
 
   return ogrBounds;
 }
@@ -79,14 +79,14 @@ simplet_bounds_from_ogr(OGRGeometryH geom){
     }
   }
 
-  //OGR_G_DestroyGeometry(hull);
+  OGR_G_DestroyGeometry(hull);
   return bounds;
 }
 
 // Free the memory associated with the bounds.
 void
 simplet_bounds_free(simplet_bounds_t *bounds){
-  if(simplet_release((simplet_retainable_t *)bounds) > 0) free(bounds);
+  if(simplet_release((simplet_retainable_t *)bounds) <= 0) free(bounds);
 }
 
 // Allocate and return a new simplet_bounds_t.
