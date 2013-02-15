@@ -6,12 +6,12 @@ tl_2010_36047_roads.shp:
 	unzip tl_2010_36047_roads.zip
 
 ne_10m_admin_0_countries.shp:
-	curl -O http://www.nacis.org/naturalearth/10m/cultural/10m-admin-0-countries.zip
-	unzip 10m-admin-0-countries.zip
+	curl -LO http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip
+	unzip ne_10m_admin_0_countries.zip
 
 ne_10m_populated_places.shp:
-	curl -O http://www.nacis.org/naturalearth/10m/cultural/10m-populated-places.zip
-	unzip 10m-populated-places.zip
+	curl -LO http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_populated_places.zip
+	unzip ne_10m_populated_places.zip
 
 tl_2010_55_cd108.shp:
 	curl -O ftp://ftp2.census.gov/geo/tiger/TIGER2010/CD/108/tl_2010_55_cd108.zip
