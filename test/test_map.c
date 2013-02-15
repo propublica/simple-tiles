@@ -1,6 +1,10 @@
 #include "test.h"
 #include <simple-tiles/map.h>
 
+static void
+close_enough(float number, float test){
+  assert((number - test) < 0.001);
+}
 
 void
 test_resetting(){
@@ -53,10 +57,10 @@ test_slippy(){
   assert((map = simplet_map_new()));
   assert(simplet_map_set_slippy(map, 0, 0, 1));
   assert(map->bounds);
-  assert(map->bounds->nw.x == -20037508.34);
-  assert(map->bounds->nw.y == 20037508.34);
-  assert(map->bounds->se.y == 0.0);
-  assert(map->bounds->se.x == 0.0);
+  close_enough(map->bounds->nw.x, -20037508.34);
+  close_enough(map->bounds->nw.y, 20037508.34);
+  close_enough(map->bounds->se.y, 0.0);
+  close_enough(map->bounds->se.x, 0.0);
   simplet_map_free(map);
 }
 

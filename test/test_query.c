@@ -8,7 +8,10 @@ test_query(){
   const char *sql = "SELECT * FROM TEST";
   if(!(query = simplet_query_new(sql)))
     assert(0);
+
+  assert(query->refcount == 1);
   assert(!strcmp(sql, query->ogrsql));
+
   simplet_query_add_style(query, "fill", "#CCCCCC");
   simplet_style_t *style;
   style = simplet_list_tail(query->styles);

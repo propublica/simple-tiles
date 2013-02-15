@@ -2,13 +2,12 @@
 #include "style.h"
 #include "util.h"
 #include "bounds.h"
+#include "memory.h"
 #include <math.h>
 
 // A storage structure that holds the current state of the layout.
 typedef struct {
   PangoLayout *layout;
-  double x;
-  double y;
   int placed;
   simplet_bounds_t *bounds;
 } placement_t;
@@ -29,8 +28,9 @@ simplet_lithograph_new(cairo_t *ctx){
 
   litho->ctx = ctx;
   litho->pango_ctx = pango_cairo_create_context(ctx);
-  cairo_reference(ctx);
 
+  cairo_reference(ctx);
+  simplet_retain((simplet_retainable_t *)litho);
   return litho;
 }
 
@@ -46,6 +46,8 @@ placement_vfree(void *placement){
 // Free a lithograph and unref the stored ctx.
 void
 simplet_lithograph_free(simplet_lithograph_t *litho){
+  if(simplet_release((simplet_retainable_t *)litho) > 0) return;
+
   cairo_destroy(litho->ctx);
   simplet_list_set_item_free(litho->placements, placement_vfree);
   g_object_unref(litho->pango_ctx);
@@ -64,6 +66,7 @@ placement_new(PangoLayout *layout, simplet_bounds_t *bounds){
 
   placement->layout = layout;
   placement->bounds = bounds;
+  placement->placed = FALSE;
 
   return placement;
 }
@@ -113,14 +116,17 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
   placement_t *placement;
   cairo_save(litho->ctx);
   while((placement = (placement_t *) simplet_list_next(iter))){
-    if(placement->placed) continue;
+    if(placement->placed == TRUE) continue;
     cairo_move_to(litho->ctx, placement->bounds->nw.x, placement->bounds->se.y);
+
     // Draw the placement
     pango_cairo_layout_path(litho->ctx, placement->layout);
-    placement->placed = 1;
+
+    placement->placed = TRUE;
   }
-  // Apply and draw various outline options.
   simplet_apply_styles(litho->ctx, styles, "text-stroke-weight", "text-stroke-color", "color",  NULL);
+
+  // Apply and draw various outline options.
   cairo_restore(litho->ctx);
 }
 
@@ -175,6 +181,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
     OGR_G_DestroyGeometry(center);
     return;
   }
+
   cairo_font_options_set_hint_style(opts, CAIRO_HINT_STYLE_NONE);
   cairo_font_options_set_hint_metrics(opts, CAIRO_HINT_METRICS_OFF);
   pango_cairo_context_set_font_options(litho->pango_ctx, opts);

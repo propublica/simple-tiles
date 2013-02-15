@@ -20,6 +20,8 @@ main(){
   simplet_query_add_style(query, "weight", "3");
 
   simplet_query_t *query2 = simplet_layer_add_query(layer, "SELECT * from 'ne_10m_admin_0_countries'");
+  simplet_query_add_style(query, "blend", "over");
+
   simplet_query_add_style(query2, "weight", "0.5");
   simplet_query_add_style(query2, "fill", "#d3e46f");
   simplet_query_add_style(query2, "stroke", "#ffffff");
@@ -32,7 +34,9 @@ main(){
   simplet_query_add_style(query2, "text-stroke-weight", "2");
   simplet_query_add_style(query2, "letter-spacing", "1");
 
+
   if(simplet_map_is_valid(map))
     simplet_map_render_to_png(map, "./out.png");
+
   simplet_map_free(map);
 }

@@ -9,6 +9,7 @@
 #include "bounds.h"
 #include "text.h"
 #include "error.h"
+#include "memory.h"
 
 // Set up some user data functions.
 SIMPLET_HAS_USER_DATA(query)
@@ -27,8 +28,10 @@ simplet_query_new(const char *sqlquery){
     return NULL;
   }
 
-  query->error.status = SIMPLET_OK;
+  query->status = SIMPLET_OK;
   query->ogrsql       = simplet_copy_string(sqlquery);
+
+  simplet_retain((simplet_retainable_t *)query);
   return query;
 }
 
@@ -42,6 +45,9 @@ simplet_query_vfree(void *query){
 // Free a layer and associated queries.
 void
 simplet_query_free(simplet_query_t *query){
+  if(simplet_release((simplet_retainable_t *)query) > 0) return;
+  if(query->error_msg) free(query->error_msg);
+
   simplet_list_t* styles = query->styles;
   simplet_list_set_item_free(styles, simplet_style_vfree);
   simplet_list_free(styles);
@@ -82,7 +88,8 @@ plot_part(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   last_x = x;
   last_y = y;
   cairo_move_to(ctx, x, y);
-  for(int j = 0; j < OGR_G_GetPointCount(geom); j++){
+  int count = OGR_G_GetPointCount(geom);
+  for(int j = 0; j < count; j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
     double dx = last_x - x;
     double dy = last_y - y;
@@ -96,7 +103,7 @@ plot_part(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
     }
   }
   // Ensure something is always drawn, might not be necessary.
-  OGR_G_GetPoint(geom, OGR_G_GetPointCount(geom) - 1, &x, &y, NULL);
+  OGR_G_GetPoint(geom, count - 1, &x, &y, NULL);
   cairo_line_to(ctx, x, y);
 }
 
@@ -106,7 +113,8 @@ plot_polygon(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   cairo_save(ctx);
   cairo_new_path(ctx);
   //  Split the polygon into sub polygons.
-  for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
+  int count = OGR_G_GetGeometryCount(geom);
+  for(int i = 0; i < count; i++){
     OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
     if(subgeom == NULL)
       continue;
@@ -144,7 +152,8 @@ plot_point(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
 
   // Loop through the points in the geom and place them on the ctx.
   cairo_device_to_user_distance(ctx, &r, &dy);
-  for(int i = 0; i < OGR_G_GetPointCount(geom); i++){
+  int count = OGR_G_GetPointCount(geom);
+  for(int i = 0; i < count; i++){
     OGR_G_GetPoint(geom, i, &x, &y, NULL);
     cairo_new_path(ctx);
     cairo_arc(ctx, x - r / 2, y - r / 2, r, 0., 2 * SIMPLET_PI);
@@ -189,11 +198,14 @@ dispatch(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
     case wkbMultiPolygon:
     case wkbMultiLineString:
     case wkbGeometryCollection:
-      for(int i = 0; i < OGR_G_GetGeometryCount(geom); i++){
-        OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
-        if(subgeom == NULL)
-          continue;
-        dispatch(subgeom, query, ctx);
+      {
+        int count = OGR_G_GetGeometryCount(geom);
+        for(int i = 0; i < count; i++){
+          OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
+          if(subgeom == NULL)
+            continue;
+          dispatch(subgeom, query, ctx);
+        }
       }
       break;
     default:
@@ -215,26 +227,20 @@ simplet_status_t
 simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   OGRDataSourceH source, simplet_lithograph_t *litho, cairo_t *ctx){
 
+
   // Grab a layer in order to suss out the srs
   OGRLayerH olayer;
   if(!(olayer = OGR_DS_ExecuteSQL(source, query->ogrsql, NULL, NULL))){
     int err = CPLGetLastErrorNo();
-    if(!err)
+    if(!err) {
       return SIMPLET_OK;
-    else
+    } else {
       return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+    }
   }
 
-  // Try and figure out the srs.
-  OGRSpatialReferenceH srs;
-  if(!(srs = OGR_L_GetSpatialRef(olayer))){
-    OGR_DS_ReleaseResultSet(source, olayer);
-    int err = CPLGetLastErrorNo();
-    if(!err)
-      return SIMPLET_OK;
-    else
-      return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
-  }
+  // Grab an srs.
+  OGRSpatialReferenceH srs = OGR_L_GetSpatialRef(olayer);
 
   // If the map has a buffer we need to grow the bounds a bit to grab more
   // data from the data source.
@@ -257,21 +263,17 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   } else {
     bounds = simplet_bounds_to_ogr(map->bounds, map->proj);
   }
-
-  // Transform the OGR bounds to the sources srs.
+  // Transform the OGR bounds to the source's srs.
   OGR_G_TransformTo(bounds, srs);
   OGR_DS_ReleaseResultSet(source, olayer);
 
   // Execute the SQL and limit it to returning only the bounds set on the map.
   olayer = OGR_DS_ExecuteSQL(source, query->ogrsql, bounds, NULL);
-  OGR_G_DestroyGeometry(bounds);
   if(!olayer)
     return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
 
   // Create a transorm to use in rendering later.
-  OGRCoordinateTransformationH transform;
-  if(!(transform = OCTNewCoordinateTransformation(srs, map->proj)))
-    return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
+  OGRCoordinateTransformationH transform = OCTNewCoordinateTransformation(srs, map->proj);
 
   // Copy the original surface so we don't muss about with defaults.
   cairo_surface_t *surface = cairo_surface_create_similar(cairo_get_target(ctx),
@@ -283,6 +285,7 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   cairo_t *sub_ctx = cairo_create(surface);
   set_seamless(query->styles, sub_ctx);
 
+
   // Initialize the transformation matrix.
   cairo_matrix_t mat;
   simplet_map_init_matrix(map, &mat);
@@ -293,13 +296,14 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
 
-    if(geom == NULL || OGR_G_Transform(geom, transform) != OGRERR_NONE){
+    if(transform) OGR_G_Transform(geom, transform);
+
+    if(geom == NULL){
       OGR_F_Destroy(feature);
       continue;
     }
 
     dispatch(geom, query, sub_ctx);
-
     // Add feature labels, this is another loop, but it should be fast enough/
     simplet_lithograph_add_placement(litho, feature, query->styles, sub_ctx);
     OGR_F_Destroy(feature);
@@ -307,9 +311,11 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
 
   // Cleanup.
   cairo_set_source_surface(ctx, surface, 0, 0);
+  simplet_apply_styles(ctx, query->styles, "blend", NULL);
   cairo_paint(ctx);
   cairo_destroy(sub_ctx);
   cairo_surface_destroy(surface);
+  OGR_G_DestroyGeometry(bounds);
   OGR_DS_ReleaseResultSet(source, olayer);
   OCTDestroyCoordinateTransformation(transform);
   return SIMPLET_OK;

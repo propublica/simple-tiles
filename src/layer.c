@@ -3,6 +3,8 @@
 #include "util.h"
 #include "error.h"
 #include <cpl_error.h>
+#include "memory.h"
+
 
 // Set up user data.
 SIMPLET_HAS_USER_DATA(layer)
@@ -17,13 +19,14 @@ simplet_layer_new(const char *datastring){
   memset(layer, 0, sizeof(*layer));
 
   layer->source = simplet_copy_string(datastring);
-  layer->error.status = SIMPLET_OK;
+  layer->status = SIMPLET_OK;
 
   if(!(layer->queries = simplet_list_new())){
     free(layer);
     return NULL;
   }
 
+  simplet_retain((simplet_retainable_t *)layer);
   return layer;
 }
 
@@ -39,6 +42,9 @@ simplet_layer_vfree(void *layer){
 // Free a layer object, and associated layers.
 void
 simplet_layer_free(simplet_layer_t *layer){
+  if(simplet_release((simplet_retainable_t *)layer) > 0) return;
+  if(layer->error_msg) free(layer->error_msg);
+
   simplet_list_set_item_free(layer->queries, simplet_query_vfree);
   simplet_list_free(layer->queries);
   free(layer->source);
@@ -91,7 +97,7 @@ simplet_layer_process(simplet_layer_t *layer, simplet_map_t *map, simplet_lithog
     if(status != SIMPLET_OK){
       simplet_list_iter_free(iter);
       OGRReleaseDataSource(source);
-      return status;
+      return set_error(layer, query->status, query->error_msg);
     }
 
     simplet_lithograph_apply(litho, query->styles);

@@ -3,7 +3,7 @@
 
 #include <ogr_api.h>
 #include <ogr_srs_api.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 #include <pango/pangocairo.h>
 
 #ifdef __cplusplus
@@ -57,14 +57,13 @@ typedef enum {
   SIMPLET_OK         // OK
 } simplet_status_t;
 
-#define SIMPLET_ERROR_FIELDS \
-  simplet_error_t error;
 
-#define SIMPLET_MAX_ERROR 1024
-typedef struct {
-  simplet_status_t status;
-  char msg[SIMPLET_MAX_ERROR];
-} simplet_error_t;
+#define SIMPLET_ERROR_FIELDS \
+  simplet_status_t status; \
+  char *error_msg;
+
+#define SIMPLET_RETAIN \
+  int refcount;
 
 /* map structures */
 typedef struct {
@@ -79,6 +78,13 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
+} simplet_retainable_t;
+
+typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   simplet_bounds_t     *bounds;
   simplet_list_t       *layers;
   OGRSpatialReferenceH proj;
@@ -91,6 +97,7 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   char           *source;
   simplet_list_t *queries;
 } simplet_layer_t;
@@ -98,6 +105,7 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   char *ogrsql;
   simplet_list_t *styles;
 } simplet_query_t;
@@ -105,6 +113,7 @@ typedef struct {
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
+  SIMPLET_RETAIN
   char *key;
   char *arg;
 } simplet_style_t;
@@ -116,8 +125,8 @@ typedef struct {
 #define SIMPLET_PI M_PI
 #endif
 
-#define SIMPLET_MERCATOR "epsg:3785"
-#define SIMPLET_WGS84    "epsg:4326"
+#define SIMPLET_MERCATOR "EPSG:3857"
+#define SIMPLET_WGS84    "EPSG:4326"
 
 
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 #ifndef _SIMPLE_TILES_STYLE_H
 #define _SIMPLE_TILES_STYLE_H
 
-#include <cairo/cairo.h>
+#include <cairo.h>
 #include "types.h"
 #include "list.h"
 #include "user_data.h"

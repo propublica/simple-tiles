@@ -57,11 +57,15 @@ test_many_queries(){
   simplet_query_t *query = simplet_layer_add_query(
       (simplet_layer_t *) simplet_list_get(map->layers, simplet_list_get_length(map->layers) - 1),
       "SELECT * from 'ne_10m_admin_0_countries' where SOV_A3 = 'US1'");
+
   simplet_query_add_style(query, "weight", "1");
   simplet_query_add_style(query, "stroke", "#00cc00dd");
-  simplet_query_add_style(query, "fill",   "#cc000099");
+  simplet_query_add_style(query, "fill",   "#cc0000");
+  simplet_query_add_style(query, "blend",  "soft light");
+
   simplet_map_render_to_png(map, "./queries.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));
+
   simplet_map_free(map);
 }
 

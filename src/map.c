@@ -10,6 +10,7 @@
 #include "util.h"
 #include "bounds.h"
 #include "text.h"
+#include "memory.h"
 
 // Output size of a slippy tile.
 #define SIMPLET_SLIPPY_SIZE 256
@@ -41,14 +42,17 @@ simplet_map_new(){
     return NULL;
   }
 
-  map->error.status = SIMPLET_OK;
+  map->status = SIMPLET_OK;
 
+  simplet_retain((simplet_retainable_t *)map);
   return map;
 }
 
 // Free the memory associated with a simplet_map_t.
 void
 simplet_map_free(simplet_map_t *map){
+  if(simplet_release((simplet_retainable_t *)map) > 0) return;
+
   if(map->bounds)
     simplet_bounds_free(map->bounds);
 
@@ -62,6 +66,9 @@ simplet_map_free(simplet_map_t *map){
 
   if(map->bgcolor)
     free(map->bgcolor);
+
+  if(map->error_msg)
+    free(map->error_msg);
 
   free(map);
 }
@@ -194,7 +201,7 @@ simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
-  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR))
+  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR) == SIMPLET_OK)
     return set_error(map, SIMPLET_OGR_ERR, "couldn't set slippy projection");
 
   double zfactor, length, origin;
@@ -239,20 +246,20 @@ simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer){
 // Check the error status of the map.
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map){
-  return map->error.status;
+  return map->status;
 }
 
 // Return a human readable reference to the error message stored on the map.
 const char*
 simplet_map_status_to_string(simplet_map_t *map){
-  return (const char*) map->error.msg;
+  return (const char*) map->error_msg;
 }
 
 // Check if the map is valid for rendering
 simplet_status_t
 simplet_map_is_valid(simplet_map_t *map){
   // Does it have a previously set error.
-  if(!map->error.status == SIMPLET_OK)
+  if(!map->status == SIMPLET_OK)
     return SIMPLET_ERR;
 
   // Does it have a bounds?
@@ -315,7 +322,7 @@ build_surface(simplet_map_t *map){
     err = simplet_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
-      set_error(map, err, "error in rendering");
+      set_error(map, layer->status, layer->error_msg);
       break;
     }
   }

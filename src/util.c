@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 #include "util.h"
+#include "memory.h"
+
 
 // A safe copy string.
 char*
