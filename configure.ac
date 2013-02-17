@@ -1,0 +1,39 @@
+AC_INIT([simple-tiles], [1.0], [https://github.com/propublica/simple-tiles/issues])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+
+AC_PROG_CC
+
+PKG_PROG_PKG_CONFIG
+PKG_CHECK_MODULES([cairo], [cairo])
+PKG_CHECK_MODULES([pango], [pango])
+PKG_CHECK_MODULES([pangocairo], [pangocairo])
+
+AC_CHECK_HEADERS([assert.h])
+AC_CHECK_HEADERS([cairo.h])
+AC_CHECK_HEADERS([cpl_error.h])
+AC_CHECK_HEADERS([math.h])
+AC_CHECK_HEADERS([ogr_api.h])
+AC_CHECK_HEADERS([ogr_srs_api.h])
+AC_CHECK_HEADERS([pango/pangocairo.h])
+AC_CHECK_HEADERS([pthread.h])
+AC_CHECK_HEADERS([stdarg.h])
+AC_CHECK_HEADERS([stdio.h])
+AC_CHECK_HEADERS([stdlib.h])
+AC_CHECK_HEADERS([string.h])
+AC_CHECK_HEADERS([time.h])
+
+AC_CHECK_FUNCS([atexit])
+AC_CHECK_FUNCS([floor])
+AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([pow])
+AC_CHECK_FUNCS([sqrt])
+AC_CHECK_FUNCS([strdup])
+AC_FUNC_MALLOC
+AC_FUNC_STRTOD
+
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_FILES([
+ Makefile
+ src/Makefile
+])
+AC_OUTPUT
