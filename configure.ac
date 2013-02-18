@@ -15,8 +15,6 @@ PKG_CHECK_MODULES([pango], [pango])
 PKG_CHECK_MODULES([pangocairo], [pangocairo])
 
 AX_LIB_GDAL
-CFLAGS="$CFLAGS $pangocairo_CFLAGS $GDAL_CFLAGS"
-LDFLAGS="$LDFLAGS $pangocairo_LDFLAGS $GDAL_LDFLAGS"
 
 AC_CHECK_HEADERS([assert.h])
 AC_CHECK_HEADERS([cairo.h])
