@@ -2,6 +2,9 @@ AC_INIT([simple-tiles], [1.0], [https://github.com/propublica/simple-tiles/issue
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 AC_PROG_CC
+AC_PROG_CC_C99
+AM_PROG_AR
+LT_INIT
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([cairo], [cairo])
@@ -9,8 +12,8 @@ PKG_CHECK_MODULES([pango], [pango])
 PKG_CHECK_MODULES([pangocairo], [pangocairo])
 
 AX_LIB_GDAL
-CFLAGS="$CFLAGS $GDAL_CFLAGS"
-LDFLAGS="$LDFLAGS $GDAL_LDFLAGS"
+CFLAGS="$CFLAGS $pangocairo_CFLAGS $GDAL_CFLAGS"
+LDFLAGS="$LDFLAGS $pangocairo_LDFLAGS $GDAL_LDFLAGS"
 
 AC_CHECK_HEADERS([assert.h])
 AC_CHECK_HEADERS([cairo.h])
