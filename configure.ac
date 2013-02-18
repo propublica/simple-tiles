@@ -8,6 +8,10 @@ PKG_CHECK_MODULES([cairo], [cairo])
 PKG_CHECK_MODULES([pango], [pango])
 PKG_CHECK_MODULES([pangocairo], [pangocairo])
 
+AX_LIB_GDAL
+CFLAGS="$CFLAGS $GDAL_CFLAGS"
+LDFLAGS="$LDFLAGS $GDAL_LDFLAGS"
+
 AC_CHECK_HEADERS([assert.h])
 AC_CHECK_HEADERS([cairo.h])
 AC_CHECK_HEADERS([cpl_error.h])
