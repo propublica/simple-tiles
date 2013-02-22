@@ -4,7 +4,7 @@ api_SOURCES = api.c
 benchmark_SOURCES = benchmark.c
 
 AM_CFLAGS=${pangocairo_CFLAGS} ${GDAL_CFLAGS}
-AM_LDFLAGS=-L../src -lm ${pangocairo_LDFLAGS} ${GDAL_LDFLAGS} -lsimple_tiles
+AM_LDFLAGS=-L../src -lm ${pangocairo_LIBS} ${GDAL_LDFLAGS} -lsimple_tiles
 
 data:
 	cd ../data && make && cd ../test

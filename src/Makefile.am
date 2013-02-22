@@ -4,4 +4,4 @@ libsimple_tiles_la_SOURCES = bounds.c error.c init.c layer.c list.c map.c memory
 include_HEADERS = bounds.h error.h init.h layer.h list.h map.h memory.h query.h simple_tiles.h style.h text.h types.h user_data.h util.h
 
 libsimple_tiles_la_CFLAGS=${pangocairo_CFLAGS} ${GDAL_CFLAGS}
-libsimple_tiles_la_LDFLAGS=-lm ${pangocairo_LDFLAGS} ${GDAL_LDFLAGS}
+libsimple_tiles_la_LDFLAGS=-lm ${pangocairo_LIBS} ${GDAL_LDFLAGS}
