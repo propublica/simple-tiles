@@ -1,25 +1,10 @@
-OPTIMIZATION?=-O3
-CFLAGS ?= -std=c99 -pedantic $(OPTIMIZATION) -g -ggdb -Wall -W -Wwrite-strings \
-	$(ARCH) $(shell pkg-config --cflags simple-tiles pangocairo) \
-	$(shell gdal-config --cflags)
-LDLIBS = -L/usr/local/lib -lm $(shell pkg-config --libs simple-tiles pangocairo) \
-	$(shell gdal-config --libs)
-OBJ = test_list.o test_style.o test_query.o test_layer.o test_map.o test_integration.o test_bounds.o
+check_PROGRAMS = runner api benchmark
+runner_SOURCES = runner.c test_list.c test_style.c test_query.c test_layer.c test_map.c test_integration.c test_bounds.c
+api_SOURCES = api.c
+benchmark_SOURCES = benchmark.c
 
-api.o: api.c
-benchmark.o: benchmark.c
-runner.o: runner.c runner.h test.h
-test_bounds.o: test_bounds.c
-test_query.o: test_query.c test.h
-test_integration.o: test_integration.c test.h
-test_layer.o: test_layer.c test.h
-test_list.o: test_list.c test.h
-test_map.o: test_map.c test.h
-test_style.o: test_style.c test.h
-
-api: api.o
-benchmark: benchmark.o
-runner: runner.o $(OBJ)
+AM_CFLAGS=${pangocairo_CFLAGS} ${GDAL_CFLAGS}
+AM_LDFLAGS=-L../src -lm ${pangocairo_LDFLAGS} ${GDAL_LDFLAGS} -lsimple_tiles
 
 data:
 	cd ../data && make && cd ../test
@@ -40,7 +25,7 @@ MEM_OPTS = --leak-resolution=high --leak-check=full --suppressions=./suppression
 memcheck: api runner benchmark
 	$(GLIB_OPTS) valgrind $(MEM_OPTS) ./api
 
-test: data run_tests run_api run_benchmark
+test: check data run_tests run_api run_benchmark
 
 dep:
 	@$(CC) -MM *.c
