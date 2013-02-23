@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <simple-tiles/simple_tiles.h>
+#include "simple_tiles.h"
 
 // simple testing macro that prints the name of the test
 // and a cute checkmark if it passed

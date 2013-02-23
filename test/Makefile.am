@@ -3,7 +3,7 @@ runner_SOURCES = runner.c test_list.c test_style.c test_query.c test_layer.c tes
 api_SOURCES = api.c
 benchmark_SOURCES = benchmark.c
 
-AM_CFLAGS=${pangocairo_CFLAGS} ${GDAL_CFLAGS}
+AM_CFLAGS=-I../src ${pangocairo_CFLAGS} ${GDAL_CFLAGS}
 AM_LDFLAGS=-L../src -lm ${pangocairo_LIBS} ${GDAL_LDFLAGS} -lsimple_tiles
 
 data:

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <assert.h>
-#include <simple-tiles/simple_tiles.h>
-#include <simple-tiles/query.h>
-#include <simple-tiles/layer.h>
+#include "simple_tiles.h"
+#include "query.h"
+#include "layer.h"
 int
 main(){
   simplet_map_t *map;

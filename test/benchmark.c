@@ -2,11 +2,11 @@
 #include <assert.h>
 #include <unistd.h>
 #include <time.h>
-#include <simple-tiles/simple_tiles.h>
-#include <simple-tiles/list.h>
-#include <simple-tiles/query.h>
-#include <simple-tiles/layer.h>
-#include <simple-tiles/error.h>
+#include "simple_tiles.h"
+#include "list.h"
+#include "query.h"
+#include "layer.h"
+#include "error.h"
 
 static void*
 setup_map(){

@@ -1,6 +1,6 @@
 #include "test.h"
-#include <simple-tiles/list.h>
-#include <simple-tiles/layer.h>
+#include "list.h"
+#include "layer.h"
 
 void
 test_layer(){

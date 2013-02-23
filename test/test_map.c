@@ -1,5 +1,5 @@
 #include "test.h"
-#include <simple-tiles/map.h>
+#include "map.h"
 
 static void
 close_enough(float number, float test){

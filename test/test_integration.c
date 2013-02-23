@@ -1,8 +1,8 @@
 #include <string.h>
-#include <simple-tiles/map.h>
-#include <simple-tiles/layer.h>
-#include <simple-tiles/query.h>
-#include <simple-tiles/list.h>
+#include "map.h"
+#include "layer.h"
+#include "query.h"
+#include "list.h"
 #include "test.h"
 
 simplet_map_t*

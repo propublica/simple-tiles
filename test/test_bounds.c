@@ -1,4 +1,4 @@
-#include <simple-tiles/bounds.h>
+#include "bounds.h"
 #include "test.h"
 
 void
