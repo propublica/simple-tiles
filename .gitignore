@@ -18,3 +18,12 @@ data/n*
 test/benchmark
 *.orig
 simple-tiles
+
+# autotools debris
+Makefile.in
+/autom4te.cache
+/aclocal.m4
+/compile
+/depcomp
+/install-sh
+/missing
