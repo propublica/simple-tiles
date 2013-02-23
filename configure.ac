@@ -1,6 +1,5 @@
 AC_INIT([simple-tiles], [1.0], [https://github.com/propublica/simple-tiles/issues])
 AC_CANONICAL_TARGET
-AC_CONFIG_FILES([simple-tiles.pc])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 AC_PROG_CC
@@ -44,5 +43,6 @@ AC_CONFIG_FILES([
  Makefile
  src/Makefile
  test/Makefile
+ src/simple-tiles.pc
 ])
 AC_OUTPUT
