@@ -9,11 +9,11 @@ AC_PROG_LN_S
 LT_INIT
 
 PKG_PROG_PKG_CONFIG
-PKG_CHECK_MODULES([cairo], [cairo])
-PKG_CHECK_MODULES([pango], [pango])
+PKG_CHECK_MODULES([cairo], [cairo >= 1.12])
+PKG_CHECK_MODULES([pango], [pango >= 1.30])
 PKG_CHECK_MODULES([pangocairo], [pangocairo])
 
-AX_LIB_GDAL
+AX_LIB_GDAL(1.9)
 
 AC_CHECK_HEADERS([assert.h])
 AC_CHECK_HEADERS([cairo.h])
