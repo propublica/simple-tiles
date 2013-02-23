@@ -4,7 +4,7 @@ includedir=@includedir@
 
 Name: simple-tiles
 Description: Map tiles made easy.
-Version: 0.1.0
+Version: @PACKAGE_VERSION@
 
 
 Requires: pangocairo

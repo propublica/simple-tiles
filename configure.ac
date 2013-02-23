@@ -1,4 +1,4 @@
-AC_INIT([simple-tiles], [1.0], [https://github.com/propublica/simple-tiles/issues])
+AC_INIT([simple-tiles], [0.2.0], [https://github.com/propublica/simple-tiles/issues])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
