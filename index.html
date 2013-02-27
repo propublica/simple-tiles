@@ -233,20 +233,20 @@ documentation layout inspired by backbone and underscore, obvs
       Sun.
     </p>
 
-    <p>Download version 0.2.0:
-      <a href="https://github.com/propublica/simple-tiles/zipball/0.2.0">ZIP</a>
-      <a href="https://github.com/propublica/simple-tiles/tarball/0.2.0">tar.gz</a>
+    <p>Download version 0.3.0:
+      <a href="https://github.com/propublica/simple-tiles/zipball/0.3.0">ZIP</a>
+      <a href="https://github.com/propublica/simple-tiles/tarball/0.3.0">tar.gz</a>
     </p>
 
     <h2 id="dependencies">Dependencies</h2>
     <p>Simple Tiles relies on GDAL and OGR for abstractions over geospatial data. You'll
-    need at least version 1.8.0 of GDAL to use Simple Tiles. On Ubuntu you can install
+    need at least version 1.9.0 of GDAL to use Simple Tiles. On Ubuntu you can install
     the library using the <a href="https://launchpad.net/~ubuntugis/+archive/ppa/">ubuntugis ppa</a>.
     On OS X the version from homebrew works well.
     </p>
 
-    <p>Simple Tiles uses <a href="http://cairographics.org">Cairo</a> and
-    <a href="http://developer.gnome.org/pango/stable/">Pango</a>  for the final
+    <p>Simple Tiles uses <a href="http://cairographics.org">Cairo (version >= 1.12)</a> and
+    <a href="http://developer.gnome.org/pango/stable/">Pango (version >= 1.30)</a>  for the final
     png output, you'll need an installed and working version of both. On Ubuntu
     apt-get installs a perfectly fine version of both, and OS X users can use homebrew.
     </p>
@@ -256,6 +256,7 @@ documentation layout inspired by backbone and underscore, obvs
 <pre>
 $ git clone git@github.com:propublica/simple-tiles.git
 $ cd simple-tiles
+$ ./configure
 $ make && make install
 </pre>
     <p>You'll probably also want to run:</p>
@@ -707,6 +708,12 @@ typedef enum {
       <img src="http://tiles-a.propublica.org/redistricting-maps/tiles/LA/12/1024/1690/12.png">
       <img src="http://tiles-b.propublica.org/redistricting-maps/tiles/LA/12/1025/1690/12.png">
     </div>
+    <h2 id="changelog">Change Log</h2>
+    <dl>
+      <dd><b>0.3.0</b></dd>
+      <dt>Switch the build system to autotools and fix a big pango bug (thanks <a href="https://github.com/adamtrilling">Adam Trilling</a>.</dt>
+    </dl>
+
     <h2 id="license">License</h2>
 <pre>
 Copyright (c) 2012, ProPublica
