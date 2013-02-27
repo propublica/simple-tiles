@@ -9,5 +9,5 @@ Version: @PACKAGE_VERSION@
 
 
 Requires: pangocairo
-Libs: -L${libdir} -lsimple-tiles
+Libs: -L${libdir} -lsimple_tiles
 Cflags: -I${includedir}
