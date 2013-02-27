@@ -1,6 +1,6 @@
 #include "test.h"
-#include <simple-tiles/query.h>
-#include <simple-tiles/style.h>
+#include "query.h"
+#include "style.h"
 
 static void
 test_query(){

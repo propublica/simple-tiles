@@ -1,8 +1,8 @@
 #include <string.h>
-#include <simple-tiles/map.h>
-#include <simple-tiles/layer.h>
-#include <simple-tiles/query.h>
-#include <simple-tiles/list.h>
+#include "map.h"
+#include "layer.h"
+#include "query.h"
+#include "list.h"
 #include "test.h"
 
 simplet_map_t*
@@ -61,7 +61,7 @@ test_many_queries(){
   simplet_query_add_style(query, "weight", "1");
   simplet_query_add_style(query, "stroke", "#00cc00dd");
   simplet_query_add_style(query, "fill",   "#cc0000");
-  simplet_query_add_style(query, "blend",  "soft light");
+  simplet_query_add_style(query, "blend",  "multiply");
 
   simplet_map_render_to_png(map, "./queries.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));

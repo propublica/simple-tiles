@@ -5,6 +5,11 @@
 #include "memory.h"
 #include <math.h>
 
+#define GTimer GTimer_GTK
+#include <glib.h>
+#include <glib-object.h>
+#undef GTimer
+
 // A storage structure that holds the current state of the layout.
 typedef struct {
   PangoLayout *layout;
@@ -25,6 +30,8 @@ simplet_lithograph_new(cairo_t *ctx){
     free(litho);
     return NULL;
   }
+
+  g_type_init();
 
   litho->ctx = ctx;
   litho->pango_ctx = pango_cairo_create_context(ctx);
