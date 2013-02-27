@@ -21,3 +21,13 @@ simple-tiles
 
 # autotools debris
 config.log
+src/.deps/
+src/Makefile
+src/simple-tiles.pc
+stamp-h1
+test/.deps/
+test/Makefile
+Makefile
+config.h
+config.status
+libtool
