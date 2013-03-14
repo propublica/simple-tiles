@@ -2,7 +2,7 @@ all: ne_10m_admin_0_countries.shp tl_2010_55_cd108.shp tl_2010_36047_roads.shp \
 	 ne_10m_populated_places.shp
 
 tl_2010_36047_roads.shp:
-	curl -O ftp://ftp2.census.gov/geo/tiger/TIGER2010/ROADS/tl_2010_36047_roads.zip
+	curl -O http://www2.census.gov/geo/tiger/TIGER2010/ROADS/tl_2010_36047_roads.zip
 	unzip tl_2010_36047_roads.zip
 
 ne_10m_admin_0_countries.shp:
