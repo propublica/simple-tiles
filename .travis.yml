@@ -7,7 +7,7 @@ before_install:
   - sudo apt-get -qq install libgdal-dev libcairo2-dev libpango1.0-dev automake
 
 script:
-  - "sudo ./configure && make && make install && sudo make test"
+  - "sudo ./configure && make && make test"
 
 notifications:
   email: false
