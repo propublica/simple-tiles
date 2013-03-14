@@ -9,7 +9,7 @@ after_install:
 
 
 script:
-  - "sudo make install && sudo make test"
+  - "sudo ./configure && make && make install && sudo make test"
 
 notifications:
   email: false
