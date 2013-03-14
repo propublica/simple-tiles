@@ -31,3 +31,4 @@ Makefile
 config.h
 config.status
 libtool
+autom4te.cache
