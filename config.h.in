@@ -122,5 +122,8 @@
 /* Version number of package */
 #undef VERSION
 
+/* For asprintf on linux. */
+#undef _GNU_SOURCE
+
 /* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc

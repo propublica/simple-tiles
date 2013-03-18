@@ -1,3 +1,4 @@
+#include "config.h" // for asprintf
 #include <cpl_error.h>
 #include "error.h"
 
