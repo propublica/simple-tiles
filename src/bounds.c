@@ -1,3 +1,4 @@
+#include "config.h" // for asprintf
 #include <stdlib.h>
 #include <stdio.h>
 #include "math.h"
