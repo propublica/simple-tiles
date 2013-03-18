@@ -256,6 +256,7 @@ documentation layout inspired by backbone and underscore, obvs
 <pre>
 $ git clone git@github.com:propublica/simple-tiles.git
 $ cd simple-tiles
+$ autoreconf --force --install # mandatory step if autotools on your system is less than v1.13
 $ ./configure
 $ make && make install
 </pre>
@@ -628,7 +629,7 @@ typedef enum {
         <dt><tt>font</tt></dt>
         <dd>
           A font description that <a href="http://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string">pango</a>
-          can read to set labels in (i.e. "Helvetica 12px").
+          can read to set labels in (i.e. "Helvetica 12px"). You can use <tt>fc-list</tt> on your system to browse the available font families.
         </dd>
         <dt><tt>letter-spacing</tt></dt>
         <dd>How far apart to space the letters in labels.</dd>

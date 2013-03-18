@@ -10,7 +10,7 @@
 char*
 simplet_copy_string(const char *src){
   if(src == NULL) src = "";
-  return strdup(src);
+  return strndup(src, (size_t) 100000);
 }
 
 // Parse a color in hex form.
