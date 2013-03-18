@@ -4,7 +4,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 AC_PROG_CC
 AC_PROG_CC_C99
-AM_PROG_AR
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AC_PROG_LN_S
 LT_INIT
 
@@ -37,6 +37,7 @@ AC_CHECK_FUNCS([sqrt])
 AC_CHECK_FUNCS([strdup])
 AC_FUNC_MALLOC
 AC_FUNC_STRTOD
+AC_DEFINE([_GNU_SOURCE], [], [For asprintf on linux.])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
