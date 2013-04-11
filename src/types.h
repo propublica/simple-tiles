@@ -5,7 +5,6 @@
 #include <ogr_srs_api.h>
 #include <cairo.h>
 #include <pango/pangocairo.h>
-#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {
