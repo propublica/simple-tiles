@@ -31,8 +31,6 @@ simplet_lithograph_new(cairo_t *ctx){
     return NULL;
   }
 
-  g_type_init();
-
   litho->ctx = ctx;
   litho->pango_ctx = pango_cairo_create_context(ctx);
 

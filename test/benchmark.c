@@ -10,8 +10,8 @@
 
 static void*
 setup_map(){
-  simplet_map_t *map;
-  assert((map = simplet_map_new()));
+  simplet_map_t *map = simplet_map_new();
+  assert(map);
   return map;
 }
 
@@ -22,14 +22,14 @@ teardown_map(void *ctx){
 
 static void*
 setup_list(){
-  simplet_list_t *list;
-  assert((list = simplet_list_new()));
+  simplet_list_t *list = simplet_list_new();
+  assert(list);
   return list;
 }
 
 static void
 teardown_list(void *ctx){
-  ctx = NULL;
+  (void) ctx;
 }
 
 static void
