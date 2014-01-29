@@ -2,21 +2,18 @@
 bin
 build
 *.o
-test/*.png
+*.png
 *.a
 *.dylib
 *.so
 *.lo
 *.la
 .libs
-api
 test_list
-runner
 data/1*
 data/t*
 data/n*
-test/benchmark
 *.orig
-simple-tiles
 
 .waf-*
+.lock-*

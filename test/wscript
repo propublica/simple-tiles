@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+from subprocess import Popen, PIPE
+
+
+def build(bld):
+    bld.program(
+        includes="../src/",
+        source=[
+            'runner.c',
+            'test_bounds.c',
+            'test_integration.c',
+            'test_layer.c',
+            'test_list.c',
+            'test_map.c',
+            'test_query.c',
+            'test_style.c'
+        ],
+        use='simple-tiles',
+        target='runner',
+        uselib='CAIRO GDAL',
+        installdir='.'
+    )
+
+    bld.program(
+        includes="../src/",
+        source='api.c',
+        use='simple-tiles',
+        target='api',
+        uselib='CAIRO GDAL',
+        installdir='.'
+    )
+
+    bld.program(
+        includes="../src/",
+        source='benchmark.c',
+        use='simple-tiles',
+        target='api',
+        uselib='CAIRO GDAL',
+        installdir='.'
+    )
+
+
+def _command(command):
+    p = Popen(command, stdout=PIPE)
+    for p in p.stdout.readlines():
+        print(p)
+
+
+def test(test):
+    _command('build/test/runner')
+    _command('build/test/benchmark')
+    _command('build/test/api')
