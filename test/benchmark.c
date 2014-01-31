@@ -37,7 +37,7 @@ initialize_map(simplet_map_t *map){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 1, 2);
   simplet_layer_t  *layer  = simplet_map_add_layer(map,
-      "../data/ne_10m_admin_0_countries.shp");
+      "./data/ne_10m_admin_0_countries.shp");
   simplet_query_t *query = simplet_layer_add_query(layer,
       "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "weight", "0.1");

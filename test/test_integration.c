@@ -14,7 +14,7 @@ build_map(){
   simplet_map_set_bounds(map,
       -179.231086, 17.831509, -100.859681, 71.441059);
   simplet_layer_t  *layer  = simplet_map_add_layer(map,
-      "../data/ne_10m_admin_0_countries.shp");
+      "./data/ne_10m_admin_0_countries.shp");
   simplet_query_t *query = simplet_layer_add_query(layer,
       "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "line-cap",  "square");
@@ -40,7 +40,7 @@ test_many_layers(){
   assert((map = build_map()));
   assert(simplet_map_is_valid(map));
   simplet_layer_t  *layer  = simplet_map_add_layer(map,
-      "../data/ne_10m_admin_0_countries.shp");
+      "./data/ne_10m_admin_0_countries.shp");
   simplet_query_t *query = simplet_layer_add_query(layer,
       "SELECT * from 'ne_10m_admin_0_countries' where SOV_A3 = 'US1'");
   simplet_query_add_style(query, "fill", "#cc0000dd");
@@ -98,7 +98,7 @@ test_holes(){
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -92.889433, 42.491912,-86.763988, 47.080772);
-  simplet_map_add_layer(map, "../data/tl_2010_55_cd108.shp");
+  simplet_map_add_layer(map, "./data/tl_2010_55_cd108.shp");
   simplet_query_t *query = simplet_layer_add_query(
       (simplet_layer_t *) simplet_list_tail(map->layers),
       "SELECT * from 'tl_2010_55_cd108'");
@@ -119,7 +119,7 @@ test_points(){
 	simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -92.889433, 42.491912,-86.763988, 47.080772);
-  simplet_layer_t  *layer  = simplet_map_add_layer(map, "../data/ne_10m_populated_places.shp");
+  simplet_layer_t  *layer  = simplet_map_add_layer(map, "./data/ne_10m_populated_places.shp");
   simplet_query_t *query = simplet_layer_add_query(layer,  "SELECT * from 'ne_10m_populated_places'");
 	simplet_query_add_style(query, "fill",   "#061F3799");
   simplet_query_add_style(query, "stroke", "#ffffff99");
@@ -137,7 +137,7 @@ test_lines(){
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -74.043825, 40.570771, -73.855660, 40.739255);
-  simplet_layer_t  *layer  = simplet_map_add_layer(map, "../data/tl_2010_36047_roads.shp");
+  simplet_layer_t  *layer  = simplet_map_add_layer(map, "./data/tl_2010_36047_roads.shp");
   simplet_query_t *query = simplet_layer_add_query(layer,  "SELECT * from 'tl_2010_36047_roads'");
   simplet_query_add_style(query, "stroke",    "#000000ff");
 	simplet_query_add_style(query, "line-cap",  "square");
@@ -155,7 +155,7 @@ test_bunk(){
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map, -74.043825, 40.570771, -73.855660, 40.739255);
-  simplet_layer_t  *layer  = simplet_map_add_layer(map, "../data/tl_2010_36047_roads.shp");
+  simplet_layer_t  *layer  = simplet_map_add_layer(map, "./data/tl_2010_36047_roads.shp");
   simplet_layer_add_query(layer, "SELECT * from 'tl_2010_36047_roads_bunk'");
   simplet_map_render_to_png(map, "./bunk.png");
   assert(SIMPLET_OK != simplet_map_get_status(map));
@@ -194,8 +194,8 @@ TASK(integration){
   puts("check lines.png");
   test(lines);
   puts("check points.png");
-  test(background);
-  puts("check background.png");
   test(points);
+  puts("check background.png");
+  test(background);
   test(bunk);
 }

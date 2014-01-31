@@ -13,7 +13,7 @@ main(){
   simplet_map_set_size(map, 1000, 1000);
   simplet_map_set_bgcolor(map, "#ddeeff");
 
-  simplet_layer_t *layer   = simplet_map_add_layer(map, "../data/ne_10m_admin_0_countries.shp");
+  simplet_layer_t *layer   = simplet_map_add_layer(map, "../../data/ne_10m_admin_0_countries.shp");
   simplet_query_t *query = simplet_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "stroke", "#226688");
   simplet_query_add_style(query, "line-join", "round");
