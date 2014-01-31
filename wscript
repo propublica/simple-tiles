@@ -12,7 +12,7 @@ def configure(conf):
                    uselib_store='GDAL')
     conf.check_cfg(path='gdal-config', args=['--libs'], package='',
                    uselib_store='GDAL')
-    conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra', '-pedantic'])
+    conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
 
 
 def build(bld):

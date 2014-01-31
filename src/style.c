@@ -179,7 +179,7 @@ blend(void *ct, const char *arg){
   else if(!strncmp("hsl luminosity", arg, 14))
     opt = CAIRO_OPERATOR_HSL_LUMINOSITY;
   cairo_set_operator(ct, opt);
-};
+}
 
 
 // List of defined styles.
