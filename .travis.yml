@@ -2,7 +2,7 @@ language: node_js
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get -qq install libgdal-dev libcairo2-dev libpango1.0-dev automake autoconf
+  - sudo apt-get -qq install libgdal-dev libcairo2-dev libpango1.0-dev
 
 script:
   - "./configure && make && make test"
