@@ -1,13 +1,14 @@
-language: node_js
+language: c
 
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get -qq install libgdal-dev libcairo2-dev libpango1.0-dev
 
-script:
-  - "./configure && make && make test"
-
 notifications:
   email: false
   irc:
     - "irc.freenode.net#propublica"
+
+compiler:
+  - clang
+  - gcc
