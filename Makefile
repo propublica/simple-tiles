@@ -4,9 +4,12 @@ all:
 install:
 	./waf install
 
-test: all
+data:
+	cd data && make && cd ..
+
+test: all data
 	build/test/runner
 	build/test/api
 	build/test/benchmark
 
-.PHONY: all install test
+.PHONY: all install test data
