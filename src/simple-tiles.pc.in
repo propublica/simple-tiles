@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@prefix@
+libdir=@libdir@
+includedir=${prefix}/include
+
+Name: simple-tiles
+Description: Map tiles made easy.
+Version: @VERSION@
+
+Requires: pangocairo
+Libs: -L${libdir} -lsimple_tiles
+Cflags: -I${includedir}

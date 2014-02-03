@@ -33,6 +33,11 @@ def build(bld):
         uselib='CAIRO GDAL'
     )
 
+    bld(
+        source='src/simple-tiles.pc.in',
+        VERSION='0.3.3'
+    )
+
     bld.recurse('test')
 
 
