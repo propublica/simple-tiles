@@ -2,13 +2,6 @@
 #include <cpl_conv.h>
 #include "error.h"
 
-// Set error on an errorable.
-simplet_status_t
-simplet_error(simplet_errorable_t *errr, simplet_status_t err, const char *msg){
-  simplet_set_error(errr, err, msg);
-  return err;
-}
-
 // Add a bit of debugging information to the error.
 int
 simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const char *msg){
@@ -35,5 +28,12 @@ simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const cha
       res = asprintf(&error->error_msg, "%s", msg);
   }
   return res;
+}
+
+// Set error on an errorable.
+simplet_status_t
+simplet_error(simplet_errorable_t *errr, simplet_status_t err, const char *msg){
+  simplet_set_error(errr, err, msg);
+  return err;
 }
 
