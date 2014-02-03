@@ -30,7 +30,8 @@ def build(bld):
         features='c cstlib',
         source=sources,
         target='simple-tiles',
-        uselib='CAIRO GDAL'
+        uselib='CAIRO GDAL',
+        install_path="${PREFIX}/lib"
     )
 
     bld(
