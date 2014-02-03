@@ -1,18 +1,6 @@
 #include <cpl_error.h>
+#include <cpl_conv.h>
 #include "error.h"
-
-
-// The OGR handler to silence ogr errors.
-static void
-ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
-  (void)eclass, (void)err_no, (void)msg;
-}
-
-// Set the ogr handler.
-void
-simplet_error_init(){
-  CPLSetErrorHandler(ogr_error_handler);
-}
 
 // Set error on an errorable.
 simplet_status_t

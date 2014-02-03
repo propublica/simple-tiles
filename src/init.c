@@ -1,6 +1,7 @@
-#include "error.h"
 #include <pthread.h>
 #include <assert.h>
+#include <cpl_conv.h>
+#include "error.h"
 
 static int initialized = 0;
 
@@ -14,12 +15,11 @@ cleanup(){
   OGRCleanupAll();
 }
 
-
 // Initialize libraries, register the atexit handler and set up error reporting.
 void
 simplet_init(){
   if(initialized) return;
-  simplet_error_init();
+  CPLSetConfigOption("OGR_ENABLE_PARTIAL_REPROJECTION", "ON");
   OGRRegisterAll();
   atexit(cleanup);
   initialized = 1;

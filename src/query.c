@@ -70,10 +70,8 @@ simplet_query_set(simplet_query_t *query, const char *sql){
 // Get current sql defined on query.
 simplet_status_t
 simplet_query_get(simplet_query_t *query, char **sql){
-  if(!(*sql = simplet_copy_string(query->ogrsql))){
-    sql = NULL;
+  if(!(*sql = simplet_copy_string(query->ogrsql)))
     return set_error(query, SIMPLET_OOM, "Out of memory copying sql");
-  }
   return SIMPLET_OK;
 }
 
@@ -87,7 +85,9 @@ plot_part(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
   OGR_G_GetPoint(geom, 0, &x, &y, NULL);
   last_x = x;
   last_y = y;
+
   cairo_move_to(ctx, x, y);
+
   int count = OGR_G_GetPointCount(geom);
   for(int j = 0; j < count; j++){
     OGR_G_GetPoint(geom, j, &x, &y, NULL);
@@ -202,8 +202,10 @@ dispatch(OGRGeometryH geom, simplet_query_t *query, cairo_t *ctx){
         int count = OGR_G_GetGeometryCount(geom);
         for(int i = 0; i < count; i++){
           OGRGeometryH subgeom = OGR_G_GetGeometryRef(geom, i);
+
           if(subgeom == NULL)
             continue;
+
           dispatch(subgeom, query, ctx);
         }
       }
@@ -296,7 +298,8 @@ simplet_query_process(simplet_query_t *query, simplet_map_t *map,
   while((feature = OGR_L_GetNextFeature(olayer))){
     OGRGeometryH geom = OGR_F_GetGeometryRef(feature);
 
-    if(transform) OGR_G_Transform(geom, transform);
+    if(transform)
+      OGR_G_Transform(geom, transform);
 
     if(geom == NULL){
       OGR_F_Destroy(feature);

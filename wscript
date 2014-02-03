@@ -13,6 +13,8 @@ def configure(conf):
     conf.check_cfg(path='gdal-config', args=['--libs'], package='',
                    uselib_store='GDAL')
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
+    if conf.env['DEBUG'] is not None:
+        conf.env.append_unique('CFLAGS', ['-g'])
 
 
 def build(bld):
@@ -32,10 +34,6 @@ def build(bld):
     )
 
     bld.recurse('test')
-
-
-def install():
-    pass
 
 
 def test(ctx):
