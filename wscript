@@ -13,8 +13,10 @@ def configure(conf):
     conf.check_cfg(path='gdal-config', args=['--libs'], package='',
                    uselib_store='GDAL')
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
+
     if conf.env['DEBUG'] is not None:
         conf.env.append_unique('CFLAGS', ['-g'])
+        conf.define('DEBUG', 1)
     else:
         conf.env.append_unique('CFLAGS', ['-O3'])
 

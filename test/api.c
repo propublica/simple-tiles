@@ -6,7 +6,6 @@
 #include "query.h"
 #include "layer.h"
 
-
 int
 main(){
   CPLSetConfigOption("CPL_DEBUG", "ON");

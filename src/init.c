@@ -19,8 +19,10 @@ cleanup(){
 void
 simplet_init(){
   if(initialized) return;
-  CPLSetConfigOption("OGR_ENABLE_PARTIAL_REPROJECTION", "YES");
-  CPLSetConfigOption("CPL_DEBUG", "YES");
+  CPLSetConfigOption("OGR_ENABLE_PARTIAL_REPROJECTION", "ON");
+  #ifdef DEBUG
+    CPLSetConfigOption("CPL_DEBUG", "ON");
+  #endif
   OGRRegisterAll();
   atexit(cleanup);
   initialized = 1;
