@@ -6,16 +6,10 @@
 #include "query.h"
 #include "layer.h"
 
-static void
-ogr_error_handler(CPLErr eclass, int err_no, const char *msg){
-  (void)eclass;
-  printf("Error %i: %s\n", err_no, msg);
-}
 
 int
 main(){
   CPLSetConfigOption("CPL_DEBUG", "ON");
-  CPLSetErrorHandler(ogr_error_handler);
 
   simplet_map_t *map;
   if(!(map = simplet_map_new()))

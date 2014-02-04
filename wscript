@@ -15,6 +15,8 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
     if conf.env['DEBUG'] is not None:
         conf.env.append_unique('CFLAGS', ['-g'])
+    else:
+        conf.env.append_unique('CFLAGS', ['-O3'])
 
 
 def build(bld):
@@ -38,6 +40,8 @@ def build(bld):
         source='src/simple-tiles.pc.in',
         VERSION='0.3.3'
     )
+
+    bld.install_files('${PREFIX}/include/simple-tiles',  bld.path.ant_glob(['src/*.h']))
 
     bld.recurse('test')
 

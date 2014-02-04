@@ -8,5 +8,5 @@ Description: Map tiles made easy.
 Version: @VERSION@
 
 Requires: pangocairo
-Libs: -L${libdir} -lsimple_tiles
+Libs: -L${libdir} -lsimple-tiles
 Cflags: -I${includedir}
