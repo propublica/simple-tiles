@@ -40,7 +40,7 @@ def build(bld):
 
     bld(
         source='src/simple-tiles.pc.in',
-        VERSION='0.3.3'
+        VERSION='0.4.0'
     )
 
     bld.install_files('${PREFIX}/include/simple-tiles',  bld.path.ant_glob(['src/*.h']))

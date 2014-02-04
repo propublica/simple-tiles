@@ -256,7 +256,6 @@ documentation layout inspired by backbone and underscore, obvs
 <pre>
 $ git clone git@github.com:propublica/simple-tiles.git
 $ cd simple-tiles
-$ autoreconf --force --install # mandatory step if autotools on your system is less than v1.13
 $ ./configure
 $ make && make install
 </pre>
@@ -711,6 +710,11 @@ typedef enum {
     </div>
     <h2 id="changelog">Change Log</h2>
     <dl>
+      <dd><b>0.4.0</b></dd>
+      <dt>
+        New build system -- waf -- and now using <tt>OGR_ENABLE_PARTIAL_REPROJECTION</tt>
+        so that shapes with unprojectable coordinates render correctly.
+      </dt>
       <dd><b>0.3.2</b></dd>
       <dt>Fix for <tt>config.h</tt></dt>
       <dd><b>0.3.1</b></dd>
