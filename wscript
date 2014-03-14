@@ -12,8 +12,9 @@ def configure(conf):
                    uselib_store='GDAL')
     conf.check_cfg(path='gdal-config', args=['--libs'], package='',
                    uselib_store='GDAL')
+    conf.check_cc(lib='m', uselib_store='M', use='M')
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
-    conf.define('_GNU_SOURCE', 1) # for asprintf
+    conf.define('_GNU_SOURCE', 1)  # for asprintf
     if conf.env.DEBUG:
         conf.env.append_unique('CFLAGS', ['-g'])
         conf.define('DEBUG', 1)
@@ -27,14 +28,14 @@ def build(bld):
         features='c cshlib',
         source=sources,
         target='simple-tiles',
-        uselib='CAIRO GDAL'
+        uselib='M CAIRO GDAL'
     )
 
     bld.stlib(
         features='c cstlib',
         source=sources,
         target='simple-tiles',
-        uselib='CAIRO GDAL',
+        uselib='M CAIRO GDAL',
         install_path="${PREFIX}/lib"
     )
 
