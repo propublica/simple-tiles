@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-./waf configure
+./waf configure $@
