@@ -13,7 +13,7 @@ def configure(conf):
     conf.check_cfg(path='gdal-config', args=['--libs'], package='',
                    uselib_store='GDAL')
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
-
+    conf.define('_GNU_SOURCE', 1) # for asprintf
     if conf.env.DEBUG:
         conf.env.append_unique('CFLAGS', ['-g'])
         conf.define('DEBUG', 1)
