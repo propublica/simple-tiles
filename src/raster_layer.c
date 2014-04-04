@@ -43,7 +43,7 @@ simplet_raster_layer_coords_to_pixels(GDALDatasetH dataset, double points[4], si
     points[1] = ((map->bounds->se.y - gt[3]) / gt[5]);
     points[2] = ((map->bounds->nw.x - gt[0]) / gt[1]);
     points[3] = ((map->bounds->nw.y - gt[3]) / gt[5]);
-    return SIMPLET_ERR;
+    return SIMPLET_OK;
   } else {
     return SIMPLET_ERR;
   }
