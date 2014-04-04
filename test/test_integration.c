@@ -37,9 +37,22 @@ test_background(){
 void 
 test_raster() {
   simplet_map_t *map;
-  assert((map = build_map()));
+  assert((map = simplet_map_new()));
+  simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
+  simplet_map_set_size(map, 256, 256);
+  simplet_map_set_bounds(map,
+      -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
+  simplet_vector_layer_t  *layer  = simplet_map_add_vector_layer(map,
+      "./data/wtrbdyp010.shp");
+  simplet_query_t *query = simplet_vector_layer_add_query(layer,
+      "SELECT * from 'wtrbdyp010'");
+  simplet_query_add_style(query, "line-cap",  "square");
+  simplet_query_add_style(query, "line-join", "round");
+  simplet_query_add_style(query, "fill",      "#061F3799");
+  simplet_query_add_style(query, "seamless",  "true");
+
   assert(simplet_map_is_valid(map));
-  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  simplet_raster_layer_t *r_layer = simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
   simplet_map_render_to_png(map, "./raster.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);

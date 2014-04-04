@@ -14,19 +14,10 @@ simplet_raster_layer_t*
 simplet_raster_layer_new(const char *datastring);
 
 void
-simplet_raster_layer_vfree(void *layer);
-
-void
 simplet_raster_layer_free(simplet_raster_layer_t *layer);
 
 simplet_status_t
 simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx);
-
-void
-simplet_raster_layer_get_source(simplet_raster_layer_t *layer, char **source);
-
-void
-simplet_raster_layer_set_source(simplet_raster_layer_t *layer, char *source);
 
 SIMPLET_HAS_USER_DATA_PROTOS(raster_layer)
 
