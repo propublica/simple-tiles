@@ -13,6 +13,7 @@ test_list
 data/1*
 data/t*
 data/n*
+data/loss_1932_2010*
 *.orig
 
 .waf-*

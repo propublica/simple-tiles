@@ -4,7 +4,8 @@
 #include "init.h"
 #include "error.h"
 #include "map.h"
-#include "layer.h"
+#include "vector_layer.h"
+#include "raster_layer.h"
 #include "query.h"
 #include "style.h"
 #include "util.h"
@@ -57,7 +58,7 @@ simplet_map_free(simplet_map_t *map){
     simplet_bounds_free(map->bounds);
 
   if(map->layers) {
-    simplet_list_set_item_free(map->layers, simplet_layer_vfree);
+    simplet_list_set_item_free(map->layers, simplet_vector_layer_vfree);
     simplet_list_free(map->layers);
   }
 
@@ -219,16 +220,16 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
 }
 
 // Add a new child layer to the map
-simplet_layer_t*
-simplet_map_add_layer(simplet_map_t *map, const char *datastring){
-  simplet_layer_t *layer;
-  if(!(layer = simplet_layer_new(datastring))){
+simplet_vector_layer_t*
+simplet_map_add_vector_layer(simplet_map_t *map, const char *datastring){
+  simplet_vector_layer_t *layer;
+  if(!(layer = simplet_vector_layer_new(datastring))){
     set_error(map, SIMPLET_OOM, "couldn't create a layer");
     return NULL;
   }
 
   if(!simplet_list_push(map->layers, layer)){
-    simplet_layer_free(layer);
+    simplet_vector_layer_free(layer);
     set_error(map, SIMPLET_OOM, "couldn't add any more layers");
     return NULL;
   }
@@ -319,7 +320,7 @@ build_surface(simplet_map_t *map){
 
   // Iterate through and draw all the layers on the cairo context.
   while((layer = simplet_list_next(iter))){
-    err = simplet_layer_process(layer, map, litho, ctx);
+    err = simplet_vector_layer_process(layer, map, litho, ctx);
     if(err != SIMPLET_OK) {
       simplet_list_iter_free(iter);
       set_error(map, layer->status, layer->error_msg);

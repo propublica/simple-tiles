@@ -54,6 +54,7 @@ typedef enum {
   SIMPLET_OOM,       // Out of memory for allocation
   SIMPLET_CAIRO_ERR, // Cairo error
   SIMPLET_OGR_ERR,   // OGR Error
+  SIMPLET_GDAL_ERR,  // GDAL Error
   SIMPLET_OK         // OK
 } simplet_status_t;
 
@@ -94,13 +95,30 @@ typedef struct {
   char *bgcolor;
 } simplet_map_t;
 
+typedef enum {
+  SIMPLET_VECTOR,
+  SIMPLET_RASTER
+} simplet_layer_type_t;
+
+#define SIMPLET_LAYER_FIELDS \
+  SIMPLET_ERROR_FIELDS \
+  SIMPLET_USER_DATA \
+  SIMPLET_RETAIN \
+  simplet_layer_type_t type; \
+  char *source; 
+
 typedef struct {
-  SIMPLET_ERROR_FIELDS
-  SIMPLET_USER_DATA
-  SIMPLET_RETAIN
-  char           *source;
-  simplet_list_t *queries;
+  SIMPLET_LAYER_FIELDS
 } simplet_layer_t;
+
+typedef struct {
+  SIMPLET_LAYER_FIELDS
+  simplet_list_t *queries;
+} simplet_vector_layer_t;
+  
+typedef struct {
+  SIMPLET_LAYER_FIELDS
+} simplet_raster_layer_t;
 
 typedef struct {
   SIMPLET_ERROR_FIELDS
