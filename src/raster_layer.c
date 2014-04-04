@@ -17,11 +17,12 @@ simplet_raster_layer_new(const char *datastring) {
 
   memset(layer, 0, sizeof(*layer));
   layer->source = simplet_copy_string(datastring);
-  layer->type  = SIMPLET_RASTER;
+  layer->type   = SIMPLET_RASTER;
   layer->status = SIMPLET_OK;
 
   // need some checking here
   simplet_retain((simplet_retainable_t *)layer);
+
   return layer;
 }
 
