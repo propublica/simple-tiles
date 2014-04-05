@@ -19,7 +19,8 @@
 
 // List of tasks to run.
 TASK(list);
-TASK(layer);
+TASK(vector_layer);
+TASK(raster_layer);
 TASK(query);
 TASK(style);
 TASK(map);

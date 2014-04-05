@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=/usr/local
+libdir=/usr/local/lib
+includedir=${prefix}/include
+
+Name: simple-tiles
+Description: Map tiles made easy.
+Version: 0.4.1
+
+Requires: pangocairo
+Libs: -L${libdir} -lsimple-tiles
+Cflags: -I${includedir}
