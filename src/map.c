@@ -287,8 +287,8 @@ simplet_map_is_valid(simplet_map_t *map){
 }
 
 // Build a rendering context to draw the map on.
-static cairo_surface_t *
-build_surface(simplet_map_t *map){
+cairo_surface_t *
+simplet_map_build_surface(simplet_map_t *map){
   // Check if the map is valid.
   if(simplet_map_is_valid(map) == SIMPLET_ERR)
     return NULL;
@@ -344,7 +344,7 @@ void
 simplet_map_render_to_stream(simplet_map_t *map, void *stream,
   cairo_status_t (*cb)(void *closure, const unsigned char *data, unsigned int length)){
   cairo_surface_t *surface;
-  if(!(surface = build_surface(map))) return;
+  if(!(surface = simplet_map_build_surface(map))) return;
 
   if(cairo_surface_write_to_png_stream(surface, cb, stream) != CAIRO_STATUS_SUCCESS)
     set_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_surface_status(surface)));
@@ -356,7 +356,7 @@ simplet_map_render_to_stream(simplet_map_t *map, void *stream,
 void
 simplet_map_render_to_png(simplet_map_t *map, const char *path){
   cairo_surface_t *surface;
-  if(!(surface = build_surface(map))) return;
+  if(!(surface = simplet_map_build_surface(map))) return;
 
   if(cairo_surface_write_to_png(surface, path) != CAIRO_STATUS_SUCCESS)
     set_error(map, SIMPLET_CAIRO_ERR, cairo_status_to_string(cairo_surface_status(surface)));

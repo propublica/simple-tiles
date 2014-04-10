@@ -78,6 +78,9 @@ simplet_map_set_width(simplet_map_t *map, unsigned int width);
 simplet_status_t
 simplet_map_set_height(simplet_map_t *map, unsigned int height);
 
+cairo_surface_t *
+simplet_map_build_surface(simplet_map_t *map);
+
 SIMPLET_HAS_USER_DATA_PROTOS(map)
 
 #ifdef __cplusplus
