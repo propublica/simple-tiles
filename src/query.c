@@ -29,7 +29,7 @@ simplet_query_new(const char *sqlquery){
   }
 
   query->status = SIMPLET_OK;
-  query->ogrsql       = simplet_copy_string(sqlquery);
+  query->ogrsql = simplet_copy_string(sqlquery);
 
   simplet_retain((simplet_retainable_t *)query);
   return query;
