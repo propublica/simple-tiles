@@ -1,7 +1,7 @@
 prefix=@prefix@
 exec_prefix=@prefix@
 libdir=@libdir@
-includedir=${prefix}/include
+includedir=${prefix}/include/simple-tiles
 
 Name: simple-tiles
 Description: Map tiles made easy.
