@@ -71,6 +71,7 @@ test_user_data(){
   int i = 5;
   simplet_map_set_user_data(map, &i);
   assert(*(int *)simplet_map_get_user_data(map) == i);
+  simplet_map_free(map);
 }
 
 TASK(map){

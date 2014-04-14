@@ -51,6 +51,8 @@ test_get(){
   assert(test->val == 5);
   test = simplet_list_get(list, list->length);
   assert(!test);
+  simplet_list_set_item_free(list, free_wrap);
+  simplet_list_free(list);
 }
 
 static void

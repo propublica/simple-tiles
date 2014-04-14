@@ -192,6 +192,7 @@ main(){
   for(bench = (bench_wrap_t*)&benchmarks; bench->call; bench++){
     printf("\nbench %s:\n", bench->name);
     double runs[bench->times];
+    memset(runs, 0, sizeof(double) * bench->times);
     for(int i = 0; i < bench->times; i++){
       void *data = bench->setup();
       clock_t start = clock();
