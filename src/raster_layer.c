@@ -1,4 +1,5 @@
 #include "raster_layer.h"
+#include "gdal_in_mem_warp.c"
 #include "util.h"
 #include "error.h"
 #include <gdal.h>
@@ -35,12 +36,35 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   free(layer);
 }
 
+// stackoverflow.com/a/13446094
+
+simplet_status_t
+coords_to_pixels(GDALDatasetH dataset, double points[4], simplet_map_t* map) {
+  double gt[6];
+  if( GDALGetGeoTransform(dataset, gt) == CE_None ) {
+    points[0] = ((map->bounds->se.x - gt[0]) / gt[1]);
+    points[1] = ((map->bounds->se.y - gt[3]) / gt[5]);
+    points[2] = ((map->bounds->nw.x - gt[0]) / gt[1]);
+    points[3] = ((map->bounds->nw.y - gt[3]) / gt[5]);
+ 
+    printf("\nSE X: %f\n", points[0]);
+    printf("SE Y: %f\n",   points[1]);
+    printf("NW X: %f\n",   points[2]);
+    printf("NW Y: %f\n",   points[3]);
+ 
+    return SIMPLET_OK;
+  } else {
+    return SIMPLET_ERR;
+  }
+}
 
 simplet_status_t
 simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx) {
   // process the map
   int width  = map->width;
   int height = map->height;
+  double pixel_bounds[4];
+
   GDALAllRegister();
   GDALDatasetH source;
   GDALDatasetH dst_mem;
@@ -52,14 +76,33 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   if (GDALGetRasterCount(source) < 4) {
     return set_error(layer, SIMPLET_GDAL_ERR, "raster layer must have 4 bands");
   }
-  char *dst = malloc(sizeof(char) * width * height * 4);
-  char mem_init_str[255];
-  snprintf(mem_init_str, 255, "MEM:::DATAPOINTER=%d,PIXELS=%i,LINES=%i,BANDS=3,DATATYPE=Byte", dst, width, height);
-  printf("%s\n", mem_init_str);
-  dst_mem = GDALOpen(mem_init_str, GA_Update);
+  if (coords_to_pixels(source, pixel_bounds, map) == SIMPLET_ERR) {
+    return set_error(layer, SIMPLET_GDAL_ERR, "cannot transform dataset");
+  }
+
+  char *dst_ptr = malloc(sizeof(char) * width * height * 4);
+
+  const char         *pszFormat = "GTiff";
+  char               *pszTargetSRS = map->proj;
+  char               *pszSourceSRS = map->proj;
+  dst_mem = GDALWarpCreateOutput( 
+                      source,
+                      dst_ptr,
+                      pszFormat, 
+                      pszTargetSRS, 
+                      map->proj,
+                      0, 
+                      NULL, 
+                      // dfMinX, dfMinY, dfMaxX, dfMaxY
+                      pixel_bounds[2], pixel_bounds[1], pixel_bounds[0], pixel_bounds[3],
+                      width, height,
+                      width, height
+                    );
+
   if (dst_mem == NULL) {
     return set_error(layer, SIMPLET_GDAL_ERR, "error creating in-memory raster");
   }
-
+  
+  free(dst_mem);
   return SIMPLET_OK;
 }
