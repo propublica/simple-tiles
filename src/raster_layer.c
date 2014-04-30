@@ -125,9 +125,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         scanline[x] |= pixel << ((band_idx) * 8);
       }
     }
-    if (y == 230) {
-      printf("%x\n", scanline[11]);
-    }
     int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
     cairo_surface_t *surface = cairo_image_surface_create_for_data(scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
     cairo_set_source_surface(ctx, surface, 0, y);
