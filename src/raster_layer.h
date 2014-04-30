@@ -17,7 +17,7 @@ void
 simplet_raster_layer_free(simplet_raster_layer_t *layer);
 
 simplet_status_t
-simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx);
+simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, cairo_t *ctx);
 
 SIMPLET_HAS_USER_DATA_PROTOS(raster_layer)
 

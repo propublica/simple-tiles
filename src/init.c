@@ -24,6 +24,7 @@ simplet_init(){
     CPLSetConfigOption("CPL_DEBUG", "ON");
   #endif
   OGRRegisterAll();
+  GDALAllRegister();
   atexit(cleanup);
   initialized = 1;
 };

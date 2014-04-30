@@ -220,6 +220,19 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
   return SIMPLET_OK;
 }
 
+
+
+static void*
+add_layer(simplet_map_t *map, simplet_layer_t *layer){
+  if(!simplet_list_push(map->layers, layer)){
+    simplet_layer_vfree((void*) layer);
+    set_error(map, SIMPLET_OOM, "couldn't add any more layers");
+    return NULL;
+  }
+
+  return layer;
+}
+
 // Add a new child layer to the map
 simplet_vector_layer_t*
 simplet_map_add_vector_layer(simplet_map_t *map, const char *datastring){
@@ -229,30 +242,18 @@ simplet_map_add_vector_layer(simplet_map_t *map, const char *datastring){
     return NULL;
   }
 
-  if(!simplet_list_push(map->layers, layer)){
-    simplet_vector_layer_free(layer);
-    set_error(map, SIMPLET_OOM, "couldn't add any more layers");
-    return NULL;
-  }
-
-  return layer;
+  return add_layer(map, (simplet_layer_t *) layer);
 }
 
 simplet_raster_layer_t*
 simplet_map_add_raster_layer(simplet_map_t *map, const char *datastring) {
   simplet_raster_layer_t *layer;
-
   if(!(layer = simplet_raster_layer_new(datastring))){
     set_error(map, SIMPLET_OOM, "couldn't create a raster layer");
     return NULL;
   }
 
-  if(!simplet_list_push(map->layers, layer)){
-    simplet_raster_layer_free(layer);
-    set_error(map, SIMPLET_OOM, "couldn't add any more layers");
-    return NULL;
-  }
-  return layer;
+  return add_layer(map, (simplet_layer_t *) layer);
 }
 
 // Add a previously initialized layer to the map.
@@ -325,10 +326,7 @@ simplet_map_build_surface(simplet_map_t *map){
   if(map->bgcolor) simplet_style_paint(ctx, map->bgcolor);
 
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
-  simplet_layer_t *layer;
-  simplet_vector_layer_t *v_layer;
-  simplet_raster_layer_t *r_layer;
-  simplet_status_t err;
+
 
   cairo_t *litho_ctx = cairo_create(surface);
 
@@ -339,23 +337,19 @@ simplet_map_build_surface(simplet_map_t *map){
   simplet_style_line_join(litho_ctx, "round");
 
   // Iterate through and draw all the layers on the cairo context.
+  simplet_layer_t *layer;
+  simplet_status_t err;
   while((layer = simplet_list_next(iter))){
     if (layer->type == SIMPLET_VECTOR) {
-      v_layer = (simplet_vector_layer_t*) layer;
-      err = simplet_vector_layer_process(v_layer, map, litho, ctx);
-      if(err != SIMPLET_OK) {
-        simplet_list_iter_free(iter);
-        set_error(map, v_layer->status, layer->error_msg);
-        break;
-      }
+      err = simplet_vector_layer_process((simplet_vector_layer_t*) layer, map, litho, ctx);
     } else if (layer->type == SIMPLET_RASTER) {
-      r_layer = (simplet_raster_layer_t*) layer;
-      err = simplet_raster_layer_process(r_layer, map, litho, ctx);
-      if (err != SIMPLET_OK) {
-        simplet_list_iter_free(iter);
-        set_error(map, r_layer->status, r_layer->error_msg);
-        break;
-      }
+      err = simplet_raster_layer_process((simplet_raster_layer_t*) layer, map, ctx);
+    }
+
+    if(err != SIMPLET_OK) {
+      simplet_list_iter_free(iter);
+      set_error(map, layer->status, layer->error_msg);
+      break;
     }
   }
 

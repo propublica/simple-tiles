@@ -1,10 +1,10 @@
 #include "gdal_in_mem_warp.h"
 
-static GDALDatasetH 
+GDALDatasetH
 GDALWarpCreateOutput( GDALDatasetH hSrcDS, char *dstPtr,
-                      const char *pszFormat, const char *pszSourceSRS, 
-                      const char *pszTargetSRS, int nOrder, 
-                      char **papszCreateOptions, 
+                      const char *pszFormat, const char *pszSourceSRS,
+                      const char *pszTargetSRS, int nOrder,
+                      char **papszCreateOptions,
                       double dfMinX, double dfMinY, double dfMaxX, double dfMaxY,
                       double dfXRes, double dfYRes,
                       int nForcePixels, int nForceLines
@@ -23,12 +23,12 @@ GDALWarpCreateOutput( GDALDatasetH hSrcDS, char *dstPtr,
 /*      Find the output driver.                                         */
 /* -------------------------------------------------------------------- */
     hDriver = GDALGetDriverByName( pszFormat );
-    if( hDriver == NULL 
+    if( hDriver == NULL
         || GDALGetMetadataItem( hDriver, GDAL_DCAP_CREATE, NULL ) == NULL )
     {
         int iDr;
-        
-        printf( "Output driver `%s' not recognised or does not support\n", 
+
+        printf( "Output driver `%s' not recognised or does not support\n",
                 pszFormat );
         printf( "direct output file creation.  The following format drivers are configured\n"
                 "and support direct output:\n" );
@@ -52,9 +52,9 @@ GDALWarpCreateOutput( GDALDatasetH hSrcDS, char *dstPtr,
 /*      Create a transformation object from the source to               */
 /*      destination coordinate system.                                  */
 /* -------------------------------------------------------------------- */
-    hTransformArg = 
-        GDALCreateGenImgProjTransformer( hSrcDS, pszSourceSRS, 
-                                         NULL, pszTargetSRS, 
+    hTransformArg =
+        GDALCreateGenImgProjTransformer( hSrcDS, pszSourceSRS,
+                                         NULL, pszTargetSRS,
                                          TRUE, 1000.0, nOrder );
 
     if( hTransformArg == NULL )
@@ -63,8 +63,8 @@ GDALWarpCreateOutput( GDALDatasetH hSrcDS, char *dstPtr,
 /* -------------------------------------------------------------------- */
 /*      Get approximate output definition.                              */
 /* -------------------------------------------------------------------- */
-    if( GDALSuggestedWarpOutput( hSrcDS, 
-                                 GDALGenImgProjTransform, hTransformArg, 
+    if( GDALSuggestedWarpOutput( hSrcDS,
+                                 GDALGenImgProjTransform, hTransformArg,
                                  adfDstGeoTransform, &nPixels, &nLines )
         != CE_None )
         return NULL;
@@ -133,9 +133,9 @@ GDALWarpCreateOutput( GDALDatasetH hSrcDS, char *dstPtr,
     printf( "Creating dataset is that %dP x %dL.\n", nPixels, nLines );
 
     char memInitStr[255];
-    snprintf(memInitStr, 
-                255, "MEM:::DATAPOINTER=%d,PIXELS=%i,LINES=%i,BANDS=3,DATATYPE=Byte", 
-                dstPtr, nForcePixels, nForceLines);
+    snprintf(memInitStr,
+                255, "MEM:::DATAPOINTER=%d,PIXELS=%i,LINES=%i,BANDS=3,DATATYPE=Byte",
+                (long) dstPtr, nForcePixels, nForceLines);
     printf("%s\n", memInitStr);
     hDstDS = GDALOpen(memInitStr, GA_Update);
 

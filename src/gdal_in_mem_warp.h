@@ -18,11 +18,11 @@
 //    ptr in which to store the in mem dataset
 //    e.g. malloc(sizeof(char) * width * height * 4);
 
-static GDALDatasetH 
+GDALDatasetH
 GDALWarpCreateOutput( GDALDatasetH hSrcDS, char *dstPtr,
-                      const char *pszFormat, const char *pszSourceSRS, 
-                      const char *pszTargetSRS, int nOrder, 
-                      char **papszCreateOptions, 
+                      const char *pszFormat, const char *pszSourceSRS,
+                      const char *pszTargetSRS, int nOrder,
+                      char **papszCreateOptions,
                       double dfMinX, double dfMinY, double dfMaxX, double dfMaxY,
                       double dfXRes, double dfYRes,
                       int nForcePixels, int nForceLines

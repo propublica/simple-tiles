@@ -3,6 +3,7 @@
 
 #include <ogr_api.h>
 #include <ogr_srs_api.h>
+#include <gdal.h>
 #include <cairo.h>
 #include <pango/pangocairo.h>
 
@@ -36,7 +37,6 @@ typedef struct simplet_node_t {
   SIMPLET_USER_DATA
 } simplet_node_t;
 
-
 typedef struct simplet_list_t {
   simplet_node_t *head;
   simplet_node_t *tail;
@@ -57,7 +57,6 @@ typedef enum {
   SIMPLET_GDAL_ERR,  // GDAL Error
   SIMPLET_OK         // OK
 } simplet_status_t;
-
 
 #define SIMPLET_ERROR_FIELDS \
   simplet_status_t status; \
@@ -86,8 +85,8 @@ typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
   SIMPLET_RETAIN
-  simplet_bounds_t     *bounds;
-  simplet_list_t       *layers;
+  simplet_bounds_t  *bounds;
+  simplet_list_t *layers;
   OGRSpatialReferenceH proj;
   double buffer; // pixel coords
   unsigned int width;
@@ -105,7 +104,7 @@ typedef enum {
   SIMPLET_USER_DATA \
   SIMPLET_RETAIN \
   simplet_layer_type_t type; \
-  char *source; 
+  char *source;
 
 typedef struct {
   SIMPLET_LAYER_FIELDS
@@ -115,7 +114,7 @@ typedef struct {
   SIMPLET_LAYER_FIELDS
   simplet_list_t *queries;
 } simplet_vector_layer_t;
-  
+
 typedef struct {
   SIMPLET_LAYER_FIELDS
 } simplet_raster_layer_t;
