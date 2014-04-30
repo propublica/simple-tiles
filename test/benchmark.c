@@ -5,7 +5,7 @@
 #include "simple_tiles.h"
 #include "list.h"
 #include "query.h"
-#include "layer.h"
+#include "vector_layer.h"
 #include "error.h"
 
 static void*
@@ -36,9 +36,9 @@ static void
 initialize_map(simplet_map_t *map){
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 1, 2);
-  simplet_layer_t  *layer  = simplet_map_add_layer(map,
+  simplet_vector_layer_t  *layer  = simplet_map_add_vector_layer(map,
       "./data/ne_10m_admin_0_countries.shp");
-  simplet_query_t *query = simplet_layer_add_query(layer,
+  simplet_query_t *query = simplet_vector_layer_add_query(layer,
       "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "fill",   "#061F37ff");
@@ -55,7 +55,7 @@ bench_empty(void *ctx){
   simplet_map_t *map = ctx;
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_slippy(map, 0, 0, 0);
-  simplet_map_add_layer(map, "../data/noop");
+  simplet_map_add_vector_layer(map, "../data/noop");
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
 }
@@ -64,7 +64,7 @@ static void
 bench_seamless(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_layer_t  *layer  = simplet_list_tail(map->layers);
+  simplet_vector_layer_t  *layer  = simplet_list_tail(map->layers);
   simplet_query_t *query = simplet_list_tail(layer->queries);
   simplet_query_add_style(query, "seamless", "true");
   char *data = NULL;
@@ -77,17 +77,17 @@ bench_many_queries(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
 
-  simplet_layer_t *layer   = simplet_list_tail(map->layers);
-  simplet_query_t *query = simplet_layer_add_query(layer,
+  simplet_vector_layer_t *layer   = simplet_list_tail(map->layers);
+  simplet_query_t *query = simplet_vector_layer_add_query(layer,
                                       "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "stroke", "#ffffffff");
 
-  query = simplet_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
+  query = simplet_vector_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "stroke", "#ffffffff");
 
-  query = simplet_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
+  query = simplet_vector_layer_add_query(layer,  "SELECT * from 'ne_10m_admin_0_countries'");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "stroke", "#ffffffff");
 
@@ -109,7 +109,7 @@ static void
 bench_text(void *ctx){
   simplet_map_t *map = ctx;
   initialize_map(map);
-  simplet_layer_t *layer   = simplet_list_tail(map->layers);
+  simplet_vector_layer_t *layer   = simplet_list_tail(map->layers);
   simplet_query_t *query = simplet_list_tail(layer->queries);
   simplet_query_add_style(query, "text-field", "ABBREV");
   simplet_query_add_style(query, "font", "Futura Medium 8");
