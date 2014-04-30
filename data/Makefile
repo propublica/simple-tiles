@@ -1,5 +1,5 @@
 all: ne_10m_admin_0_countries.shp tl_2010_55_cd108.shp tl_2010_36047_roads.shp \
-	 ne_10m_populated_places.shp loss_1932_2010.tiff
+	 ne_10m_populated_places.shp loss_1932_2010.tif
 
 tl_2010_36047_roads.shp:
 	wget ftp://ftp2.census.gov/geo/tiger/TIGER2010/ROADS/tl_2010_36047_roads.zip
@@ -17,7 +17,7 @@ tl_2010_55_cd108.shp:
 	wget ftp://ftp2.census.gov/geo/tiger/TIGER2010/CD/108/tl_2010_55_cd108.zip
 	unzip tl_2010_55_cd108.zip
 
-loss_1932_2010.tiff:
+loss_1932_2010.tif:
 	wget http://propublica.s3.amazonaws.com/projects/simple-tiles/test_data/loss_1932_2010.zip
 	unzip loss_1932_2010.zip
 

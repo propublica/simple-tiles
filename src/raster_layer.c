@@ -1,5 +1,4 @@
 #include "raster_layer.h"
-#include "gdal_in_mem_warp.h"
 #include "util.h"
 #include "error.h"
 #include "memory.h"
@@ -76,43 +75,54 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   // get a transformer
   void *transform_args = GDALCreateGenImgProjTransformer3(src_wkt, src_t, dest_wkt, dst_t);
-  free(dest_wkt);
+  free(dest_wkt); // might blow up
   if(transform_args == NULL)
     return set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
 
-  double* x = calloc(width, sizeof(double));
-  double* y = calloc(width, sizeof(double));
-  double* z = calloc(width, sizeof(double));
-  int* test = calloc(width, sizeof(int));
+  double* x_lookup = malloc(width * sizeof(double));
+  double* y_lookup = malloc(width * sizeof(double));
+  double* z_lookup = malloc(width * sizeof(double));
+  int* test = malloc(width * sizeof(int));
+  unsigned char *scanline = malloc(sizeof(unsigned char) * width * 4);
 
   // draw to cairo
-  for(int i = 0; i < height; i++){
+  for(int y = 0; y < height; y++){
     // write pixel positions to the destination scanline
     for(int k = 0; k < width; k++){
-      x[k] = k + 0.5;
-      y[k] = i + 0.5;
-      z[k] = 0.0;
+      x_lookup[k] = k + 0.5;
+      y_lookup[k] = y + 0.5;
+      z_lookup[k] = 0.0;
     }
 
-    // initialize arrays
-    GDALGenImgProjTransform(transform_args, TRUE, width, x, y, z, test);
-    for(int j = 0; j < width; i++) {
-      // could not transform the point, skip this pixel
-      if(!test[j]) continue;
-      // sanity check? From gdalsimplewarp
-      if(x[j] < 0.0 || y[j] < 0.0) continue;
+    memset(scanline, 0, sizeof(unsigned char) * width * 4);
 
-      int src_off = x[j] + y[j] * width;
-      for(int band = 0; band < bands; band++) {
-        // write to cairo
-        // cairo[band][j] = gdal[band][src_off];
+    GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
+
+    for(int x = 0; x < width; x++) {
+      // could not transform the point, skip this pixel
+      if(!test[x]) continue;
+      // sanity check? From gdalsimplewarp
+      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) continue;
+      // test to see if we are in the image or not
+
+      for(int band = 1; band <= bands; band++) {
+        GByte pixel = 0;
+        CPLErr err = GDALRasterIO(GDALGetRasterBand(source, band), GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+        printf("%i\n", pixel);
+
+        scanline[x * 4 + band - 1] = pixel;
       }
     }
+    int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
+    cairo_surface_t *surface = cairo_image_surface_create_for_data(scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
+    cairo_set_source_surface(ctx, surface, 0, y);
+    cairo_paint(ctx);
+    cairo_surface_destroy(surface);
   }
-
-  free(x);
-  free(y);
-  free(z);
+  // set the surface back to the original here.
+  free(x_lookup);
+  free(y_lookup);
+  free(z_lookup);
   free(test);
   GDALDestroyGenImgProjTransformer(transform_args);
   return SIMPLET_OK;

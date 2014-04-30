@@ -326,7 +326,6 @@ simplet_map_build_surface(simplet_map_t *map){
 
   simplet_listiter_t *iter = simplet_get_list_iter(map->layers);
 
-
   cairo_t *litho_ctx = cairo_create(surface);
 
   // Set up a map-wide text structure.
