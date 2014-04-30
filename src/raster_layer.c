@@ -43,9 +43,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   int width  = map->width;
   int height = map->height;
 
-  GDALDatasetH source;
-
-  source = GDALOpen(layer->source, GA_ReadOnly);
+  GDALDatasetH source = GDALOpen(layer->source, GA_ReadOnly);
   if(source == NULL)
     return set_error(layer, SIMPLET_GDAL_ERR, "error opening raster source");
 
