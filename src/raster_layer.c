@@ -106,23 +106,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
-        CPLErr err = GDALRasterIO(GDALGetRasterBand(source, band), GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-        int band_idx = 0;
-        switch(band) {
-          case 1:
-            band_idx = 2;
-            break;
-          case 2:
-            band_idx = 1;
-            break;
-          case 3:
-            band_idx = 0;
-            break;
-          case 4:
-            band_idx = 3;
-            break;
-        }
-        scanline[x] |= pixel << ((band_idx) * 8);
+        GDALRasterIO(GDALGetRasterBand(source, band), GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+        int band_remap[5] = {0, 2, 1, 0, 3};
+        scanline[x] |= pixel << ((band_remap[band]) * 8);
       }
     }
     int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
