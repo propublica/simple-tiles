@@ -100,9 +100,16 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
     for(int x = 0; x < width; x++) {
       // could not transform the point, skip this pixel
-      if(!test[x]) continue;
+      if(!test[x]) {
+        scanline[x] = 0xff;
+        continue;
+      }
+
       // sanity check? From gdalsimplewarp
-      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) continue;
+      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) {
+        scanline[x] = 0xff;
+        continue;
+      }
 
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
@@ -111,6 +118,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         scanline[x] |= pixel << ((band_remap[band]) * 8);
       }
     }
+
     int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
     cairo_surface_t *surface = cairo_image_surface_create_for_data(scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
     cairo_set_source_surface(ctx, surface, 0, y);
