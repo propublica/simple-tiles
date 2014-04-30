@@ -103,16 +103,30 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       if(!test[x]) continue;
       // sanity check? From gdalsimplewarp
       if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) continue;
-      // test to see if we are in the image or not
 
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
         CPLErr err = GDALRasterIO(GDALGetRasterBand(source, band), GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-        scanline[x] |= pixel >> ((band - 1) * 8);
+        int band_idx = 0;
+        switch(band) {
+          case 1:
+            band_idx = 2;
+            break;
+          case 2:
+            band_idx = 1;
+            break;
+          case 3:
+            band_idx = 0;
+            break;
+          case 4:
+            band_idx = 3;
+            break;
+        }
+        scanline[x] |= pixel << ((band_idx) * 8);
       }
     }
-    if (y == 83) {
-      printf("%x\n", scanline[132]);
+    if (y == 230) {
+      printf("%x\n", scanline[11]);
     }
     int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
     cairo_surface_t *surface = cairo_image_surface_create_for_data(scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
