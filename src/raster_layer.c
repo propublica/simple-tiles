@@ -6,7 +6,7 @@
 #include <gdal.h>
 #include <gdal_alg.h>
 #include <stdbool.h>
-
+#include <stdint.h>
 
 // Add in an error function.
 SIMPLET_ERROR_FUNC(raster_layer_t)
@@ -83,7 +83,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   double* y_lookup = malloc(width * sizeof(double));
   double* z_lookup = malloc(width * sizeof(double));
   int* test = malloc(width * sizeof(int));
-  unsigned char *scanline = malloc(sizeof(unsigned char) * width * 4);
+  uint32_t *scanline = malloc(sizeof(uint32_t) * width);
 
   // draw to cairo
   for(int y = 0; y < height; y++){
@@ -94,7 +94,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       z_lookup[k] = 0.0;
     }
 
-    memset(scanline, 0, sizeof(unsigned char) * width * 4);
+    memset(scanline, 0, sizeof(uint32_t) * width);
 
     GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
 
@@ -108,10 +108,11 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
         CPLErr err = GDALRasterIO(GDALGetRasterBand(source, band), GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-        printf("%i\n", pixel);
-
-        scanline[x * 4 + band - 1] = pixel;
+        scanline[x] |= pixel >> ((band - 1) * 8);
       }
+    }
+    if (y == 83) {
+      printf("%x\n", scanline[132]);
     }
     int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
     cairo_surface_t *surface = cairo_image_surface_create_for_data(scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
