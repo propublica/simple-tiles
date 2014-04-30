@@ -2,9 +2,12 @@
 #include "gdal_in_mem_warp.h"
 #include "util.h"
 #include "error.h"
-#include <gdal.h>
-#include <cpl_error.h>
 #include "memory.h"
+#include "map.h"
+#include <gdal.h>
+#include <gdal_alg.h>
+#include <stdbool.h>
+
 
 // Add in an error function.
 SIMPLET_ERROR_FUNC(raster_layer_t)
@@ -35,66 +38,82 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   free(layer);
 }
 
-// stackoverflow.com/a/13446094
-static simplet_status_t
-coords_to_pixels(GDALDatasetH dataset, double points[4], simplet_map_t* map) {
-  double gt[6];
-
-  if(GDALGetGeoTransform(dataset, gt) != CE_None)
-    return SIMPLET_ERR;
-
-  points[2] = ((map->bounds->nw.x - gt[0]) / gt[1]);
-  points[3] = ((map->bounds->nw.y - gt[3]) / gt[5]);
-  points[0] = ((map->bounds->se.x - gt[0]) / gt[1]);
-  points[1] = ((map->bounds->se.y - gt[3]) / gt[5]);
-
-  return SIMPLET_OK;
-}
-
 simplet_status_t
 simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, cairo_t *ctx) {
   // process the map
   int width  = map->width;
   int height = map->height;
-  double pixel_bounds[4];
 
   GDALDatasetH source;
-  GDALDatasetH dst_mem;
 
   source = GDALOpen(layer->source, GA_ReadOnly);
   if(source == NULL)
     return set_error(layer, SIMPLET_GDAL_ERR, "error opening raster source");
 
-  // TODO: allow for many bands
-  if(GDALGetRasterCount(source) < 4)
-    return set_error(layer, SIMPLET_GDAL_ERR, "raster layer must have 4 bands");
+  int bands = GDALGetRasterCount(source);
+  if(bands > 4) bands = 4;
 
-  if(coords_to_pixels(source, pixel_bounds, map) == SIMPLET_ERR)
-    return set_error(layer, SIMPLET_GDAL_ERR, "cannot transform dataset");
+  // create geotransform
+  double src_t[6];
+  if(GDALGetGeoTransform(source, src_t) != CE_None)
+    return set_error(layer, SIMPLET_GDAL_ERR, "can't get geotransform on dataset");
 
+  double dst_t[6];
+  cairo_matrix_t mat;
+  simplet_map_init_matrix(map, &mat);
+  cairo_matrix_invert(&mat);
+  dst_t[0] = mat.x0;
+  dst_t[1] = mat.xx;
+  dst_t[2] = mat.xy;
+  dst_t[3] = mat.y0;
+  dst_t[4] = mat.yx;
+  dst_t[5] = mat.yy;
 
-  char *dst_ptr = malloc(sizeof(char) * width * height * 4);
+  // grab WKTs from source and dest
+  const char *src_wkt  = GDALGetProjectionRef(source);
+  char *dest_wkt;
+  OSRExportToWkt(map->proj, &dest_wkt);
 
-  const char *format = "GTiff";
-  char *target = map->proj;
-  dst_mem = GDALWarpCreateOutput(
-                      source,
-                      dst_ptr,
-                      format,
-                      target,
-                      map->proj,
-                      0,
-                      NULL,
-                      // dfMinX, dfMinY, dfMaxX, dfMaxY
-                      pixel_bounds[2], pixel_bounds[1], pixel_bounds[0], pixel_bounds[3],
-                      width, height,
-                      width, height
-                    );
+  // get a transformer
+  void *transform_args = GDALCreateGenImgProjTransformer3(src_wkt, src_t, dest_wkt, dst_t);
+  free(dest_wkt);
+  if(transform_args == NULL)
+    return set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
 
-  if (dst_mem == NULL)
-    return set_error(layer, SIMPLET_GDAL_ERR, "error creating in-memory raster");
+  double* x = calloc(width, sizeof(double));
+  double* y = calloc(width, sizeof(double));
+  double* z = calloc(width, sizeof(double));
+  int* test = calloc(width, sizeof(int));
 
+  // draw to cairo
+  for(int i = 0; i < height; i++){
+    // write pixel positions to the destination scanline
+    for(int k = 0; k < width; k++){
+      x[k] = k + 0.5;
+      y[k] = i + 0.5;
+      z[k] = 0.0;
+    }
 
-  free(dst_mem);
+    // initialize arrays
+    GDALGenImgProjTransform(transform_args, TRUE, width, x, y, z, test);
+    for(int j = 0; j < width; i++) {
+      // could not transform the point, skip this pixel
+      if(!test[j]) continue;
+      // sanity check? From gdalsimplewarp
+      if(x[j] < 0.0 || y[j] < 0.0) continue;
+
+      int src_off = x[j] + y[j] * width;
+      for(int band = 0; band < bands; band++) {
+        // write to cairo
+        // cairo[band][j] = gdal[band][src_off];
+      }
+    }
+  }
+
+  free(x);
+  free(y);
+  free(z);
+  free(test);
+  GDALDestroyGenImgProjTransformer(transform_args);
   return SIMPLET_OK;
 }

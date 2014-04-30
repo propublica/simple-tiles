@@ -123,8 +123,7 @@ simplet_map_get_srs(simplet_map_t *map, char **srs){
 }
 
 // Initialize the transformation matrix for transforming data source coordinates
-// into cairo coordinates. We only assume square maps, so we'll want to change this
-// at some point.
+// into cairo coordinates.
 void
 simplet_map_init_matrix(simplet_map_t *map, cairo_matrix_t *mat){
   cairo_matrix_init(mat, 1, 0, 0, -1, 0, 0);

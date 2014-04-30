@@ -21,7 +21,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
 SIMPLET_HAS_USER_DATA_PROTOS(raster_layer)
 
-
 #ifdef __cplusplus
 }
 #endif
