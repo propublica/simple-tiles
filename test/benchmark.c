@@ -132,6 +132,18 @@ bench_unprojected(void *ctx){
   assert(SIMPLET_OK == simplet_map_get_status(map));
 }
 
+static void
+bench_raster(void *ctx) {
+  simplet_map_t *map = ctx;
+  simplet_map_set_slippy(map, 0, 0, 0);
+  simplet_map_set_bounds(map,
+      -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
+  simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  char *data = NULL;
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+}
+
 #define ITEMS 100000
 static void
 bench_list(void *ctx){
@@ -160,6 +172,7 @@ bench_wrap_t benchmarks[] = {
   BENCH(map, seamless)
   BENCH(map, empty)
   BENCH(map, many_queries)
+  BENCH(map, raster)
   BENCH(list, list)
   { NULL, NULL, NULL, NULL, 0}
 };

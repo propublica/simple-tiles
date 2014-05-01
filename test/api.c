@@ -39,6 +39,7 @@ main(){
   simplet_query_add_style(query2, "text-stroke-weight", "2");
   simplet_query_add_style(query2, "letter-spacing", "1");
 
+  simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
 
   if(simplet_map_is_valid(map))
     simplet_map_render_to_png(map, "./out.png");
