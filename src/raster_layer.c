@@ -93,7 +93,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     }
 
     memset(scanline, 0, sizeof(uint32_t) * width);
-
     GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
 
     for(int x = 0; x < width; x++) {
@@ -118,7 +117,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     }
 
     int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
-    cairo_surface_t *surface = cairo_image_surface_create_for_data(scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
+    cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
     cairo_set_source_surface(ctx, surface, 0, y);
     cairo_paint(ctx);
     cairo_surface_destroy(surface);
@@ -128,6 +127,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   free(y_lookup);
   free(z_lookup);
   free(test);
+  free(scanline);
   GDALDestroyGenImgProjTransformer(transform_args);
   return SIMPLET_OK;
 }

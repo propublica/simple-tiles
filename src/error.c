@@ -25,7 +25,8 @@ simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const cha
       break;
     case SIMPLET_GDAL_ERR:
       error->status = SIMPLET_GDAL_ERR;
-       res = asprintf(&error->error_msg, "GDAL error: %s, %s", CPLGetLastErrorMsg(), msg);
+      res = asprintf(&error->error_msg, "GDAL error: %s, %s", CPLGetLastErrorMsg(), msg);
+      break;
     case SIMPLET_OK:
       error->status = SIMPLET_OK;
       res = asprintf(&error->error_msg, "%s", msg);

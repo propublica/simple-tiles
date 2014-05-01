@@ -336,8 +336,8 @@ simplet_map_build_surface(simplet_map_t *map){
 
   // Iterate through and draw all the layers on the cairo context.
   simplet_layer_t *layer;
-  simplet_status_t err;
   while((layer = simplet_list_next(iter))){
+    simplet_status_t err = SIMPLET_OK;
     if (layer->type == SIMPLET_VECTOR) {
       err = simplet_vector_layer_process((simplet_vector_layer_t*) layer, map, litho, ctx);
     } else if (layer->type == SIMPLET_RASTER) {
