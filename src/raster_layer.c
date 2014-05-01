@@ -96,17 +96,17 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
 
     for(int x = 0; x < width; x++) {
+
       // could not transform the point, skip this pixel
-      if(!test[x]) {
-        scanline[x] = 0xff;
-        continue;
-      }
+      if(!test[x]) continue;
 
       // sanity check? From gdalsimplewarp
-      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) {
-        scanline[x] = 0xff;
-        continue;
-      }
+      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) continue;
+
+      // check to see if we are outside of the raster
+      if(x_lookup[x] > GDALGetRasterXSize(source)
+         || y_lookup[x] > GDALGetRasterYSize(source)) continue;
+
 
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
