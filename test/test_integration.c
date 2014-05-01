@@ -37,7 +37,9 @@ test_background(){
 void
 test_raster() {
   simplet_map_t *map;
-  assert((map = build_map()));
+  assert((map = simplet_map_new()));
+  simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
+  simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map,
       -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
   simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");

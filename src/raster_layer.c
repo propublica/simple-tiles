@@ -92,11 +92,12 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       z_lookup[k] = 0.0;
     }
 
+
+
     memset(scanline, 0, sizeof(uint32_t) * width);
     GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
 
     for(int x = 0; x < width; x++) {
-
       // could not transform the point, skip this pixel
       if(!test[x]) continue;
 
@@ -107,10 +108,24 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       if(x_lookup[x] > GDALGetRasterXSize(source)
          || y_lookup[x] > GDALGetRasterYSize(source)) continue;
 
-
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
-        GDALRasterIO(GDALGetRasterBand(source, band), GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+        GDALRasterBandH b = GDALGetRasterBand(source, band);
+        GDALRasterIO(b, GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+
+        // set the pixel to fully transparent if we don't have a value
+        int has_no_data = 0;
+        double no_data = GDALGetRasterNoDataValue(b, &has_no_data);
+        if(has_no_data) {
+          if(no_data == pixel){
+            scanline[x] = 0x00 << 24;
+            continue;
+          } else {
+            // otherwise make it show up
+            scanline[x] |= 0xff << 24;
+          }
+        }
+
         int band_remap[5] = {0, 2, 1, 0, 3};
         scanline[x] |= pixel << ((band_remap[band]) * 8);
       }
@@ -118,6 +133,10 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
     int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
     cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
+
+    if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+      set_error(layer, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
+
     cairo_set_source_surface(ctx, surface, 0, y);
     cairo_paint(ctx);
     cairo_surface_destroy(surface);
@@ -129,5 +148,5 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   free(test);
   free(scanline);
   GDALDestroyGenImgProjTransformer(transform_args);
-  return SIMPLET_OK;
+  return layer->status;
 }

@@ -106,18 +106,3 @@ simplet_vector_layer_process(simplet_vector_layer_t *layer, simplet_map_t *map, 
   OGRReleaseDataSource(source);
   return SIMPLET_OK;
 }
-
-// Get the datasource string for this layer.
-void
-simplet_vector_layer_get_source(simplet_vector_layer_t *layer, char **source){
-  *source = simplet_copy_string(layer->source);
-}
-
-// Set a copy of this source as this layers datasource string.
-void
-simplet_vector_layer_set_source(simplet_vector_layer_t *layer, char *source){
-  char *src = simplet_copy_string(source);
-  if(!src) set_error(layer, SIMPLET_OOM, "out of memory setting source");
-  layer->source = src;
-}
-

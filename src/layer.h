@@ -13,6 +13,12 @@ extern "C" {
 void
 simplet_layer_vfree(void *layer);
 
+void
+simplet_layer_get_source(simplet_layer_t *layer, char **source);
+
+void
+simplet_layer_set_source(simplet_layer_t *layer, char *source);
+
 #ifdef __cplusplus
 }
 #endif
