@@ -28,12 +28,6 @@ simplet_vector_layer_add_query_directly(simplet_vector_layer_t *layer, simplet_q
 simplet_status_t
 simplet_vector_layer_process(simplet_vector_layer_t *layer, simplet_map_t *map, simplet_lithograph_t *litho, cairo_t *ctx);
 
-void
-simplet_vector_layer_get_source(simplet_vector_layer_t *layer, char **source);
-
-void
-simplet_vector_layer__set_source(simplet_vector_layer_t *layer, char *source);
-
 SIMPLET_HAS_USER_DATA_PROTOS(vector_layer)
 
 
