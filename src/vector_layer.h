@@ -32,7 +32,7 @@ void
 simplet_vector_layer_get_source(simplet_vector_layer_t *layer, char **source);
 
 void
-simplet_vector_layer__set_source(simplet_vector_layer_t *layer, char *source);
+simplet_vector_layer_set_source(simplet_vector_layer_t *layer, char *source);
 
 SIMPLET_HAS_USER_DATA_PROTOS(vector_layer)
 
