@@ -92,8 +92,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       z_lookup[k] = 0.0;
     }
 
-
-
     memset(scanline, 0, sizeof(uint32_t) * width);
     GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
 
