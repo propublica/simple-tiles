@@ -147,5 +147,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   free(test);
   free(scanline);
   GDALDestroyGenImgProjTransformer(transform_args);
+  GDALClose(source);
   return layer->status;
 }
