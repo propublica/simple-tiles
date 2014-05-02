@@ -93,6 +93,12 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     }
 
     memset(scanline, 0, sizeof(uint32_t) * width);
+
+    // set an opaque alpha value for RGB images
+    if(bands < 4)
+      for(int i = 0; i < width; i++)
+        scanline[i] = 0xff << 24;
+
     GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
 
     for(int x = 0; x < width; x++) {
@@ -114,14 +120,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         // set the pixel to fully transparent if we don't have a value
         int has_no_data = 0;
         double no_data = GDALGetRasterNoDataValue(b, &has_no_data);
-        if(has_no_data) {
-          if(no_data == pixel){
-            scanline[x] = 0x00 << 24;
-            continue;
-          } else {
-            // otherwise make it show up
-            scanline[x] |= 0xff << 24;
-          }
+        if(has_no_data && no_data == pixel) {
+          scanline[x] = 0x00 << 24;
+          continue;
         }
 
         int band_remap[5] = {0, 2, 1, 0, 3};
