@@ -2,12 +2,13 @@
 #include "query.h"
 #include "util.h"
 #include "error.h"
+#include <string.h>
 #include <cpl_error.h>
 #include "memory.h"
 
 
 // Set up user data.
-SIMPLET_HAS_USER_DATA(layer)
+SIMPLET_HAS_USER_DATA(vector_layer)
 
 // Create and return a new layer instance.
 simplet_vector_layer_t*

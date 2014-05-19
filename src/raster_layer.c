@@ -11,6 +11,8 @@
 // Add in an error function.
 SIMPLET_ERROR_FUNC(raster_layer_t)
 
+SIMPLET_HAS_USER_DATA(raster_layer)
+
 simplet_raster_layer_t*
 simplet_raster_layer_new(const char *datastring) {
   simplet_raster_layer_t *layer;

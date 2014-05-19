@@ -6,7 +6,7 @@ close_enough(float number, float test){
   assert((number - test) < 0.001);
 }
 
-void
+static void
 test_resetting(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
@@ -23,7 +23,7 @@ test_resetting(){
   simplet_map_free(map);
 }
 
-void
+static void
 test_map(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
@@ -38,7 +38,7 @@ test_map(){
   simplet_map_free(map);
 }
 
-void
+static void
 test_proj(){
   const char *srs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs ";
   simplet_map_t *map;
@@ -51,7 +51,7 @@ test_proj(){
   simplet_map_free(map);
 }
 
-void
+static void
 test_slippy(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
@@ -64,7 +64,7 @@ test_slippy(){
   simplet_map_free(map);
 }
 
-void
+static void
 test_user_data(){
   simplet_map_t *map;
   assert((map = simplet_map_new()));

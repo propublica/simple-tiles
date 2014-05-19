@@ -53,8 +53,22 @@ test_getters(){
   simplet_query_free(query);
 }
 
+static void
+test_user_data() {
+  simplet_query_t *query;
+  if(!(query = simplet_query_new("SELECT * FROM TEST;")))
+    assert(0);
+  int i = 1;
+  simplet_query_set_user_data(query, &i);
+  int *j;
+  j = simplet_query_get_user_data(query);
+  assert(i == *j);
+  simplet_query_free(query);
+}
+
 TASK(query) {
   test(query);
   test(lookup);
   test(getters);
+  test(user_data);
 }
