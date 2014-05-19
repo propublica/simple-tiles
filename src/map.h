@@ -35,8 +35,8 @@ simplet_map_add_vector_layer(simplet_map_t *map, const char *datastring);
 simplet_raster_layer_t*
 simplet_map_add_raster_layer(simplet_map_t *map, const char *datastring);
 
-simplet_vector_layer_t*
-simplet_map_add_vector_layer_directly(simplet_map_t *map, simplet_vector_layer_t *layer);
+simplet_layer_t*
+simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer);
 
 simplet_status_t
 simplet_map_get_status(simplet_map_t *map);
