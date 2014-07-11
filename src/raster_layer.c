@@ -75,7 +75,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   // get a transformer
   void *transform_args = GDALCreateGenImgProjTransformer3(src_wkt, src_t, dest_wkt, dst_t);
-  free(dest_wkt); // might blow up
+  free(dest_wkt);
   if(transform_args == NULL)
     return set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
 
