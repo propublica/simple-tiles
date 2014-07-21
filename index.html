@@ -154,7 +154,8 @@ documentation layout inspired by backbone and underscore, obvs
         <li><a href="#simplet_map_set_slippy">simplet_map_set_slippy</a></li>
         <li><a href="#simplet_map_set_bgcolor">simplet_map_set_bgcolor</a></li>
         <li><a href="#simplet_map_get_bgcolor">simplet_map_get_bgcolor</a></li>
-        <li><a href="#simplet_map_add_layer">simplet_map_add_layer</a></li>
+        <li><a href="#simplet_map_add_vector_layer">simplet_map_add_vector_layer</a></li>
+        <li><a href="#simplet_map_add_raster_layer">simplet_map_add_raster_layer</a></li>
         <li><a href="#simplet_map_add_layer_directly">simplet_map_add_layer_directly</a></li>
         <li><a href="#simplet_map_get_status">simplet_map_get_status</a></li>
         <li><a href="#simplet_map_status_to_string">simplet_map_status_to_string</a></li>
@@ -167,20 +168,26 @@ documentation layout inspired by backbone and underscore, obvs
       <hr>
       <h4><a href="#bounds">Bounds</a> bounds.h</h4>
       <ul>
-        <li><a href="#simplet_bounds_new">simplet_layer_new</a></li>
+        <li><a href="#simplet_bounds_new">simplet_bounds_new</a></li>
         <li><a href="#simplet_bounds_free">simplet_bounds_free</a></li>
         <li><a href="#simplet_bounds_extend">simplet_bounds_extend</a></li>
         <li><a href="#simplet_bounds_to_wkt">simplet_bounds_to_wkt</a></li>
       </ul>
       <hr>
-      <h4><a href="#layers">Layers</a> layer.h</h4>
+      <h4><a href="#vector_layers">Vector Layers</a> vector_layer.h</h4>
       <ul>
-        <li><a href="#simplet_layer_new">simplet_layer_new</a></li>
-        <li><a href="#simplet_layer_free">simplet_layer_free</a></li>
-        <li><a href="#simplet_layer_set_source">simplet_layer_set_source</a></li>
-        <li><a href="#simplet_layer_get_source">simplet_layer_get_source</a></li>
-        <li><a href="#simplet_layer_add_query">simplet_layer_add_query</a></li>
-        <li><a href="#simplet_layer_add_query_directly">simplet_layer_add_query_directly</a></li>
+        <li><a href="#simplet_vector_layer_new">simplet_vector_layer_new</a></li>
+        <li><a href="#simplet_vector_layer_free">simplet_vector_layer_free</a></li>
+        <li><a href="#simplet_vector_layer_add_query">simplet_vector_layer_add_query</a></li>
+        <li><a href="#simplet_vector_layer_add_query_directly">simplet_vector_layer_add_query_directly</a></li>
+        <li><a href="#simplet_vector_layer_get_source">simplet_vector_layer_get_source</a></li>
+        <li><a href="#simplet_vector_layer_set_source">simplet_vector_layer_set_source</a></li>
+      </ul>
+      <hr>
+      <h4><a href="#raster_layers">Raster Layers</a> raster_layer.h</h4>
+      <ul>
+        <li><a href="#simplet_raster_layer_new">simplet_raster_layer_new</a></li>
+        <li><a href="#simplet_raster_layer_free">simplet_raster_layer_free</a></li>
       </ul>
       <hr>
       <h4><a href="#queries">Filters</a> query.h</h4>
@@ -280,20 +287,26 @@ cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
     <ul>
       <li>
         <tt>simplet_map_t</tt>: Each <tt>simplet_map_t</tt> stores the projection,
-        bounds, the width and height of the desired image, and a list of
-        <tt>simplet_layer_t</tt> instances.
+        bounds, the width and height of the desired image, and a list of <tt>simplet_layer_t</tt>
+        instances, which are dispatched to <tt>simplet_vector_layer_t</tt> or 
+        <tt>simplet_raster_layer_t</tt> depending on the data type.
       </li>
       <li>
-        <tt>simplet_layer_t</tt>: Each <tt>simplet_layer_t</tt> contains an
+        <tt>simplet_vector_layer_t</tt>: Each <tt>simplet_vector_layer_t</tt> contains an
         <a href="http://www.gdal.org/ogr/ogr_formats.html">OGR</a> compatible
         datasource string, and stores a list of <tt>simplet_query_t</tt> instances.
         Layers define access to spatial storage either from physical files or
         databases. Each contains a list of <tt>simplet_query_t</tt> structures.
       </li>
       <li>
+        <tt>simple_raster_layer_t</tt>: Each <tt>simple_raster_layer_t</tt> contains a
+        <a href="http://www.gdal.org/formats_list.html">GDAL</a> compatible raster
+        datasource string.
+      </li>
+      <li>
         <tt>simplet_query_t</tt>: A <tt>simplet_query_t</tt> instance stores
         <a href="http://www.gdal.org/ogr/ogr_sql.html">ogrsql</a>
-        to query the data on its parent's <tt>simplet_layer_t</tt> datasource.
+        to query the data on its parent's <tt>simplet_vector_layer_t</tt> datasource.
         Each query contains a list of <tt>simplet_style_t</tt> structures.
       </li>
       <li>
@@ -309,7 +322,7 @@ cc main.o `pkg-config --libs simple-tiles` `gdal-config --libs` -o main
 <pre>
 #include &lt;simple-tiles/simple_tiles.h&gt;
 #include &lt;simple-tiles/query.h&gt;
-#include &lt;simple-tiles/layer.h&gt;
+#include &lt;simple-tiles/vector_layer.h&gt;
 
 int
 main(){
@@ -318,8 +331,8 @@ main(){
   simplet_map_set_bgcolor(map, "#ffffff");
   simplet_map_set_bounds(map, -585080.885134, 6849466.721081, 4161303.603672, 9587780.816356);
   simplet_map_set_size(map, 423, 260);
-  simplet_layer_t *layer = simplet_map_add_layer(map, "PG:dbname=simple_tiles_roads");
-  simplet_query_t *query = simplet_layer_add_query(layer, "select * from roads");
+  simplet_vector_layer_t *layer = simplet_map_add_vector_layer(map, "PG:dbname=simple_tiles_roads");
+  simplet_query_t *query = simplet_vector_layer_add_query(layer, "select * from roads");
   simplet_query_add_style(query, "stroke", "#11111166");
   simplet_query_add_style(query, "line-join", "round");
   simplet_query_add_style(query, "weight", "0.1");
@@ -421,13 +434,22 @@ main(){
       is then owned by the caller and should be <tt>free</tt>'d.
     </p>
 
-    <h4 id="simplet_map_add_layer"><code>simplet_layer_t* simplet_map_add_layer(simplet_map_t *map, const char *datastring)</code></h4>
+    <h4 id="simplet_map_add_vector_layer"><code>simplet_vector_layer_t* simplet_map_add_layer(simplet_map_t *map, const char *datastring)</code></h4>
     <p>
-      Adds a layer to the maps layer's list. <tt>datastring</tt> represents a
+      Adds a vector layer to the map's layer list. <tt>datastring</tt> represents a
       resource that is readable by <a href="http://www.gdal.org/ogr/ogr_formats.html">OGR</a>,
-      and returns a <tt>simplet_layer_t</tt> which is owned by the <tt>map</tt>
+      and returns a <tt>simplet_vector_layer_t</tt> which is owned by the <tt>map</tt>
       and will be freed when the map is. Returns <tt>NULL</tt> on failure.
     </p>
+
+    <h4 id="simplet_map_add_raster_layer"><code>simplet_raster_layer_t* simplet_map_add_raster_layer(simplet_map_t *map, const char *datastring)</code></h4>
+    <p>
+      Adds a raster layer to the map's layer list. <tt>datastring</tt> represents a
+      resource that is readable by <a href="http://www.gdal.org/formats_list.html">GDAL</a>,
+      and returns a <tt>simplet_raster_layer_t</tt> which is owned by the <tt>map</tt>
+      and will be freed when the map is. Returns <tt>NULL</tt> on failure.
+    </p>
+
 
     <h4 id="simplet_map_add_layer_directly"><code>simplet_layer_t* simplet_map_add_layer_directly(simplet_map_t *map, simplet_layer_t *layer)</code></h4>
     <p>
@@ -444,6 +466,7 @@ typedef enum {
   SIMPLET_OOM,       // Out of memory for allocation
   SIMPLET_CAIRO_ERR, // Cairo error
   SIMPLET_OGR_ERR,   // OGR Error
+  SIMPLET_GDAL_ERR,  // GDAL Error
   SIMPLET_OK         // OK
 } simplet_status_t;
 </pre>
@@ -520,18 +543,8 @@ typedef enum {
 
     <h2 id="layers">Layers</h2>
     <p>
-      Each layer maps to a OGR datasource, and contains a list of queries to
+      Each layer maps to a OGR or GDAL datasource. Vector layers contain a list of queries to
       run against that source.
-    </p>
-
-    <h4 id="simplet_layer_new"><code>simplet_layer_t* simplet_layer_new(const char *datastring)</code></h4>
-    <p>
-      Create a new <tt>simplet_layer_t</tt>, returns <tt>NULL</tt> on failure.
-    </p>
-
-    <h4 id="simplet_layer_free"><code>void simplet_layer_free(simplet_layer_t *layer)</code></h4>
-    <p>
-      Deallocate the <tt>simplet_layer_t</tt>.
     </p>
 
     <h4 id="simplet_layer_set_source"><code>void simplet_layer_set_source(simplet_layer_t *layer, char *source)</code></h4>
@@ -546,7 +559,18 @@ typedef enum {
       space for the copy. <tt>source</tt> should be freed when no longer needed.
     </p>
 
-    <h4 id="simplet_layer_add_query"><code>simplet_query_t* simplet_layer_add_query(simplet_layer_t *layer, const char *ogrsql)</code></h4>
+    <h2 id="vector_layers">Vector Layers</h2>
+    <h4 id="simplet_vector_layer_new"><code>simplet_vector_layer_t* simplet_vector_layer_new(const char *datastring)</code></h4>
+    <p>
+      Create a new <tt>simplet_vector_layer_t</tt>, returns <tt>NULL</tt> on failure.
+    </p>
+
+    <h4 id="simplet_vector_layer_free"><code>void simplet_vector_layer_free(simplet_vector_layer_t *layer)</code></h4>
+    <p>
+      Deallocate the <tt>simplet_vector_layer_t</tt>.
+    </p>
+
+    <h4 id="simplet_vector_layer_add_query"><code>simplet_query_t* simplet_vector_layer_add_query(simplet_vector_layer_t *layer, const char *ogrsql)</code></h4>
     <p>
       Creates and adds a query to the <tt>layer</tt>'s query list. The returned
       query is owned by the <tt>layer</tt> and should not be freed with <a href="simplet_query_free">simplet_query_free</a>.
@@ -555,11 +579,23 @@ typedef enum {
       Returns <tt>NULL</tt> on failure.
     </p>
 
-    <h4 id="simplet_layer_add_query_directly"><code>simplet_query_t* simplet_layer_add_query_directly(simplet_layer_t *layer, simplet_query_t *query)</code></h4>
+    <h4 id="simplet_vector_layer_add_query_directly"><code>simplet_query_t* simplet_vector_layer_add_query_directly(simplet_vector_layer_t *layer, simplet_query_t *query)</code></h4>
     <p>
       Adds a previously initialized <tt>query</tt> to the <tt>layer</tt>'s query list.
       The returned query is then owned by the <tt>layer</tt> and should not
       be freed with <a href="simplet_query_free">simplet_query_free</a>.
+    </p>
+
+    <h2 id="raster_layers">Raster Layers</h2>
+
+    <h4 id="simplet_raster_layer_new"><code>simplet_raster_layer_t* simplet_raster_layer_new(const char *datastring)</code></h4>
+    <p>
+      Create a new <tt>simplet_raster_layer_t</tt>, returns <tt>NULL</tt> on failure.
+    </p>
+
+    <h4 id="simplet_raster_layer_free"><code>void simplet_raster_layer_free(simplet_raster_layer_t *layer)</code></h4>
+    <p>
+      Deallocate the <tt>simplet_raster_layer_t</tt>.
     </p>
 
     <h2 id="queries">Filters</h2>
