@@ -142,7 +142,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     cairo_paint(ctx);
     cairo_surface_destroy(surface);
   }
-  // set the surface back to the original here.
+
   free(x_lookup);
   free(y_lookup);
   free(z_lookup);
