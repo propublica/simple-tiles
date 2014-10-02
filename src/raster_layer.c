@@ -5,6 +5,7 @@
 #include "map.h"
 #include <gdal.h>
 #include <gdal_alg.h>
+#include <gdalwarper.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -68,32 +69,58 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   dst_t[4] = mat.yx;
   dst_t[5] = mat.yy;
 
+  GDALDriverH mem_driver = GDALGetDriverByName("MEM");
+  if(mem_driver == NULL)
+    return set_error(layer, SIMPLET_GDAL_ERR, "couldn't get memdriver");
+
+  GDALDatasetH out = GDALCreate(mem_driver, "simple_tiles_memory_dataset",
+                                width, height, bands, GDT_Byte, NULL);
+  if(out == NULL)
+    return set_error(layer, SIMPLET_GDAL_ERR, "couldn't allocate memory for image");
+
+  GDALSetGeoTransform(out, dst_t);
+  GDALWarpOptions *warp_opts = GDALCreateWarpOptions();
+  warp_opts->hSrcDS = source;
+  warp_opts->hDstDS = out;
+  warp_opts->nBandCount = bands;
+  warp_opts->panSrcBands = malloc(sizeof(int) * bands);
+  warp_opts->panDstBands = malloc(sizeof(int) * bands);
+  for(int i = 0; i < bands; i++)
+    warp_opts->panSrcBands[i] = warp_opts->panDstBands[i] = 1;
+
   // grab WKTs from source and dest
   const char *src_wkt  = GDALGetProjectionRef(source);
   char *dest_wkt;
   OSRExportToWkt(map->proj, &dest_wkt);
+  GDALSetProjection(out, dest_wkt);
 
   // get a transformer
-  void *transform_args = GDALCreateGenImgProjTransformer3(src_wkt, src_t, dest_wkt, dst_t);
+  warp_opts->pTransformerArg = GDALCreateGenImgProjTransformer(source, src_wkt,
+                                                               out, dest_wkt, FALSE,
+                                                               0.0, 1);
   free(dest_wkt);
-  if(transform_args == NULL)
-    return set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
+  if(warp_opts->pTransformerArg == NULL) {
+    set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
+    goto transformer_fail;
+  }
+  warp_opts->pfnTransformer = GDALGenImgProjTransform;
 
-  double* x_lookup = malloc(width * sizeof(double));
-  double* y_lookup = malloc(width * sizeof(double));
-  double* z_lookup = malloc(width * sizeof(double));
-  int* test = malloc(width * sizeof(int));
+  GDALWarpOperationH warper = GDALCreateWarpOperation(warp_opts);
+  if(warper == NULL){
+    set_error(layer, SIMPLET_GDAL_ERR, "no warper");
+    goto warper_fail;
+  }
+
+  CPLErr err = GDALChunkAndWarpMulti(warper, 0, 0, width, height);
+  if(err != CPLE_None) {
+    set_error(layer, SIMPLET_GDAL_ERR, "warp failed");
+    goto warper_fail;
+  }
+
   uint32_t *scanline = malloc(sizeof(uint32_t) * width);
 
   // draw to cairo
   for(int y = 0; y < height; y++){
-    // write pixel positions to the destination scanline
-    for(int k = 0; k < width; k++){
-      x_lookup[k] = k + 0.5;
-      y_lookup[k] = y + 0.5;
-      z_lookup[k] = 0.0;
-    }
-
     memset(scanline, 0, sizeof(uint32_t) * width);
 
     // set an opaque alpha value for RGB images
@@ -101,23 +128,11 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       for(int i = 0; i < width; i++)
         scanline[i] = 0xff << 24;
 
-    GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
-
     for(int x = 0; x < width; x++) {
-      // could not transform the point, skip this pixel
-      if(!test[x]) continue;
-
-      // sanity check? From gdalsimplewarp
-      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) continue;
-
-      // check to see if we are outside of the raster
-      if(x_lookup[x] > GDALGetRasterXSize(source)
-         || y_lookup[x] > GDALGetRasterYSize(source)) continue;
-
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
-        GDALRasterBandH b = GDALGetRasterBand(source, band);
-        GDALRasterIO(b, GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+        GDALRasterBandH b = GDALGetRasterBand(out, band);
+        GDALRasterIO(b, GF_Read, x, y, 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
 
         // set the pixel to fully transparent if we don't have a value
         int has_no_data = 0;
@@ -143,12 +158,12 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     cairo_surface_destroy(surface);
   }
 
-  free(x_lookup);
-  free(y_lookup);
-  free(z_lookup);
-  free(test);
   free(scanline);
-  GDALDestroyGenImgProjTransformer(transform_args);
+warper_fail:
+  GDALDestroyGenImgProjTransformer(warp_opts->pTransformerArg);
+transformer_fail:
   GDALClose(source);
+  GDALClose(out);
+  GDALDestroyWarpOptions(warp_opts);
   return layer->status;
 }
