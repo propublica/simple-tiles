@@ -39,10 +39,10 @@ test_raster() {
   simplet_map_t *map;
   assert((map = simplet_map_new()));
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
-  simplet_map_set_size(map, 256, 256);
+  simplet_map_set_size(map, 1000, 1000);
   simplet_map_set_bounds(map,
       -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
-  simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  simplet_map_add_raster_layer(map, "./data/west-bay-aerial-mosaic-flat.tif");
   assert(simplet_map_is_valid(map));
   simplet_map_render_to_png(map, "./raster.png");
   assert(SIMPLET_OK == simplet_map_get_status(map));

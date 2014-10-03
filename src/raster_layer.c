@@ -87,7 +87,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   // draw to cairo
   for(int y = 0; y < height; y++){
-    // write pixel positions to the destination scanline
+    // write center of our pixel positions to the destination scanline
     for(int k = 0; k < width; k++){
       x_lookup[k] = k + 0.5;
       y_lookup[k] = y + 0.5;
@@ -119,6 +119,52 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         GDALRasterBandH b = GDALGetRasterBand(source, band);
         GDALRasterIO(b, GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
 
+        // grab our four reference pixels
+        double ref_x[2] = {x - 1, x};
+        double ref_y[2] = {y - 1, y};
+        double ref_z[2] = {0, 0};
+        int ref_test[2] = {0};
+        double adder = 0.0;
+        GDALGenImgProjTransform(transform_args, TRUE, 2, ref_x, ref_y, ref_z, ref_test);
+        if(!ref_test[0] && !ref_test[1]) continue;
+        // upper left
+        if(ref_x[0] >= 0 && ref_x[0] < GDALGetRasterXSize(source)
+          && ref_y[0] >= 0 && ref_y[0] < GDALGetRasterYSize(source)) {
+          GByte pixel = 0;
+          GDALRasterIO(b, GF_Read, (int) ref_x[0], (int) ref_y[0], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+          adder += (x_lookup[x] - ref_x[0]) * (y_lookup[x] - ref_y[0]) * (double)pixel;
+        }
+        printf("ul: %f\n", adder);
+
+        // upper right
+        if(ref_x[1] >= 0 && ref_x[1] < GDALGetRasterXSize(source)
+          && ref_y[0] >= 0 && ref_y[0] < GDALGetRasterYSize(source)) {
+          GByte pixel = 0;
+          GDALRasterIO(b, GF_Read, (int) ref_x[1], (int) ref_y[0], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+          adder += (ref_x[1] - x_lookup[x]) * (y_lookup[x] - ref_y[0]) * (double)pixel;
+        }
+        printf("ur: %f\n", adder);
+
+        // // lower left
+        if(ref_x[0] >= 0 && ref_x[0] < GDALGetRasterXSize(source)
+          && ref_y[1] >= 0 && ref_y[1] < GDALGetRasterYSize(source)) {
+          GByte pixel = 0;
+          GDALRasterIO(b, GF_Read, (int) ref_x[0], (int) ref_y[1], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+          adder += (x_lookup[x] - ref_x[0]) * (ref_y[1] - y_lookup[x]) * (double)pixel;
+        }
+        printf("ll: %f\n", adder);
+
+        // // lower right
+        if(ref_x[1] >= 0 && ref_x[1] < GDALGetRasterXSize(source)
+          && ref_y[1] >= 0 && ref_y[1] < GDALGetRasterYSize(source)) {
+          GByte pixel = 0;
+          GDALRasterIO(b, GF_Read, (int) ref_x[1], (int) ref_y[1], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+          adder += (ref_x[1] - x_lookup[x]) * (ref_y[1] - y_lookup[x]) * (double)pixel;
+        }
+        printf("lr: %f\n", adder);
+
+        pixel = adder / ((ref_x[1] - ref_x[0]) * (ref_y[1] - ref_y[0]));
+        pixel = pixel > 255 ? 255 : (pixel < 0 ? 0 : pixel);
         // set the pixel to fully transparent if we don't have a value
         int has_no_data = 0;
         double no_data = GDALGetRasterNoDataValue(b, &has_no_data);
