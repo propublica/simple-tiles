@@ -125,9 +125,22 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       if(x_lookup[x] > GDALGetRasterXSize(source)
          || y_lookup[x] > GDALGetRasterYSize(source)) continue;
 
+
+
+
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
         GDALRasterBandH b = GDALGetRasterBand(source, band);
+        GDALRasterIO(b, GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+
+        // set the pixel to fully transparent if we don't have a value
+        int has_no_data = 0;
+        double no_data = GDALGetRasterNoDataValue(b, &has_no_data);
+        if(has_no_data && no_data == pixel) {
+          scanline[x] = 0x00 << 24;
+          continue;
+        }
+
         if(layer->resample) {
           // grab our four reference pixels
           double ref_x[2] = {x - 0.5, x + 0.5};
@@ -171,16 +184,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
           pixel = adder / ((ref_x[1] - ref_x[0]) * (ref_y[1] - ref_y[0]));
           pixel = pixel > 255 ? 255 : (pixel < 0 ? 0 : pixel);
-        } else {
-          GDALRasterIO(b, GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-        }
-
-        // set the pixel to fully transparent if we don't have a value
-        int has_no_data = 0;
-        double no_data = GDALGetRasterNoDataValue(b, &has_no_data);
-        if(has_no_data && no_data == pixel) {
-          scanline[x] = 0x00 << 24;
-          continue;
         }
 
         int band_remap[5] = {0, 2, 1, 0, 3};

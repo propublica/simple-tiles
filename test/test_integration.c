@@ -1,6 +1,7 @@
 #include <string.h>
 #include "map.h"
 #include "vector_layer.h"
+#include "raster_layer.h"
 #include "query.h"
 #include "list.h"
 #include "test.h"
