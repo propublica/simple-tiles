@@ -6,6 +6,8 @@
 #include <gdal.h>
 #include <cairo.h>
 #include <pango/pangocairo.h>
+#include <stdbool.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,6 +119,7 @@ typedef struct {
 
 typedef struct {
   SIMPLET_LAYER_FIELDS
+  bool resample;
 } simplet_raster_layer_t;
 
 typedef struct {
