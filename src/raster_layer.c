@@ -140,7 +140,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
           scanline[x] = 0x00 << 24;
           continue;
         }
-
+        // http://www.ipol.im/pub/art/2011/g_lmii/#index19h1
+        // convert this to resampling kernels - plan grab the nearest neighbor image into a buffer
+        // first and then resample off of that
         if(layer->resample) {
           // grab our four reference pixels
           double ref_x[2] = {x - 0.5, x + 0.5};
