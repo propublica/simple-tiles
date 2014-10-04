@@ -6,6 +6,7 @@
 #include "list.h"
 #include "query.h"
 #include "vector_layer.h"
+#include "raster_layer.h"
 #include "error.h"
 
 static void*
@@ -144,6 +145,20 @@ bench_raster(void *ctx) {
   assert(SIMPLET_OK == simplet_map_get_status(map));
 }
 
+
+static void
+bench_raster_lanczos(void *ctx) {
+  simplet_map_t *map = ctx;
+  simplet_map_set_slippy(map, 0, 0, 0);
+  simplet_map_set_bounds(map,
+      -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
+  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  simplet_raster_layer_set_resample(layer, simplet_lanczos);
+  char *data = NULL;
+  simplet_map_render_to_stream(map, data, stream);
+  assert(SIMPLET_OK == simplet_map_get_status(map));
+}
+
 static void
 bench_many_raster(void *ctx) {
   simplet_map_t *map = ctx;
@@ -186,6 +201,7 @@ bench_wrap_t benchmarks[] = {
   BENCH(map, empty)
   BENCH(map, many_queries)
   BENCH(map, raster)
+  BENCH(map, raster_lanczos)
   BENCH(map, many_raster)
   BENCH(list, list)
   { NULL, NULL, NULL, NULL, 0}
