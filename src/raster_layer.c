@@ -7,6 +7,7 @@
 #include <gdal_alg.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <math.h>
 
 // Add in an error function.
 SIMPLET_ERROR_FUNC(raster_layer_t)
@@ -24,7 +25,6 @@ simplet_raster_layer_new(const char *datastring) {
   layer->type   = SIMPLET_RASTER;
   layer->status = SIMPLET_OK;
 
-  // need some checking here
   simplet_retain((simplet_retainable_t *)layer);
 
   return layer;
@@ -40,7 +40,6 @@ simplet_raster_layer_get_resample(simplet_raster_layer_t *layer) {
   return layer->kernel;
 }
 
-// Free a layer object, and associated layers.
 void
 simplet_raster_layer_free(simplet_raster_layer_t *layer){
   if(simplet_release((simplet_retainable_t *)layer) > 0) return;
@@ -48,7 +47,6 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   free(layer->source);
   free(layer);
 }
-
 
 double
 simplet_bilinear(const double value){
@@ -144,7 +142,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         GDALRasterBandH b = GDALGetRasterBand(source, band);
         GDALRasterIO(b, GF_Read, (int) x_lookup[x], (int) y_lookup[x], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
 
-        // set the pixel to fully transparent if we don't have a value
+        // set the pixel to fully transparent if we don't have a pixel value
         int has_no_data = 0;
         double no_data = GDALGetRasterNoDataValue(b, &has_no_data);
         if(has_no_data && no_data == pixel) {
@@ -153,7 +151,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         }
 
         if(layer->kernel) {
-          // grab our four reference pixels
+          // grab our 4x4 smoothing window
           double ref_x[2] = {x, x + 1};
           double ref_y[2] = {y, y + 1};
           double ref_z[2] = {0, 0};
@@ -164,6 +162,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
           GByte pixels[4];
           GDALRasterIO(b, GF_Read, (int) ref_x[0], (int) ref_y[0], 2, 2, &pixels, 2, 2, GDT_Byte, 0, 0);
+
+          // run the kernel on our pixel window
           for(int m = 0; m < 2; m++){
             for(int n = 0; n < 2; n++){
               double res = layer->kernel(x_lookup[x] - ref_x[m]) * layer->kernel(y_lookup[x] - ref_y[n]);
@@ -172,6 +172,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
             }
           }
 
+          // normalize the kernel output
           pixel = adder / divisor;
           pixel = pixel > 255 ? 255 : (pixel < 0 ? 0 : pixel);
         }
