@@ -117,9 +117,10 @@ typedef struct {
   simplet_list_t *queries;
 } simplet_vector_layer_t;
 
+typedef double (*simplet_resample_kernel_t)(const double value);
 typedef struct {
   SIMPLET_LAYER_FIELDS
-  bool resample;
+  simplet_resample_kernel_t kernel;
 } simplet_raster_layer_t;
 
 typedef struct {

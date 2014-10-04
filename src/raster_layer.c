@@ -31,15 +31,14 @@ simplet_raster_layer_new(const char *datastring) {
 }
 
 void
-simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, bool resample) {
-  layer->resample = resample;
+simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, simplet_resample_kernel_t kernel) {
+  layer->kernel = kernel;
 }
 
-bool
+simplet_resample_kernel_t
 simplet_raster_layer_get_resample(simplet_raster_layer_t *layer) {
-  return layer->resample;
+  return layer->kernel;
 }
-
 
 // Free a layer object, and associated layers.
 void
@@ -48,6 +47,20 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   if(layer->error_msg) free(layer->error_msg);
   free(layer->source);
   free(layer);
+}
+
+
+double
+simplet_bilinear(const double value){
+  return fabs(1 - value);
+}
+
+double
+simplet_lanczos(const double value){
+  if(value >= 2.0)
+    return 0.0;
+  double rx = value / 2.0;
+  return sin(M_PI * rx) / (M_PI * rx);
 }
 
 simplet_status_t
@@ -100,8 +113,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   for(int y = 0; y < height; y++){
     // write center of our pixel positions to the destination scanline
     for(int k = 0; k < width; k++){
-      x_lookup[k] = k;
-      y_lookup[k] = y;
+      x_lookup[k] = k + 0.5;
+      y_lookup[k] = y + 0.5;
       z_lookup[k] = 0.0;
     }
 
@@ -126,8 +139,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
          || y_lookup[x] > GDALGetRasterYSize(source)) continue;
 
 
-
-
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
         GDALRasterBandH b = GDALGetRasterBand(source, band);
@@ -140,51 +151,28 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
           scanline[x] = 0x00 << 24;
           continue;
         }
-        // http://www.ipol.im/pub/art/2011/g_lmii/#index19h1
-        // convert this to resampling kernels - plan grab the nearest neighbor image into a buffer
-        // first and then resample off of that
-        if(layer->resample) {
+
+        if(layer->kernel) {
           // grab our four reference pixels
-          double ref_x[2] = {x - 0.5, x + 0.5};
-          double ref_y[2] = {y - 0.5, y + 0.5};
+          double ref_x[2] = {x, x + 1};
+          double ref_y[2] = {y, y + 1};
           double ref_z[2] = {0, 0};
           int ref_test[2] = {0};
-          double adder = 0.0;
+          double adder = 0.0, divisor = 0.0;
           GDALGenImgProjTransform(transform_args, TRUE, 2, ref_x, ref_y, ref_z, ref_test);
           if(!ref_test[0] && !ref_test[1]) continue;
-          // upper left
-          if(ref_x[0] >= 0 && ref_x[0] < GDALGetRasterXSize(source)
-            && ref_y[0] >= 0 && ref_y[0] < GDALGetRasterYSize(source)) {
-            GByte pixel = 0;
-            GDALRasterIO(b, GF_Read, (int) ref_x[0], (int) ref_y[0], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-            adder += (x_lookup[x] - ref_x[0]) * (y_lookup[x] - ref_y[0]) * (double)pixel;
+
+          GByte pixels[4];
+          GDALRasterIO(b, GF_Read, (int) ref_x[0], (int) ref_y[0], 2, 2, &pixels, 2, 2, GDT_Byte, 0, 0);
+          for(int m = 0; m < 2; m++){
+            for(int n = 0; n < 2; n++){
+              double res = layer->kernel(x_lookup[x] - ref_x[m]) * layer->kernel(y_lookup[x] - ref_y[n]);
+              adder   += res * (double)pixels[m + n];
+              divisor += res;
+            }
           }
 
-          // upper right
-          if(ref_x[1] >= 0 && ref_x[1] < GDALGetRasterXSize(source)
-            && ref_y[0] >= 0 && ref_y[0] < GDALGetRasterYSize(source)) {
-            GByte pixel = 0;
-            GDALRasterIO(b, GF_Read, (int) ref_x[1], (int) ref_y[0], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-            adder += (ref_x[1] - x_lookup[x]) * (y_lookup[x] - ref_y[0]) * (double)pixel;
-          }
-
-          // lower left
-          if(ref_x[0] >= 0 && ref_x[0] < GDALGetRasterXSize(source)
-            && ref_y[1] >= 0 && ref_y[1] < GDALGetRasterYSize(source)) {
-            GByte pixel = 0;
-            GDALRasterIO(b, GF_Read, (int) ref_x[0], (int) ref_y[1], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-            adder += (x_lookup[x] - ref_x[0]) * (ref_y[1] - y_lookup[x]) * (double)pixel;
-          }
-
-          // lower right
-          if(ref_x[1] >= 0 && ref_x[1] < GDALGetRasterXSize(source)
-            && ref_y[1] >= 0 && ref_y[1] < GDALGetRasterYSize(source)) {
-            GByte pixel = 0;
-            GDALRasterIO(b, GF_Read, (int) ref_x[1], (int) ref_y[1], 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
-            adder += (ref_x[1] - x_lookup[x]) * (ref_y[1] - y_lookup[x]) * (double)pixel;
-          }
-
-          pixel = adder / ((ref_x[1] - ref_x[0]) * (ref_y[1] - ref_y[0]));
+          pixel = adder / divisor;
           pixel = pixel > 255 ? 255 : (pixel < 0 ? 0 : pixel);
         }
 
