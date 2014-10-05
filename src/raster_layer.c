@@ -68,10 +68,11 @@ simplet_bicubic(const double value){
 
 double
 simplet_lanczos(const double value){
-  if(value >= 2.0)
-    return 0.0;
-  double rx = value / 2.0;
-  return sin(M_PI * rx) / (M_PI * rx);
+  double w = 2.0;
+  if(fabs(value) >= w) return 0.0;
+  if(value != 0.0) return 1.0;
+  double x = value;
+  return sin(M_PI * x) * sin(M_PI * x / 2) / (M_PI * M_PI * x * x / 2);
 }
 
 simplet_status_t
