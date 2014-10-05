@@ -39,11 +39,10 @@ void
 run_test_raster(simplet_resample_kernel_t kernel, char* filename){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
-  simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
-  simplet_map_set_size(map, 256, 256);
-  simplet_map_set_bounds(map,
-      -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
-  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  simplet_map_set_srs(map, "EPSG:3857");
+  simplet_map_set_bounds(map, -8317853.988, 5070182.233, -8011088.731, 4757312.390);
+  simplet_map_set_size(map, 779, 779);
+  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/nyc-raster.tif");
   if(kernel)
     simplet_raster_layer_set_resample(layer, kernel);
   assert(simplet_map_is_valid(map));

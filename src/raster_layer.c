@@ -62,7 +62,7 @@ simplet_bicubic(const double value){
   double a = -0.5;
   if(t <= 1.0) {
     return (a + 2) * t * t * t - (a + 3) * t * t + 1;
-  } else if(t <  2.0) {
+  } else if(t < 2.0) {
     return a * t * t * t - 5 * a * t * t + 8 * a * t - 4 * a;
   }
   return 0;
@@ -70,7 +70,7 @@ simplet_bicubic(const double value){
 
 double
 simplet_lanczos(const double value){
-  double w = 3.0;
+  double w = 2.0;
   if(fabs(value) >= w) return 0.0;
   if(value == 0.0) return 1.0;
   double x = value;
@@ -127,8 +127,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   for(int y = 0; y < height; y++){
     // write center of our pixel positions to the destination scanline
     for(int k = 0; k < width; k++){
-      x_lookup[k] = k + 0.5;
-      y_lookup[k] = y + 0.5;
+      x_lookup[k] = k;
+      y_lookup[k] = y;
       z_lookup[k] = 0.0;
     }
 
@@ -152,7 +152,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       if(x_lookup[x] > GDALGetRasterXSize(source)
          || y_lookup[x] > GDALGetRasterYSize(source)) continue;
 
-
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
         GDALRasterBandH b = GDALGetRasterBand(source, band);
@@ -168,29 +167,28 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
         if(layer->kernel) {
           // grab our 4x4 smoothing window
-          double ref_x[2] = {x, x + 1};
-          double ref_y[2] = {y, y + 1};
-          double ref_z[2] = {0, 0};
-          int ref_test[2] = {0};
+          double ref_x = x - 2;
+          double ref_y = y - 2;
+          double ref_z = 0;
+          int ref_test;
           double adder = 0.0, divisor = 0.0;
-          GDALGenImgProjTransform(transform_args, TRUE, 2, ref_x, ref_y, ref_z, ref_test);
-          if(!ref_test[0] && !ref_test[1]) continue;
+          GDALGenImgProjTransform(transform_args, TRUE, 1, &ref_x, &ref_y, &ref_z, &ref_test);
+          if(!ref_test) continue;
 
-          GByte pixels[4];
-          GDALRasterIO(b, GF_Read, (int) ref_x[0], (int) ref_y[0], 2, 2, &pixels, 2, 2, GDT_Byte, 0, 0);
-
+          GByte pixels[16];
+          GDALRasterIO(b, GF_Read, (int) ref_x, (int) ref_y, 4, 4, &pixels, 4, 4, GDT_Byte, 0, 0);
+          int x0 = (int) ceil(x_lookup[x] - 2);
+          int y0 = (int) ceil(y_lookup[x] - 2);
           // run the kernel on our pixel window
-          for(int m = 0; m < 2; m++){
-            for(int n = 0; n < 2; n++){
-              double res = layer->kernel(x_lookup[x] - ref_x[m]) * layer->kernel(y_lookup[x] - ref_y[n]);
-              adder   += res * (double)pixels[m + n];
+          for(int m = 0; m < 4; m++){
+            for(int n = 0; n < 4; n++){
+              double res = layer->kernel(x_lookup[x] - (x0 + m)) * layer->kernel(y_lookup[y] - (y0 + n));
+              adder   += res * pixels[m + n];
               divisor += res;
             }
           }
-
           // normalize the kernel output
           pixel = adder / divisor;
-          pixel = pixel > 255 ? 255 : (pixel < 0 ? 0 : pixel);
         }
 
         int band_remap[5] = {0, 2, 1, 0, 3};
