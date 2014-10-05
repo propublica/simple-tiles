@@ -51,7 +51,9 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
 // from: http://www.ipol.im/pub/art/2011/g_lmii/
 double
 simplet_bilinear(const double value){
-  return fabs(1 - value);
+  double x = fabs(1 - value);
+  if(x > 0) return x;
+  return 0;
 }
 
 double
@@ -68,11 +70,11 @@ simplet_bicubic(const double value){
 
 double
 simplet_lanczos(const double value){
-  double w = 2.0;
+  double w = 3.0;
   if(fabs(value) >= w) return 0.0;
-  if(value != 0.0) return 1.0;
+  if(value == 0.0) return 1.0;
   double x = value;
-  return sin(M_PI * x) * sin(M_PI * x / 2) / (M_PI * M_PI * x * x / 2);
+  return sin(M_PI * x) / (M_PI * x) * sin(M_PI * x / w) / (M_PI * x / w);
 }
 
 simplet_status_t
