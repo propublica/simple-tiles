@@ -48,9 +48,22 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   free(layer);
 }
 
+// from: http://www.ipol.im/pub/art/2011/g_lmii/
 double
 simplet_bilinear(const double value){
   return fabs(1 - value);
+}
+
+double
+simplet_bicubic(const double value){
+  double t = fabs(value);
+  double a = -0.5;
+  if(t <= 1.0) {
+    return (a + 2) * t * t * t - (a + 3) * t * t + 1;
+  } else if(t <  2.0) {
+    return a * t * t * t - 5 * a * t * t + 8 * a * t - 4 * a;
+  }
+  return 0;
 }
 
 double

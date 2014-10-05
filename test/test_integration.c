@@ -36,54 +36,41 @@ test_background(){
 }
 
 void
-test_raster() {
+run_test_raster(simplet_resample_kernel_t kernel, char* filename){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
   simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
   simplet_map_set_size(map, 256, 256);
   simplet_map_set_bounds(map,
       -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
-  simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  if(kernel)
+    simplet_raster_layer_set_resample(layer, kernel);
   assert(simplet_map_is_valid(map));
-  simplet_map_render_to_png(map, "./raster.png");
+  simplet_map_render_to_png(map, filename);
   assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
 }
 
+void
+test_raster() {
+  run_test_raster(NULL, "./raster.png");
+}
 
 void
 test_raster_resample_bilinear() {
-  simplet_map_t *map;
-  assert((map = simplet_map_new()));
-  simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
-  simplet_map_set_size(map, 256, 256);
-  simplet_map_set_bounds(map,
-      -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
-  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
-  simplet_raster_layer_set_resample(layer, simplet_bilinear);
-  assert(simplet_map_is_valid(map));
-  simplet_map_render_to_png(map, "./raster-bilinear.png");
-  assert(SIMPLET_OK == simplet_map_get_status(map));
-  simplet_map_free(map);
+  run_test_raster(simplet_bilinear, "./raster-bilinear.png");
 }
 
+void
+test_raster_resample_bicubic() {
+  run_test_raster(simplet_bicubic, "./raster-bicubic.png");
+}
 
 void
 test_raster_resample_lanczos() {
-  simplet_map_t *map;
-  assert((map = simplet_map_new()));
-  simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
-  simplet_map_set_size(map, 256, 256);
-  simplet_map_set_bounds(map,
-      -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
-  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
-  simplet_raster_layer_set_resample(layer, simplet_lanczos);
-  assert(simplet_map_is_valid(map));
-  simplet_map_render_to_png(map, "./raster-lanczos.png");
-  assert(SIMPLET_OK == simplet_map_get_status(map));
-  simplet_map_free(map);
+  run_test_raster(simplet_lanczos, "./raster-lanczos.png");
 }
-
 
 void
 test_many_layers(){
@@ -241,6 +228,8 @@ TASK(integration){
   puts("check raster.png");
   test(raster_resample_bilinear);
   puts("check raster-bilinear.png");
+  test(raster_resample_bicubic);
+  puts("check raster-bicubic.png");
   test(raster_resample_lanczos);
   puts("check raster-lanczos.png");
   test(slippy_gen);
