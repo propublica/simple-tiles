@@ -33,6 +33,9 @@ double
 simplet_bicubic(const double value);
 
 double
+simplet_average(const double value);
+
+double
 simplet_lanczos(const double value);
 
 SIMPLET_HAS_USER_DATA_PROTOS(raster_layer)
