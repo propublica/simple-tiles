@@ -180,27 +180,27 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
           double x_scale = x_lookup[x] - tx;
           double y_scale = y_lookup[y] - ty;
-          int x_step = x_scale > 1.0 ? ceil(x_scale) : 1.0;
-          int y_step = y_scale > 1.0 ? ceil(y_scale) : 1.0;
+          int x_step = x_scale < 1.0 ? ceil(x_scale) : 1.0;
+          int y_step = y_scale < 1.0 ? ceil(y_scale) : 1.0;
           // grab our 3x3 smoothing window
-          double ref_x = x_lookup[x] - x_step * 1.5;
-          double ref_y = y_lookup[x] - y_step * 1.5;
+          double ref_x = x_lookup[x] - x_step * 2;
+          double ref_y = y_lookup[x] - y_step * 2;
           double adder = 0.0, divisor = 0.0;
 
-          GByte pixels[9];
-          for(int n = 0; n < 3; n ++) {
-            for(int m = 0; m < 3; m++) {
-              GDALRasterIO(b, GF_Read, (int) (ref_x + m * x_step), (int) (ref_y + n * y_step), 1, 1, &pixels[n * 3 + m], 1, 1, GDT_Byte, 0, 0);
+          GByte pixels[16];
+          for(int n = 0; n < 4; n ++) {
+            for(int m = 0; m < 4; m++) {
+              GDALRasterIO(b, GF_Read, (int) (ref_x + m * x_step), (int) (ref_y + n * y_step), 1, 1, &pixels[n * 4 + m], 1, 1, GDT_Byte, 0, 0);
             }
           }
 
           double x0 = ref_x;
           double y0 = ref_y;
 
-          for(int n = 0; n < 3; n++){
-            for(int m = 0; m < 3; m++){
+          for(int n = 0; n < 4; n++){
+            for(int m = 0; m < 4; m++){
               double res = layer->kernel((x_lookup[x] - (x0 + m * x_step)) / x_step) * layer->kernel((y_lookup[x] - (y0 + n * y_step)) / y_step);
-              adder   += res * (double)pixels[n * 3 + m];
+              adder   += res * (double)pixels[n * 4 + m];
               divisor += res;
             }
           }
