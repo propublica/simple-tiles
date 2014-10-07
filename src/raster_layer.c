@@ -172,28 +172,43 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         }
 
         if(layer->kernel) {
+          double tx = x - 1;
+          double ty = y - 1;
+          double tz = 0;
+          int tt;
+          GDALGenImgProjTransform(transform_args, TRUE, 1, &tx, &ty, &tz, &tt);
+
+          double x_scale = (x_lookup[x] - tx);
+          double y_scale = (y_lookup[y] - ty);
+          int x_step = x_scale > 1.0 ? ceil(x_scale) : 1.0;
+          int y_step = y_scale > 1.0 ? ceil(y_scale) : 1.0;
           // grab our 4x4 smoothing window
-          double ref_x = x_lookup[x] - 2;
-          double ref_y = y_lookup[x] - 2;
+          double ref_x = x_lookup[x] - x_step * 2;
+          double ref_y = y_lookup[x] - y_step * 2;
           double adder = 0.0, divisor = 0.0;
 
           GByte pixels[16];
-          GDALRasterIO(b, GF_Read, (int) (ref_x), (int) (ref_y), 4, 4, &pixels, 4, 4, GDT_Byte, 0, 0);
+          for(int n = 0; n < 4; n ++) {
+            for(int m = 0; m < 4; m++) {
+              GDALRasterIO(b, GF_Read, (int) (ref_x + m * x_step), (int) (ref_y + n * y_step), 1, 1, &pixels[n * 4 + m], 1, 1, GDT_Byte, 0, 0);
+            }
+          }
 
           int x0 = (int) ceil(ref_x);
           int y0 = (int) ceil(ref_y);
 
           for(int n = 0; n < 4; n++){
             for(int m = 0; m < 4; m++){
-              double res = layer->kernel(x_lookup[x] - (x0 + m)) * layer->kernel(y_lookup[x] - (y0 + n));
-              adder   += res * (double)pixels[n * 4 + m];
+              double res = layer->kernel((x_lookup[x] - (x0 + m * x_step)) / x_step) * layer->kernel((y_lookup[x] - (y0 + n * y_step)) / y_step);
+              adder  += res * (double)pixels[n * 4 + m];
               divisor += res;
             }
           }
+
           // normalize the kernel output
-          pixel = adder / divisor;
-          pixel = adder / divisor > 255 ? 255 : (adder / divisor) < 0 ? 0 : pixel;
+          pixel = adder / divisor > 255 ? 255 : (adder / divisor) < 0 ? 0 : round(adder / divisor);
         }
+
 
         int band_remap[5] = {0, 2, 1, 0, 3};
         scanline[x] |= ((int)pixel) << ((band_remap[band]) * 8);
