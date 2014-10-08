@@ -211,8 +211,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glBindVertexArray(vao);
 
     GLfloat vertices[] = {
-      0.0, 0.0, 0.0, 0.5, 0.0, 0.0,
-      0.5, 0.0, 0.0, 0.5, 0.5, 0.0
+      -1.0, 1.0, 1.0, 1.0, -1.0, -1.0,
+      1.0, 1.0, -1.0, 1.0, -1.0, -1.0
     };
 
     GLuint vbuf;
@@ -277,7 +277,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glBindTexture(GL_TEXTURE_2D, outtex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width/2, height/2, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, outtex, 0);
-
     GLuint tex;
     glGenTextures(1, &tex);
     glActiveTexture(GL_TEXTURE0);
