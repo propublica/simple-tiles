@@ -13,6 +13,8 @@ def configure(conf):
     conf.check_cfg(path='gdal-config', args=['--libs'], package='',
                    uselib_store='GDAL')
     conf.check_cc(lib='m', uselib_store='M', use='M')
+
+
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
     conf.define('_GNU_SOURCE', 1)  # for asprintf
     if conf.env.DEBUG:
@@ -28,7 +30,8 @@ def build(bld):
         features='c cshlib',
         source=sources,
         target='simple-tiles',
-        uselib='M CAIRO GDAL'
+        uselib='M CAIRO GDAL',
+        framework=["OpenGL"]
     )
 
     bld.stlib(
@@ -36,12 +39,14 @@ def build(bld):
         source=sources,
         target='simple-tiles',
         uselib='M CAIRO GDAL',
-        install_path="${PREFIX}/lib"
+        install_path="${PREFIX}/lib",
+        framework=["OpenGL"]
     )
 
     bld(
         source='src/simple-tiles.pc.in',
-        VERSION='0.4.1'
+        VERSION='0.4.1',
+        framework=["OpenGL"]
     )
 
     bld.install_files('${PREFIX}/include/simple-tiles',  bld.path.ant_glob(['src/*.h']))
