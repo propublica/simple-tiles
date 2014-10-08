@@ -31,7 +31,7 @@ def build(bld):
         source=sources,
         target='simple-tiles',
         uselib='M CAIRO GDAL',
-        framework="OpenGL"
+        framework=["OpenGL"]
     )
 
     bld.stlib(
@@ -40,12 +40,13 @@ def build(bld):
         target='simple-tiles',
         uselib='M CAIRO GDAL',
         install_path="${PREFIX}/lib",
-        framework="OpenGL"
+        framework=["OpenGL"]
     )
 
     bld(
         source='src/simple-tiles.pc.in',
-        VERSION='0.4.1'
+        VERSION='0.4.1',
+        framework=["OpenGL"]
     )
 
     bld.install_files('${PREFIX}/include/simple-tiles',  bld.path.ant_glob(['src/*.h']))

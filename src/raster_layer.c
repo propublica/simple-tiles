@@ -3,7 +3,10 @@
 #include "error.h"
 #include "memory.h"
 #include "map.h"
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #include <OpenGL/OpenGL.h>
+
 #include <gdal.h>
 #include <gdal_alg.h>
 #include <stdbool.h>
@@ -198,13 +201,10 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     // add error checking here
     CGLDestroyPixelFormat(pix);
     errorCode = CGLSetCurrentContext(context);
-
     // and on linux http://cgit.freedesktop.org/mesa/demos/tree/src/osdemos/osdemo.c
     GLuint tex, framebuffer;
-
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
     glGenTextures(1, &tex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
 
