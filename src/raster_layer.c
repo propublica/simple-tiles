@@ -180,8 +180,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
           double x_scale = x_lookup[x] - tx;
           double y_scale = y_lookup[y] - ty;
-          int x_step = x_scale < 1.0 ? ceil(x_scale) : 1.0;
-          int y_step = y_scale < 1.0 ? ceil(y_scale) : 1.0;
+          int x_step = x_scale > 1.0 ? ceil(x_scale) : 1.0;
+          int y_step = y_scale > 1.0 ? ceil(y_scale) : 1.0;
+
           // grab our 3x3 smoothing window
           double ref_x = x_lookup[x] - x_step * 2;
           double ref_y = y_lookup[x] - y_step * 2;
@@ -194,8 +195,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
             }
           }
 
-          double x0 = ref_x;
-          double y0 = ref_y;
+          double x0 = ceil(ref_x);
+          double y0 = ceil(ref_y);
 
           for(int n = 0; n < 4; n++){
             for(int m = 0; m < 4; m++){
