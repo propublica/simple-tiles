@@ -3,6 +3,7 @@
 #include "error.h"
 #include "memory.h"
 #include "map.h"
+#include <OpenGL/OpenGL.h>
 #include <gdal.h>
 #include <gdal_alg.h>
 #include <stdbool.h>
@@ -88,6 +89,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   // process the map
   int width  = map->width;
   int height = map->height;
+  if(layer->resample) { width *= 2; height *= 2; }
 
   GDALDatasetH source = GDALOpen(layer->source, GA_ReadOnly);
   if(source == NULL)
@@ -103,7 +105,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   double dst_t[6];
   cairo_matrix_t mat;
+  if(layer->resample) { map->width *= 2; map->height *= 2; }
   simplet_map_init_matrix(map, &mat);
+  if(layer->resample) { map->width /= 2; map->height /= 2; }
   cairo_matrix_invert(&mat);
   dst_t[0] = mat.x0;
   dst_t[1] = mat.xx;
@@ -127,7 +131,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   double* y_lookup = malloc(width * sizeof(double));
   double* z_lookup = malloc(width * sizeof(double));
   int* test = malloc(width * sizeof(int));
-  uint32_t *scanline = malloc(sizeof(uint32_t) * width);
+  uint32_t *data = malloc(sizeof(uint32_t) * width * height);
 
   // draw to cairo
   for(int y = 0; y < height; y++){
@@ -137,8 +141,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       y_lookup[k] = y + 0.5;
       z_lookup[k] = 0.0;
     }
-
-    memset(scanline, 0, sizeof(uint32_t) * width);
+    uint32_t *scanline = data + y * width;
 
     // set an opaque alpha value for RGB images
     if(bands < 4)
@@ -171,66 +174,60 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
           continue;
         }
 
-        if(layer->kernel) {
-          double tx = x - 1;
-          double ty = y - 1;
-          double tz = 0;
-          int tt;
-          GDALGenImgProjTransform(transform_args, TRUE, 1, &tx, &ty, &tz, &tt);
-
-          double x_scale = x_lookup[x] - tx;
-          double y_scale = y_lookup[y] - ty;
-          int x_step = x_scale < 1.0 ? ceil(x_scale) : 1.0;
-          int y_step = y_scale < 1.0 ? ceil(y_scale) : 1.0;
-          // grab our 3x3 smoothing window
-          double ref_x = x_lookup[x] - x_step * 2;
-          double ref_y = y_lookup[x] - y_step * 2;
-          double adder = 0.0, divisor = 0.0;
-
-          GByte pixels[16];
-          for(int n = 0; n < 4; n ++) {
-            for(int m = 0; m < 4; m++) {
-              GDALRasterIO(b, GF_Read, (int) (ref_x + m * x_step), (int) (ref_y + n * y_step), 1, 1, &pixels[n * 4 + m], 1, 1, GDT_Byte, 0, 0);
-            }
-          }
-
-          double x0 = ref_x;
-          double y0 = ref_y;
-
-          for(int n = 0; n < 4; n++){
-            for(int m = 0; m < 4; m++){
-              double res = layer->kernel((x_lookup[x] - (x0 + m * x_step)) / x_step) * layer->kernel((y_lookup[x] - (y0 + n * y_step)) / y_step);
-              adder   += res * (double)pixels[n * 4 + m];
-              divisor += res;
-            }
-          }
-
-          // normalize the kernel output
-          pixel = adder / divisor > 255 ? 255 : (adder / divisor) < 0 ? 0 : round(adder / divisor);
-        }
-
-
         int band_remap[5] = {0, 2, 1, 0, 3};
         scanline[x] |= ((int)pixel) << ((band_remap[band]) * 8);
       }
     }
-
-    int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
-    cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
-
-    if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-      set_error(layer, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
-
-    cairo_set_source_surface(ctx, surface, 0, y);
-    cairo_paint(ctx);
-    cairo_surface_destroy(surface);
   }
+
+  if(layer->resample) {
+    // on os x
+    CGLContextObj context;
+    CGLPixelFormatAttribute attributes[4] = {
+      kCGLPFAAccelerated,   // no software rendering
+      kCGLPFAOpenGLProfile, // core profile with the version stated below
+      (CGLPixelFormatAttribute) kCGLOGLPVersion_3_2_Core,
+      (CGLPixelFormatAttribute) 0
+    };
+    CGLPixelFormatObj pix;
+    CGLError errorCode;
+    GLint num; // stores the number of possible pixel formats
+    errorCode = CGLChoosePixelFormat(attributes, &pix, &num);
+    // add error checking here
+    errorCode = CGLCreateContext(pix, NULL, &context ); // second parameter can be another context for object sharing
+    // add error checking here
+    CGLDestroyPixelFormat(pix);
+    errorCode = CGLSetCurrentContext(context);
+
+    // and on linux http://cgit.freedesktop.org/mesa/demos/tree/src/osdemos/osdemo.c
+    GLuint tex, framebuffer;
+
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    glGenTextures(1, &tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+
+    // do things here
+    CGLSetCurrentContext(NULL);
+    CGLDestroyContext(context);
+  }
+
+  int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
+  cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) data, CAIRO_FORMAT_ARGB32, width, height, stride);
+
+  if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+    set_error(layer, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
+
+  cairo_set_source_surface(ctx, surface, 0, 0);
+  cairo_paint(ctx);
+  cairo_surface_destroy(surface);
 
   free(x_lookup);
   free(y_lookup);
   free(z_lookup);
   free(test);
-  free(scanline);
+  free(data);
   GDALDestroyGenImgProjTransformer(transform_args);
   GDALClose(source);
   return layer->status;
