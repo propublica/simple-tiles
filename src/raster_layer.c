@@ -265,9 +265,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glUseProgram(program);
 
     GLint pos = glGetAttribLocation(program, "position");
-
     glEnableVertexAttribArray(pos);
-    glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
 
     GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
@@ -286,9 +285,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
     glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    glLoadIdentity();
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     width /= 2; height /= 2;
