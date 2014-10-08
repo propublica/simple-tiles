@@ -3,8 +3,12 @@
 #include "error.h"
 #include "memory.h"
 #include "map.h"
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+
+#ifndef __APPLE__
+#define __APPLE__ 1
+#endif
+#include <OpenGL/gl3.h>
+#include <OpenGL/gl3ext.h>
 #include <OpenGL/OpenGL.h>
 
 #include <gdal.h>
@@ -108,9 +112,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   double dst_t[6];
   cairo_matrix_t mat;
-  if(layer->resample) { map->width *= 2; map->height *= 2; }
   simplet_map_init_matrix(map, &mat);
-  if(layer->resample) { map->width /= 2; map->height /= 2; }
   cairo_matrix_invert(&mat);
   dst_t[0] = mat.x0;
   dst_t[1] = mat.xx;
@@ -186,29 +188,116 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   if(layer->resample) {
     // on os x
     CGLContextObj context;
-    CGLPixelFormatAttribute attributes[4] = {
-      kCGLPFAAccelerated,   // no software rendering
-      kCGLPFAOpenGLProfile, // core profile with the version stated below
-      (CGLPixelFormatAttribute) kCGLOGLPVersion_3_2_Core,
+    CGLPixelFormatAttribute attributes[5] = {
+      kCGLPFAAccelerated,
+      kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute) kCGLOGLPVersion_3_2_Core,
+      kCGLPFADoubleBuffer,
       (CGLPixelFormatAttribute) 0
     };
     CGLPixelFormatObj pix;
     CGLError errorCode;
-    GLint num; // stores the number of possible pixel formats
+    GLint num;
     errorCode = CGLChoosePixelFormat(attributes, &pix, &num);
     // add error checking here
-    errorCode = CGLCreateContext(pix, NULL, &context ); // second parameter can be another context for object sharing
+    errorCode = CGLCreateContext(pix, NULL, &context);
     // add error checking here
     CGLDestroyPixelFormat(pix);
     errorCode = CGLSetCurrentContext(context);
+
     // and on linux http://cgit.freedesktop.org/mesa/demos/tree/src/osdemos/osdemo.c
-    GLuint tex, framebuffer;
+
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    GLfloat vertices[] = {
+      0.0, 0.0, 0.0, 0.5, 0.0, 0.0,
+      0.5, 0.0, 0.0, 0.5, 0.5, 0.0
+    };
+
+    GLuint vbuf;
+    glGenBuffers(1, &vbuf);
+    glBindBuffer(GL_ARRAY_BUFFER, vbuf);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    GLuint triangles[] = {
+      0, 1, 2,
+      2, 1, 3
+    };
+
+    GLuint ebuf;
+    glGenBuffers(1, &ebuf);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebuf);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
+
+    const GLchar *vertex =
+      "#version 150\n"
+      "in vec2 position;"
+      "out vec2 coord;"
+      "void main(){"
+      "  coord = position;"
+      "}"
+    ;
+
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertex, NULL);
+    glCompileShader(vertexShader);
+
+    const GLchar *fragment =
+      "#version 150\n"
+      "uniform sampler2D tex;"
+      "in vec2 coord;"
+      "out vec4 color;"
+      "void main(){"
+      "  color = texture(tex, coord);"
+      "}"
+    ;
+
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragment, NULL);
+    glCompileShader(fragmentShader);
+
+    GLint program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+    glBindFragDataLocation(program, 0, "color");
+    glLinkProgram(program);
+    glUseProgram(program);
+
+    GLint pos = glGetAttribLocation(program, "position");
+
+    glEnableVertexAttribArray(pos);
+    glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
+
+    GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    glGenTextures(1, &tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
 
-    // do things here
+    GLuint outtex;
+    glGenTextures(1, &outtex);
+    glBindTexture(GL_TEXTURE_2D, outtex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width/2, height/2, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, outtex, 0);
+
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+    glUniform1i(glGetUniformLocation(program, "tex"), 0);
+
+    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLoadIdentity();
+
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    width /= 2; height /= 2;
+    uint32_t *out = malloc(sizeof(uint32_t) * width * height);
+    glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, out);
+
+    free(data);
+    data = out;
+
     CGLSetCurrentContext(NULL);
     CGLDestroyContext(context);
   }

@@ -13,6 +13,7 @@ def configure(conf):
     conf.check_cfg(path='gdal-config', args=['--libs'], package='',
                    uselib_store='GDAL')
     conf.check_cc(lib='m', uselib_store='M', use='M')
+    conf.check_cc(lib='GL', uselib_store='GL', use='GL')
 
 
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
@@ -30,7 +31,7 @@ def build(bld):
         features='c cshlib',
         source=sources,
         target='simple-tiles',
-        uselib='M CAIRO GDAL',
+        uselib='GL M CAIRO GDAL',
         framework=["OpenGL"]
     )
 
@@ -38,7 +39,7 @@ def build(bld):
         features='c cstlib',
         source=sources,
         target='simple-tiles',
-        uselib='M CAIRO GDAL',
+        uselib='GL M CAIRO GDAL',
         install_path="${PREFIX}/lib",
         framework=["OpenGL"]
     )
