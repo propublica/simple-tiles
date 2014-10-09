@@ -39,12 +39,12 @@ void
 run_test_raster(simplet_resample_kernel_t kernel, char* filename){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
-  // simplet_map_set_srs(map, "EPSG:3857");
-  // simplet_map_set_bounds(map, -8317853.988, 5070182.233, -8011088.731, 4757312.390);
-  // simplet_map_set_size(map, 779, 763);
-  simplet_map_set_slippy(map, 9641,12312,15);
+  simplet_map_set_srs(map, "EPSG:3857");
+  simplet_map_set_bounds(map, -8317853.988, 5070182.233, -8011088.731, 4757312.390);
+  simplet_map_set_size(map, 400, 400);
+  simplet_map_set_slippy(map, 4822,6159,14);
   simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "/Users/jeff/dev/simple-tiles/data/nyc2-rgb-pansharpened-8bit-nodata.tif");
-  layer->resample = true;
+  // layer->resample = true;
   if(kernel)
     simplet_raster_layer_set_resample(layer, kernel);
   assert(simplet_map_is_valid(map));

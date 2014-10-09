@@ -109,7 +109,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   double dst_t[6];
   cairo_matrix_t mat;
+  if(layer->resample) { map->width *= 2; map->height *= 2; }
   simplet_map_init_matrix(map, &mat);
+  if(layer->resample) { map->width /= 2; map->height /= 2; }
   cairo_matrix_invert(&mat);
   dst_t[0] = mat.x0;
   dst_t[1] = mat.xx;
@@ -183,6 +185,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   }
 
   if(layer->resample) {
+    // and on linux http://cgit.freedesktop.org/mesa/demos/tree/src/osdemos/osdemo.c
+
     // on os x
     CGLContextObj context;
     CGLPixelFormatAttribute attributes[5] = {
@@ -201,7 +205,22 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     CGLDestroyPixelFormat(pix);
     errorCode = CGLSetCurrentContext(context);
 
-    // and on linux http://cgit.freedesktop.org/mesa/demos/tree/src/osdemos/osdemo.c
+
+    GLuint framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    GLuint color;
+    glGenRenderbuffers(1, &color);
+    glBindRenderbuffer(GL_RENDERBUFFER, color);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color);
+
+    GLuint depth;
+    glGenRenderbuffers(1, &depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth);
 
     GLuint vao;
     glGenVertexArrays(1, &vao);
@@ -249,8 +268,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       "in vec2 coord;"
       "out vec4 color;"
       "void main(){"
-      // "  color = texture(tex, vec2((coord.x + 1.0)/2.0, (coord.y + 1.0)/2.0);"
-      "  color = vec4((coord.x + 1.0)/2.0, (coord.y + 1.0)/2.0, 0.0, 1.0);"
+      "  color = texture(tex, vec2((coord.x + 1.0) / 2.0, (coord.y + 1.0) / 2.0));"
       "}"
     ;
 
@@ -264,39 +282,36 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glBindFragDataLocation(program, 0, "color");
     glLinkProgram(program);
     glUseProgram(program);
+    int logLen = 1024;
+    if(logLen > 0) {
+      // Show any errors as appropriate
+      char log[logLen];
+      glGetProgramInfoLog(program, logLen, &logLen, log);
+      printf("Prog Info Log: %s\n", log);
+      glGetShaderInfoLog(fragmentShader, logLen, &logLen, log);
+      printf("Prog Info Log: %s\n", log);
+    }
 
     GLint pos = glGetAttribLocation(program, "position");
     glEnableVertexAttribArray(pos);
     glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    GLuint framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    GLuint color;
-    glGenRenderbuffers(1, &color);
-    glBindRenderbuffer(GL_RENDERBUFFER, color);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width/2, height/2);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color);
-
-    GLuint depth;
-    glGenRenderbuffers(1, &depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width/2, height/2);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth);
 
     GLuint tex;
     glGenTextures(1, &tex);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glViewport(0, 0, width/2, height/2);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
     width /= 2; height /= 2;
     uint32_t *out = malloc(sizeof(uint32_t) * width * height);
     glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, out);
@@ -304,13 +319,12 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     free(data);
     data = out;
 
-
     CGLSetCurrentContext(NULL);
     CGLDestroyContext(context);
   }
 
-  int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
-  cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) data, CAIRO_FORMAT_ARGB32, width, height, stride);
+  int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, map->width);
+  cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) data, CAIRO_FORMAT_ARGB32, map->width, map->height, stride);
 
   if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
     set_error(layer, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
