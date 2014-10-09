@@ -136,6 +136,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   double* z_lookup = malloc(width * sizeof(double));
   int* test = malloc(width * sizeof(int));
   uint32_t *data = malloc(sizeof(uint32_t) * width * height);
+  memset(data, 0, sizeof(uint32_t) * width * height);
 
   // draw to cairo
   for(int y = 0; y < height; y++){
