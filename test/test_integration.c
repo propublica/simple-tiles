@@ -43,8 +43,8 @@ run_test_raster(simplet_resample_kernel_t kernel, char* filename){
   simplet_map_set_bounds(map, -8317853.988, 5070182.233, -8011088.731, 4757312.390);
   simplet_map_set_size(map, 400, 400);
   simplet_map_set_slippy(map, 4822,6159,14);
-  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "/Users/jeff/dev/simple-tiles/data/nyc2-rgb-pansharpened-8bit-nodata.tif");
-  // layer->resample = true;
+  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/nyc2-rgb-pansharpened-8bit-nodata.tif");
+  layer->resample = true;
   if(kernel)
     simplet_raster_layer_set_resample(layer, kernel);
   assert(simplet_map_is_valid(map));
@@ -55,7 +55,7 @@ run_test_raster(simplet_resample_kernel_t kernel, char* filename){
 
 void
 test_raster() {
-  run_test_raster(NULL, "/Users/jeff/dev/simple-tiles/raster.png");
+  run_test_raster(NULL, "./raster.png");
 }
 
 void

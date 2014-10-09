@@ -36,11 +36,11 @@ simplet_raster_layer_new(const char *datastring) {
 }
 
 void
-simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, simplet_resample_kernel_t kernel) {
-  layer->kernel = kernel;
+simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, bool resample) {
+  layer->resample = resample;
 }
 
-simplet_resample_kernel_t
+bool
 simplet_raster_layer_get_resample(simplet_raster_layer_t *layer) {
   return layer->kernel;
 }
@@ -282,15 +282,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glBindFragDataLocation(program, 0, "color");
     glLinkProgram(program);
     glUseProgram(program);
-    int logLen = 1024;
-    if(logLen > 0) {
-      // Show any errors as appropriate
-      char log[logLen];
-      glGetProgramInfoLog(program, logLen, &logLen, log);
-      printf("Prog Info Log: %s\n", log);
-      glGetShaderInfoLog(fragmentShader, logLen, &logLen, log);
-      printf("Prog Info Log: %s\n", log);
-    }
 
     GLint pos = glGetAttribLocation(program, "position");
     glEnableVertexAttribArray(pos);
