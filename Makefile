@@ -9,7 +9,7 @@ data:
 
 test: all data
 	build/test/runner
-	build/test/api
-	build/test/benchmark
+	# build/test/api
+	# build/test/benchmark
 
 .PHONY: all install test data

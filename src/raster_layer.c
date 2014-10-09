@@ -4,9 +4,6 @@
 #include "memory.h"
 #include "map.h"
 
-#ifndef __APPLE__
-#define __APPLE__ 1
-#endif
 #include <OpenGL/gl3.h>
 #include <OpenGL/gl3ext.h>
 #include <OpenGL/OpenGL.h>
@@ -211,8 +208,10 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glBindVertexArray(vao);
 
     GLfloat vertices[] = {
-      -1.0, 1.0, 1.0, 1.0, -1.0, -1.0,
-      1.0, 1.0, -1.0, 1.0, -1.0, -1.0
+      -1.0,  1.0,
+       1.0,  1.0,
+       1.0, -1.0,
+      -1.0, -1.0
     };
 
     GLuint vbuf;
@@ -222,7 +221,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
     GLuint triangles[] = {
       0, 1, 2,
-      2, 1, 3
+      2, 3, 0
     };
 
     GLuint ebuf;
@@ -236,6 +235,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       "out vec2 coord;"
       "void main(){"
       "  coord = position;"
+      "  gl_Position = vec4(position, 0.0, 1.0);"
       "}"
     ;
 
@@ -249,7 +249,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       "in vec2 coord;"
       "out vec4 color;"
       "void main(){"
-      "  color = texture(tex, coord);"
+      // "  color = texture(tex, vec2((coord.x + 1.0)/2.0, (coord.y + 1.0)/2.0);"
+      "  color = vec4((coord.x + 1.0)/2.0, (coord.y + 1.0)/2.0, 0.0, 1.0);"
       "}"
     ;
 
@@ -266,17 +267,24 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
     GLint pos = glGetAttribLocation(program, "position");
     glEnableVertexAttribArray(pos);
-    glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    GLuint outtex;
-    glGenTextures(1, &outtex);
-    glBindTexture(GL_TEXTURE_2D, outtex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width/2, height/2, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, outtex, 0);
+    GLuint color;
+    glGenRenderbuffers(1, &color);
+    glBindRenderbuffer(GL_RENDERBUFFER, color);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width/2, height/2);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color);
+
+    GLuint depth;
+    glGenRenderbuffers(1, &depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width/2, height/2);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth);
+
     GLuint tex;
     glGenTextures(1, &tex);
     glActiveTexture(GL_TEXTURE0);
@@ -284,16 +292,18 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
     glUniform1i(glGetUniformLocation(program, "tex"), 0);
 
-    glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
+    glViewport(0, 0, width/2, height/2);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
     width /= 2; height /= 2;
     uint32_t *out = malloc(sizeof(uint32_t) * width * height);
     glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, out);
 
     free(data);
     data = out;
+
 
     CGLSetCurrentContext(NULL);
     CGLDestroyContext(context);

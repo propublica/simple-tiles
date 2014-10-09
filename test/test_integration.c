@@ -43,7 +43,7 @@ run_test_raster(simplet_resample_kernel_t kernel, char* filename){
   // simplet_map_set_bounds(map, -8317853.988, 5070182.233, -8011088.731, 4757312.390);
   // simplet_map_set_size(map, 779, 763);
   simplet_map_set_slippy(map, 9641,12312,15);
-  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/nyc2-rgb-pansharpened-8bit-nodata.tif");
+  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "/Users/jeff/dev/simple-tiles/data/nyc2-rgb-pansharpened-8bit-nodata.tif");
   layer->resample = true;
   if(kernel)
     simplet_raster_layer_set_resample(layer, kernel);
@@ -55,7 +55,7 @@ run_test_raster(simplet_resample_kernel_t kernel, char* filename){
 
 void
 test_raster() {
-  run_test_raster(NULL, "./raster.png");
+  run_test_raster(NULL, "/Users/jeff/dev/simple-tiles/raster.png");
 }
 
 void
@@ -219,30 +219,30 @@ test_stream(){
 }
 
 TASK(integration){
-	test(projection);
-  puts("check projection.png");
-  test(many_queries);
-  puts("check queries.png");
-  test(many_layers);
-  puts("check layers.png");
+  // test(projection);
+  // puts("check projection.png");
+  // test(many_queries);
+  // puts("check queries.png");
+  // test(many_layers);
+  // puts("check layers.png");
   test(raster);
-  puts("check raster.png");
+  // puts("check raster.png");
   // test(raster_resample_bilinear);
   // puts("check raster-bilinear.png");
   // test(raster_resample_bicubic);
   // puts("check raster-bicubic.png");
   // test(raster_resample_lanczos);
   // puts("check raster-lanczos.png");
-  test(slippy_gen);
-  puts("check slippy.png");
-  test(stream);
-  puts("check holes.png");
-  test(holes);
-  puts("check lines.png");
-  test(lines);
-  puts("check points.png");
-  test(points);
-  puts("check background.png");
-  test(background);
-  test(bunk);
+  // test(slippy_gen);
+  // puts("check slippy.png");
+  // test(stream);
+  // puts("check holes.png");
+  // test(holes);
+  // puts("check lines.png");
+  // test(lines);
+  // puts("check points.png");
+  // test(points);
+  // puts("check background.png");
+  // test(background);
+  // test(bunk);
 }
