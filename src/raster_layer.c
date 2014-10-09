@@ -310,16 +310,16 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     free(data);
     data = out;
 
-    glDeleteTextures(1, tex);
+    glDeleteTextures(1, &tex);
     glDeleteProgram(program);
     glDeleteShader(fragment_shader);
     glDeleteShader(vertex_shader);
-    glDeleteBuffers(1, &ebuf)
+    glDeleteBuffers(1, &ebuf);
     glDeleteBuffers(1, &vbuf);
-    glDeleteRenderBuffers(1, &color);
-    glDeleteRenderBuffers(1, &depth);
+    glDeleteBuffers(1, &color);
+    glDeleteBuffers(1, &depth);
+    glDeleteBuffers(1, &framebuffer);
     glDeleteTextures(1, &tex);
-    glDeleteFrameBuffers(1, &frambuffer);
     CGLSetCurrentContext(NULL);
     CGLDestroyContext(context);
   }
