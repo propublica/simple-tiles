@@ -258,9 +258,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       "}"
     ;
 
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertex, NULL);
-    glCompileShader(vertexShader);
+    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &vertex, NULL);
+    glCompileShader(vertex_shader);
 
     const GLchar *fragment =
       "#version 150\n"
@@ -272,13 +272,13 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       "}"
     ;
 
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragment, NULL);
-    glCompileShader(fragmentShader);
+    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment, NULL);
+    glCompileShader(fragment_shader);
 
     GLint program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
     glBindFragDataLocation(program, 0, "color");
     glLinkProgram(program);
     glUseProgram(program);
@@ -310,6 +310,16 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
     free(data);
     data = out;
 
+    glDeleteTextures(1, tex);
+    glDeleteProgram(program);
+    glDeleteShader(fragment_shader);
+    glDeleteShader(vertex_shader);
+    glDeleteBuffers(1, &ebuf)
+    glDeleteBuffers(1, &vbuf);
+    glDeleteRenderBuffers(1, &color);
+    glDeleteRenderBuffers(1, &depth);
+    glDeleteTextures(1, &tex);
+    glDeleteFrameBuffers(1, &frambuffer);
     CGLSetCurrentContext(NULL);
     CGLDestroyContext(context);
   }
