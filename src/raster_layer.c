@@ -4,9 +4,8 @@
 #include "memory.h"
 #include "map.h"
 
-#include <OpenGL/gl3.h>
-#include <OpenGL/gl3ext.h>
-#include <OpenGL/OpenGL.h>
+#include "raster_resample.h"
+
 
 #include <gdal.h>
 #include <gdal_alg.h>
@@ -42,7 +41,7 @@ simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, bool resample) 
 
 bool
 simplet_raster_layer_get_resample(simplet_raster_layer_t *layer) {
-  return layer->kernel;
+  return layer->resample;
 }
 
 void
@@ -51,41 +50,6 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   if(layer->error_msg) free(layer->error_msg);
   free(layer->source);
   free(layer);
-}
-
-// from: http://www.ipol.im/pub/art/2011/g_lmii/
-double
-simplet_bilinear(const double value){
-  double x = fabs(value);
-  if(x < 1) return 1 - x;
-  return 0;
-}
-
-double
-simplet_bicubic(const double value){
-  double t = fabs(value);
-  double a = -0.5;
-  if(t <= 1.0) {
-    return (a + 2) * t * t * t - (a + 3) * t * t + 1;
-  } else if(t < 2.0) {
-    return a * t * t * t - 5 * a * t * t + 8 * a * t - 4 * a;
-  }
-  return 0;
-}
-
-double
-simplet_average(const double value) {
-  (void) value;
-  return 1;
-}
-
-double
-simplet_lanczos(const double value){
-  double w = 2.0;
-  if(fabs(value) >= w) return 0.0;
-  if(value == 0.0) return 1.0;
-  double x = value;
-  return sin(M_PI * x) / (M_PI * x) * sin(M_PI * x / w) / (M_PI  * x / w);
 }
 
 simplet_status_t
@@ -186,143 +150,10 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   }
 
   if(layer->resample) {
-    // and on linux http://cgit.freedesktop.org/mesa/demos/tree/src/osdemos/osdemo.c
-
-    // on os x
-    CGLContextObj context;
-    CGLPixelFormatAttribute attributes[5] = {
-      kCGLPFAAccelerated,
-      kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute) kCGLOGLPVersion_3_2_Core,
-      kCGLPFADoubleBuffer,
-      (CGLPixelFormatAttribute) 0
-    };
-    CGLPixelFormatObj pix;
-    CGLError errorCode;
-    GLint num;
-    errorCode = CGLChoosePixelFormat(attributes, &pix, &num);
-    // add error checking here
-    errorCode = CGLCreateContext(pix, NULL, &context);
-    // add error checking here
-    CGLDestroyPixelFormat(pix);
-    errorCode = CGLSetCurrentContext(context);
-
-
-    GLuint framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    GLuint color;
-    glGenRenderbuffers(1, &color);
-    glBindRenderbuffer(GL_RENDERBUFFER, color);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color);
-
-    GLuint depth;
-    glGenRenderbuffers(1, &depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth);
-
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    GLfloat vertices[] = {
-      -1.0,  1.0,
-       1.0,  1.0,
-       1.0, -1.0,
-      -1.0, -1.0
-    };
-
-    GLuint vbuf;
-    glGenBuffers(1, &vbuf);
-    glBindBuffer(GL_ARRAY_BUFFER, vbuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    GLuint triangles[] = {
-      0, 1, 2,
-      2, 3, 0
-    };
-
-    GLuint ebuf;
-    glGenBuffers(1, &ebuf);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebuf);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
-
-    const GLchar *vertex =
-      "#version 150\n"
-      "in vec2 position;"
-      "out vec2 coord;"
-      "void main(){"
-      "  coord = position;"
-      "  gl_Position = vec4(position, 0.0, 1.0);"
-      "}"
-    ;
-
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex, NULL);
-    glCompileShader(vertex_shader);
-
-    const GLchar *fragment =
-      "#version 150\n"
-      "uniform sampler2D tex;"
-      "in vec2 coord;"
-      "out vec4 color;"
-      "void main(){"
-      "  color = texture(tex, vec2((coord.x + 1.0) / 2.0, (coord.y + 1.0) / 2.0));"
-      "}"
-    ;
-
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment, NULL);
-    glCompileShader(fragment_shader);
-
-    GLint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glBindFragDataLocation(program, 0, "color");
-    glLinkProgram(program);
-    glUseProgram(program);
-
-    GLint pos = glGetAttribLocation(program, "position");
-    glEnableVertexAttribArray(pos);
-    glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glUniform1i(glGetUniformLocation(program, "tex"), 0);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glViewport(0, 0, width/2, height/2);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    width /= 2; height /= 2;
-    uint32_t *out = malloc(sizeof(uint32_t) * width * height);
-    glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, out);
-
+    uint32_t *resampled;
+    simplet_resample(&resampled, data, width, height);
     free(data);
-    data = out;
-
-    glDeleteTextures(1, &tex);
-    glDeleteProgram(program);
-    glDeleteShader(fragment_shader);
-    glDeleteShader(vertex_shader);
-    glDeleteBuffers(1, &ebuf);
-    glDeleteBuffers(1, &vbuf);
-    glDeleteBuffers(1, &color);
-    glDeleteBuffers(1, &depth);
-    glDeleteBuffers(1, &framebuffer);
-    glDeleteTextures(1, &tex);
-    CGLSetCurrentContext(NULL);
-    CGLDestroyContext(context);
+    data = resampled;
   }
 
   int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, map->width);

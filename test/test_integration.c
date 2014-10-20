@@ -1,4 +1,3 @@
-// #include <string.h>
 #include "map.h"
 #include "vector_layer.h"
 #include "raster_layer.h"
@@ -36,15 +35,15 @@ test_background(){
 }
 
 void
-run_test_raster(simplet_resample_kernel_t kernel, char* filename){
+run_test_raster(bool resample, char* filename){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
   simplet_map_set_srs(map, "EPSG:3857");
   simplet_map_set_bounds(map, -8317853.988, 5070182.233, -8011088.731, 4757312.390);
   simplet_map_set_size(map, 400, 400);
   simplet_map_set_slippy(map, 4822,6159,14);
-  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "/Users/jeff/dev/simple-tiles/data/nyc2-rgb-pansharpened-8bit-nodata.tif");
-  layer->resample = true;
+  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/nyc2-rgb-pansharpened-8bit-nodata.tif");
+  layer->resample = resample;
   assert(simplet_map_is_valid(map));
   simplet_map_render_to_png(map, filename);
   assert(SIMPLET_OK == simplet_map_get_status(map));
@@ -53,22 +52,12 @@ run_test_raster(simplet_resample_kernel_t kernel, char* filename){
 
 void
 test_raster() {
-  run_test_raster(NULL, "/Users/jeff/dev/simple-tiles/raster.png");
+  run_test_raster(false, "./raster.png");
 }
 
 void
-test_raster_resample_bilinear() {
-  run_test_raster(simplet_bilinear, "./raster-bilinear.png");
-}
-
-void
-test_raster_resample_bicubic() {
-  run_test_raster(simplet_bicubic, "./raster-bicubic.png");
-}
-
-void
-test_raster_resample_lanczos() {
-  run_test_raster(simplet_lanczos, "./raster-lanczos.png");
+test_raster_resample() {
+  run_test_raster(true, "./raster-resample.png");
 }
 
 void
@@ -224,13 +213,9 @@ TASK(integration){
   // test(many_layers);
   // puts("check layers.png");
   test(raster);
-  // puts("check raster.png");
-  // test(raster_resample_bilinear);
-  // puts("check raster-bilinear.png");
-  // test(raster_resample_bicubic);
-  // puts("check raster-bicubic.png");
-  // test(raster_resample_lanczos);
-  // puts("check raster-lanczos.png");
+  puts("check raster.png");
+  test(raster_resample);
+  puts("check raster-resample.png");
   // test(slippy_gen);
   // puts("check slippy.png");
   // test(stream);

@@ -5,7 +5,7 @@ includedir=${prefix}/include/
 
 Name: simple-tiles
 Description: Map tiles made easy.
-Version: 0.4.1
+Version: 0.5.0
 
 Requires: pangocairo
 Libs: -L${libdir} -lm -lsimple-tiles
