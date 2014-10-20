@@ -27,5 +27,4 @@ simplet_destroy_gl_context(void* ctx){
   CGLSetCurrentContext(0);
   CGLDestroyContext(ctx);
 }
-
 #endif
