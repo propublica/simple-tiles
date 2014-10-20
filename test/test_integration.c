@@ -191,7 +191,7 @@ test_bunk(){
 
 cairo_status_t
 stream(void *closure, const unsigned char *data, unsigned int length){
-  data = NULL, length = 0, closure = NULL; /* suppress warnings */
+  (void)data, (void)length, (void)closure; /* suppress warnings */
   return CAIRO_STATUS_SUCCESS;
 }
 
