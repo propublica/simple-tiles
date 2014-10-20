@@ -9,4 +9,4 @@ Version: @VERSION@
 
 Requires: pangocairo
 Libs: -L${libdir} -lsimple-tiles @LIBS@
-Cflags: -I${includedir}
+Cflags: -I${includedir} @INCLUDES@

@@ -30,11 +30,8 @@ def configure(conf):
         conf.define('ST_APPLE', 1)
     elif sys.platform.startswith('linux'):
         conf.define('ST_LINUX', 1)
-        conf.check_cc(lib='GL', uselib_store='GL', use='GL')
-        conf.check_cc(lib='GLU', uselib_store='GL', use='GL')
         conf.check_cfg(package='osmesa', args=['--cflags', '--libs'],
                        uselib_store='GL')
-
 
 
 def build(bld):
@@ -53,11 +50,14 @@ def build(bld):
 
     libs = []
     for k in ['LIB_GDAL', 'LIB_M', 'LIB_GL', 'LIB_CAIRO']:
-        print k, bld.env[k]
         if bld.env[k] != []:
             libs.append('-l' + ' -l'.join(bld.env[k]))
 
-    bld(source='src/simple-tiles.pc.in', VERSION='0.5.0', LIBS=' '.join(libs))
+    includes = ' '.join(['-I' + ' -I'.join(bld.env[k]) for k in ['INCLUDES_CAIRO', 'INCLUDES_GDAL']])
+
+    bld(source='src/simple-tiles.pc.in', VERSION='0.5.0',
+        LIBS=' '.join(libs), INCLUDES=includes)
+
     bld.install_files('${PREFIX}/include/simple-tiles',
                       bld.path.ant_glob(['src/*.h']))
 
