@@ -30,6 +30,8 @@ def configure(conf):
         conf.define('ST_APPLE', 1)
     elif sys.platform.startswith('linux'):
         conf.define('ST_LINUX', 1)
+        conf.check_cc(lib='GL', uselib_store='GL', use='GL')
+        conf.check_cc(lib='GLU', uselib_store='GL', use='GL')
         conf.check_cfg(package='osmesa', args=['--cflags', '--libs'],
                        uselib_store='GL')
 

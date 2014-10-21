@@ -5,6 +5,9 @@ install:
 	./waf install
 
 clean:
+	./waf clean
+
+distclean:
 	./waf distclean
 
 data:
@@ -12,7 +15,7 @@ data:
 
 test: all data
 	build/test/runner
-	build/test/api
-	build/test/benchmark
+	# build/test/api
+	# build/test/benchmark
 
-.PHONY: all install test data clean
+.PHONY: all install test data clean distclean

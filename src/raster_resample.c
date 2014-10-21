@@ -8,6 +8,7 @@
 // At low zoom levels this will produce blocky images, but it is fast,
 // simple and produces fine enough results.
 // I'm fully open to other ideas on how to do this.
+// We also have to use OpenGL 2.1 b/c ubuntu packages are so silly old.
 int
 simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t height){
   void *ctx = simplet_grab_gl_context(width, height);
@@ -28,10 +29,6 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
   glBindRenderbuffer(GL_RENDERBUFFER, depth);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth);
-
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
 
   GLfloat vertices[] = {
     -1.0,  1.0,
@@ -56,9 +53,9 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
 
   const GLchar *vertex =
-    "#version 150\n"
-    "in vec2 position;"
-    "out vec2 coord;"
+    "#version 120\n"
+    "attribute vec2 position;"
+    "varying vec2 coord;"
     "void main(){"
     "  coord = position;"
     "  gl_Position = vec4(position, 0.0, 1.0);"
@@ -70,12 +67,11 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
   glCompileShader(vertex_shader);
 
   const GLchar *fragment =
-    "#version 150\n"
+    "#version 120\n"
     "uniform sampler2D tex;"
-    "in vec2 coord;"
-    "out vec4 color;"
+    "varying vec2 coord;"
     "void main(){"
-    "  color = texture(tex, vec2((coord.x + 1.0) / 2.0, (coord.y + 1.0) / 2.0));"
+    "  gl_FragColor = texture2D(tex, vec2((coord.x + 1.0) / 2.0, (coord.y + 1.0) / 2.0));"
     "}"
   ;
 
@@ -89,6 +85,27 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
   glBindFragDataLocation(program, 0, "color");
   glLinkProgram(program);
   glUseProgram(program);
+
+  if(glGetError()) puts("poo");
+
+  int infologLength = 0;
+  int charsWritten  = 0;
+
+  glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &infologLength);
+
+  if (infologLength > 0)
+  {
+      GLchar* infoLog = (GLchar *)malloc(infologLength);
+      if (infoLog == NULL)
+      {
+          printf( "ERROR: Could not allocate InfoLog buffer");
+          exit(1);
+      }
+      glGetShaderInfoLog(fragment_shader, infologLength, &charsWritten, infoLog);
+      printf( "Shader InfoLog:\n%s", infoLog );
+      free(infoLog);
+  }
+
 
   GLint pos = glGetAttribLocation(program, "position");
   glEnableVertexAttribArray(pos);

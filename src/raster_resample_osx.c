@@ -7,7 +7,7 @@ simplet_grab_gl_context(uint16_t width, uint16_t height){
   CGLContextObj context;
   CGLPixelFormatAttribute attributes[5] = {
     kCGLPFAAccelerated,
-    kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute) kCGLOGLPVersion_3_2_Core,
+    kCGLPFAOpenGLProfile, (CGLPixelFormatAttribute) kCGLOGLPVersion_Legacy,
     kCGLPFADoubleBuffer,
     (CGLPixelFormatAttribute) 0
   };
