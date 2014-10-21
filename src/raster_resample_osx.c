@@ -1,8 +1,9 @@
-#ifdef ST_APPLE
 #include "raster_resample_port.h"
 
+#ifdef ST_APPLE
 void*
-simplet_grab_gl_context(){
+simplet_grab_gl_context(uint16_t width, uint16_t height){
+  (void) width, (void) height;
   CGLContextObj context;
   CGLPixelFormatAttribute attributes[5] = {
     kCGLPFAAccelerated,

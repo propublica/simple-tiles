@@ -1,17 +1,15 @@
-#include "raster_layer.h"
-#include "util.h"
-#include "error.h"
-#include "memory.h"
-#include "map.h"
-
-#include "raster_resample.h"
-
-
 #include <gdal.h>
 #include <gdal_alg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
+
+#include "raster_layer.h"
+#include "raster_resample.h"
+#include "util.h"
+#include "error.h"
+#include "memory.h"
+#include "map.h"
 
 // Add in an error function.
 SIMPLET_ERROR_FUNC(raster_layer_t)

@@ -10,7 +10,7 @@
 // I'm fully open to other ideas on how to do this.
 int
 simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t height){
-  void *ctx = simplet_grab_gl_context();
+  void *ctx = simplet_grab_gl_context(width, height);
   if(ctx == NULL) return -1;
 
   GLuint framebuffer;
@@ -110,6 +110,7 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
   glClear(GL_COLOR_BUFFER_BIT);
   glViewport(0, 0, width/2, height/2);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
   width /= 2; height /= 2;
   uint32_t *out = malloc(sizeof(uint32_t) * width * height);
   glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, out);

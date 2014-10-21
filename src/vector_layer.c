@@ -1,9 +1,10 @@
+#include <string.h>
+#include <cpl_error.h>
+
 #include "vector_layer.h"
 #include "query.h"
 #include "util.h"
 #include "error.h"
-#include <string.h>
-#include <cpl_error.h>
 #include "memory.h"
 
 
