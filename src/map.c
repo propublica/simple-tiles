@@ -185,8 +185,7 @@ simplet_map_get_bgcolor(simplet_map_t *map, char **str){
 // Set the bounds of the map.
 simplet_status_t
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny){
-  if(map->bounds)
-    simplet_bounds_free(map->bounds);
+  simplet_bounds_free(map->bounds);
 
   if(!(map->bounds = simplet_bounds_new()))
     return set_error(map, SIMPLET_OOM, "couldn't create bounds");

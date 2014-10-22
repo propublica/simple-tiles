@@ -13,18 +13,7 @@
 extern "C" {
 #endif
 
-/* bounds and simple points */
-typedef struct {
-  double x;
-  double y;
-} simplet_point_t;
 
-typedef struct {
-  simplet_point_t nw;
-  simplet_point_t se;
-  double width;
-  double height;
-} simplet_bounds_t;
 
 typedef void (*simplet_user_data_free)(void *val);
 #define SIMPLET_USER_DATA \
@@ -83,6 +72,22 @@ typedef struct {
   SIMPLET_RETAIN
 } simplet_retainable_t;
 
+/* bounds and simple points */
+typedef struct {
+  double x;
+  double y;
+} simplet_point_t;
+
+typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+  SIMPLET_RETAIN
+  simplet_point_t nw;
+  simplet_point_t se;
+  double width;
+  double height;
+} simplet_bounds_t;
+
 typedef struct {
   SIMPLET_ERROR_FIELDS
   SIMPLET_USER_DATA
@@ -117,11 +122,9 @@ typedef struct {
   simplet_list_t *queries;
 } simplet_vector_layer_t;
 
-typedef double (*simplet_resample_kernel_t)(const double value);
 typedef struct {
   SIMPLET_LAYER_FIELDS
   bool resample;
-  simplet_resample_kernel_t kernel;
 } simplet_raster_layer_t;
 
 typedef struct {
