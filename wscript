@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from waflib import Options
-import sys
+import sys, os
 
 
 def options(opt):
@@ -20,7 +20,7 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
     conf.define('_GNU_SOURCE', 1)  # for asprintf
 
-    if conf.env.DEBUG:
+    if os.environ['DEBUG']:
         conf.env.append_unique('CFLAGS', ['-g'])
         conf.define('DEBUG', 1)
     else:

@@ -86,27 +86,6 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
   glLinkProgram(program);
   glUseProgram(program);
 
-  if(glGetError()) puts("poo");
-
-  int infologLength = 0;
-  int charsWritten  = 0;
-
-  glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &infologLength);
-
-  if (infologLength > 0)
-  {
-      GLchar* infoLog = (GLchar *)malloc(infologLength);
-      if (infoLog == NULL)
-      {
-          printf( "ERROR: Could not allocate InfoLog buffer");
-          exit(1);
-      }
-      glGetShaderInfoLog(fragment_shader, infologLength, &charsWritten, infoLog);
-      printf( "Shader InfoLog:\n%s", infoLog );
-      free(infoLog);
-  }
-
-
   GLint pos = glGetAttribLocation(program, "position");
   glEnableVertexAttribArray(pos);
   glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 0, 0);
