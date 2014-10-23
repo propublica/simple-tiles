@@ -149,9 +149,12 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   if(layer->resample) {
     uint32_t *resampled;
-    simplet_resample(&resampled, data, width, height);
-    free(data);
-    data = resampled;
+    if(simplet_resample(&resampled, data, width, height) != 0) {
+      set_error(layer, SIMPLET_GL_ERR, "couldn't resample");
+    } else {
+      free(data);
+      data = resampled;
+    }
   }
 
   int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, map->width);

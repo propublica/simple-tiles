@@ -44,8 +44,9 @@ typedef enum {
   SIMPLET_ERR = 0,   // Generic error
   SIMPLET_OOM,       // Out of memory for allocation
   SIMPLET_CAIRO_ERR, // Cairo error
-  SIMPLET_OGR_ERR,   // OGR Error
-  SIMPLET_GDAL_ERR,  // GDAL Error
+  SIMPLET_OGR_ERR,   // OGR error
+  SIMPLET_GDAL_ERR,  // GDAL error
+  SIMPLET_GL_ERR,    // OpenGL error
   SIMPLET_OK         // OK
 } simplet_status_t;
 
