@@ -20,7 +20,7 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', ['-std=c99', '-Wall', '-Wextra'])
     conf.define('_GNU_SOURCE', 1)  # for asprintf
 
-    if os.environ['DEBUG']:
+    if 'DEBUG' in os.environ:
         conf.env.append_unique('CFLAGS', ['-g'])
         conf.define('DEBUG', 1)
     else:
