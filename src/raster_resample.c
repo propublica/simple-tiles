@@ -11,8 +11,7 @@
 // We also have to use OpenGL 2.1 b/c ubuntu packages are so silly old.
 int
 simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t height){
-  width /= 2; height /= 2;
-  uint32_t *out = malloc(sizeof(uint32_t) * width * height);
+  uint32_t *out = calloc(sizeof(uint32_t), width / 2 * height / 2);
   if(out == NULL) return -1;
   void *ctx = simplet_grab_gl_context(width, height);
   if(ctx == NULL) { free(out); return -1; }
@@ -107,7 +106,9 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
-  glViewport(0, 0, width/2, height/2);
+  width /= 2; height /= 2;
+
+  glViewport(0, 0, width, height);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
   glReadPixels(0, 0, width, height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, out);
