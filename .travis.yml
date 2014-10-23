@@ -2,7 +2,7 @@ language: c
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get -qq install libgdal-dev libcairo2-dev libpango1.0-dev libosmesa6-dev
+  - sudo apt-get -y install libgdal-dev libcairo2-dev libpango1.0-dev libosmesa-dev
 
 notifications:
   email: false
