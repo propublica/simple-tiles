@@ -127,5 +127,3 @@ simplet_resample(uint32_t **resampled, uint32_t *data, uint16_t width, uint16_t 
   simplet_destroy_gl_context(ctx);
   return glGetError(); // GL_NO_ERROR is guaranteed to be 0
 }
-
-
