@@ -46,8 +46,8 @@ typedef enum {
   SIMPLET_CAIRO_ERR, // Cairo error
   SIMPLET_OGR_ERR,   // OGR error
   SIMPLET_GDAL_ERR,  // GDAL error
-  SIMPLET_GL_ERR,    // OpenGL error
-  SIMPLET_OK         // OK
+  SIMPLET_OK,        // OK, needs be here because of legacy reasons
+  SIMPLET_GL_ERR     // OpenGL error
 } simplet_status_t;
 
 #define SIMPLET_ERROR_FIELDS \
