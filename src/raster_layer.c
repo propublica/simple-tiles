@@ -93,10 +93,10 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   if(transform_args == NULL)
     return set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
 
-  double* x_lookup = malloc(width * sizeof(double));
-  double* y_lookup = malloc(width * sizeof(double));
-  double* z_lookup = malloc(width * sizeof(double));
-  int* test = malloc(width * sizeof(int));
+  double *x_lookup = malloc(width * sizeof(double));
+  double *y_lookup = malloc(width * sizeof(double));
+  double *z_lookup = malloc(width * sizeof(double));
+  int *test = malloc(width * sizeof(int));
   uint32_t *data = malloc(sizeof(uint32_t) * width * height);
   memset(data, 0, sizeof(uint32_t) * width * height);
 
