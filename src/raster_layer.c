@@ -50,6 +50,12 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   free(layer);
 }
 
+static double
+sinc(double x) {
+  if(x == 0.0) return 1.0;
+  return sin(M_PI * x) / (M_PI * x);
+};
+
 simplet_status_t
 simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, cairo_t *ctx) {
   // process the map
