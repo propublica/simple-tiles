@@ -161,6 +161,12 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         // float kernel[5] = {0.127,0.235,0.276,0.235,0.127};
         float kernel[9] = {-0.008,0.000,0.095,0.249,0.327,0.249,0.095,0.000,-0.008};
         // float kernel[9] = {-6.475609741217127e-05, 0.021588636731247567, -0.020329729322874697, 0.007184793695574433, 0.98324210998693, 0.007184793695574433, -0.020329729322874697, 0.021588636731247567, -6.475609741217127e-05};
+        // var hw = 9 / 2;
+        // var ihw = 1 / hw;
+        // var icw = 1 / 3; <- that is weird, but I can intuit why we need it
+        // var x_raw = (x - hw) + 0.5;
+        // return sinc(x_raw * icw) * sinc(x_raw * ihw);
+
         for(int kx = 0; kx < kernel_size; kx++) {
           for(int ky = 0; ky < kernel_size; ky++) {
             GByte px = window[kx * kernel_size + ky];
