@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-
-
 typedef void (*simplet_user_data_free)(void *val);
 #define SIMPLET_USER_DATA \
   void *user_data;
@@ -46,8 +44,7 @@ typedef enum {
   SIMPLET_CAIRO_ERR, // Cairo error
   SIMPLET_OGR_ERR,   // OGR error
   SIMPLET_GDAL_ERR,  // GDAL error
-  SIMPLET_OK,        // OK, needs be here because of legacy reasons
-  SIMPLET_GL_ERR     // OpenGL error
+  SIMPLET_OK        // OK, needs be here because of legacy reasons
 } simplet_status_t;
 
 #define SIMPLET_ERROR_FIELDS \
@@ -123,9 +120,15 @@ typedef struct {
   simplet_list_t *queries;
 } simplet_vector_layer_t;
 
+typedef enum {
+  SIMPLET_NEAREST = 0,
+  SIMPLET_BILINEAR,
+  SIMPLET_LANCZOS
+} simplet_kern_t;
+
 typedef struct {
   SIMPLET_LAYER_FIELDS
-  bool resample;
+  simplet_kern_t resample;
 } simplet_raster_layer_t;
 
 typedef struct {

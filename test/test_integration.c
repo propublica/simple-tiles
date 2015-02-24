@@ -35,13 +35,10 @@ test_background(){
 }
 
 void
-run_test_raster(bool resample, char* filename){
+run_test_raster(simplet_kern_t resample, char* filename){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
-  simplet_map_set_srs(map, "EPSG:3857");
-  simplet_map_set_bounds(map, -8317853.988, 5070182.233, -8011088.731, 4757312.390);
-  simplet_map_set_size(map, 400, 400);
-  simplet_map_set_slippy(map, 4822, 6159, 14);
+  simplet_map_set_slippy(map, 1219, 1539, 12);
   simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/nyc2-rgb-pansharpened-8bit-nodata.tif");
   layer->resample = resample;
   assert(simplet_map_is_valid(map));
@@ -52,12 +49,17 @@ run_test_raster(bool resample, char* filename){
 
 void
 test_raster() {
-  run_test_raster(false, "./raster.png");
+  run_test_raster(SIMPLET_NEAREST, "./raster.png");
 }
 
 void
-test_raster_resample() {
-  run_test_raster(true, "./raster-resample.png");
+test_raster_bilinear() {
+  run_test_raster(SIMPLET_BILINEAR, "./raster-bilinear.png");
+}
+
+void
+test_raster_lanczos() {
+  run_test_raster(SIMPLET_LANCZOS, "./raster-lanczos.png");
 }
 
 void
@@ -214,8 +216,10 @@ TASK(integration){
   // puts("check layers.png");
   test(raster);
   puts("check raster.png");
-  test(raster_resample);
-  puts("check raster-resample.png");
+  test(raster_bilinear);
+  puts("check raster-bilinear.png");
+  test(raster_lanczos);
+  puts("check raster-lanczos.png");
   // test(slippy_gen);
   // puts("check slippy.png");
   // test(stream);

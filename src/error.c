@@ -19,10 +19,6 @@ simplet_set_error(simplet_errorable_t *error, simplet_status_t status, const cha
       error->status = SIMPLET_CAIRO_ERR;
       res = asprintf(&error->error_msg, "cairo error: %s", msg);
       break;
-    case SIMPLET_GL_ERR:
-      error->status = SIMPLET_GL_ERR;
-      res = asprintf(&error->error_msg, "OpenGL error: %s", msg);
-      break;
     case SIMPLET_OGR_ERR:
       error->status = SIMPLET_OGR_ERR;
       res = asprintf(&error->error_msg, "OGR error: %s, %s", CPLGetLastErrorMsg(), msg);

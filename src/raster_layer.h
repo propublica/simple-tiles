@@ -21,9 +21,9 @@ simplet_status_t
 simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, cairo_t *ctx);
 
 void
-simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, bool resample);
+simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, simplet_kern_t resample);
 
-bool
+simplet_kern_t
 simplet_raster_layer_get_resample(simplet_raster_layer_t *layer);
 
 double

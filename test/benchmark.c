@@ -149,7 +149,7 @@ bench_raster_resample(void *ctx) {
   simplet_map_t *map = ctx;
   simplet_map_set_slippy(map, 602, 769, 11);
   simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/nyc2-rgb-pansharpened-8bit-nodata.tif");
-  simplet_raster_layer_set_resample(layer, true);
+  simplet_raster_layer_set_resample(layer, SIMPLET_LANCZOS);
   char *data = NULL;
   simplet_map_render_to_stream(map, data, stream);
   assert(SIMPLET_OK == simplet_map_get_status(map));
