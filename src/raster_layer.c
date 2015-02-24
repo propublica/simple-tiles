@@ -60,38 +60,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   // process the map
   int width  = map->width;
   int height = map->height;
-  int kernel_size = 1;
-  double *kernel;
-
-  switch(layer->resample) {
-    case SIMPLET_NEAREST:
-      kernel_size = 1;
-      kernel = calloc(1, sizeof(float));
-      kernel[0] = 1;
-      break;
-    case SIMPLET_BILINEAR:
-      kernel_size = 3;
-      kernel = calloc(3, sizeof(float));
-      kernel[0] = 0.25;
-      kernel[1] = 0.5;
-      kernel[2] = 0.25;
-      break;
-    case SIMPLET_LANCZOS:
-      kernel_size = 5;
-      double tot = 0;
-      kernel = calloc(kernel_size, sizeof(double));
-      for(int i = 0; i < kernel_size; i++){
-        double x = (double) i - kernel_size / 2.0 + 0.5;
-        // the divided by three is this one weird trick from here:
-        // http://cbloomrants.blogspot.com/2011/03/03-24-11-image-filters-and-gradients.html
-        kernel[i] = sinc(x / 3) * sinc(x / (kernel_size / 2));
-        tot += kernel[i];
-      }
-      for(int i = 0; i < kernel_size; i++) kernel[i] /= tot;
-      break;
-    default:
-      return set_error(layer, SIMPLET_ERR, "unknown resample kernel");
-  }
 
   GDALDatasetH source = GDALOpen(layer->source, GA_ReadOnly);
   if(source == NULL)
@@ -117,7 +85,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   dst_t[5] = mat.yy;
 
   // grab WKTs from source and dest
-  const char *src_wkt  = GDALGetProjectionRef(source);
+  const char *src_wkt = GDALGetProjectionRef(source);
   char *dest_wkt;
   OSRExportToWkt(map->proj, &dest_wkt);
 
@@ -133,6 +101,39 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   int *test = malloc(width * sizeof(int));
   uint32_t *data = malloc(sizeof(uint32_t) * width * height);
   memset(data, 0, sizeof(uint32_t) * width * height);
+
+  int kernel_size;
+  double *kernel;
+
+  switch(layer->resample) {
+    case SIMPLET_NEAREST:
+      kernel_size = 1;
+      kernel = calloc(kernel_size, sizeof(*kernel));
+      kernel[0] = 1;
+      break;
+    case SIMPLET_BILINEAR:
+      kernel_size = 3;
+      kernel = calloc(kernel_size, sizeof(*kernel));
+      kernel[0] = 0.25;
+      kernel[1] = 0.5;
+      kernel[2] = 0.25;
+      break;
+    case SIMPLET_LANCZOS:
+      kernel_size = 5;
+      double tot = 0;
+      kernel = calloc(kernel_size, sizeof(double));
+      for(int i = 0; i < kernel_size; i++){
+        double x = (double) i - kernel_size / 2.0 + 0.5;
+        // the divided by three is this one weird trick from here:
+        // http://cbloomrants.blogspot.com/2011/03/03-24-11-image-filters-and-gradients.html
+        kernel[i] = sinc(x / 3) * sinc(x / (kernel_size / 2));
+        tot += kernel[i];
+      }
+      for(int i = 0; i < kernel_size; i++) kernel[i] /= tot;
+      break;
+    default:
+      return set_error(layer, SIMPLET_ERR, "unknown resample kernel");
+  }
 
   // draw to cairo
   for(int y = 0; y < height; y++){
@@ -218,6 +219,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   free(z_lookup);
   free(test);
   free(data);
+  free(kernel);
   GDALDestroyGenImgProjTransformer(transform_args);
   GDALClose(source);
   return layer->status;
