@@ -1,13 +1,15 @@
+#include <gdal.h>
+#include <gdal_alg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <math.h>
+
 #include "raster_layer.h"
+#include "raster_resample.h"
 #include "util.h"
 #include "error.h"
 #include "memory.h"
 #include "map.h"
-#include <gdal.h>
-#include <gdal_alg.h>
-#include <gdalwarper.h>
-#include <stdbool.h>
-#include <stdint.h>
 
 // Add in an error function.
 SIMPLET_ERROR_FUNC(raster_layer_t)
@@ -25,13 +27,21 @@ simplet_raster_layer_new(const char *datastring) {
   layer->type   = SIMPLET_RASTER;
   layer->status = SIMPLET_OK;
 
-  // need some checking here
   simplet_retain((simplet_retainable_t *)layer);
 
   return layer;
 }
 
-// Free a layer object, and associated layers.
+void
+simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, bool resample) {
+  layer->resample = resample;
+}
+
+bool
+simplet_raster_layer_get_resample(simplet_raster_layer_t *layer) {
+  return layer->resample;
+}
+
 void
 simplet_raster_layer_free(simplet_raster_layer_t *layer){
   if(simplet_release((simplet_retainable_t *)layer) > 0) return;
@@ -40,11 +50,22 @@ simplet_raster_layer_free(simplet_raster_layer_t *layer){
   free(layer);
 }
 
+static double
+sinc(double x) {
+  if(x == 0.0) return 1.0;
+  return sin(M_PI * x) / (M_PI * x);
+};
+
 simplet_status_t
 simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, cairo_t *ctx) {
   // process the map
   int width  = map->width;
   int height = map->height;
+  int kernel_size = 1;
+  // if(layer->resample) { width *= 2; height *= 2; }
+  if(layer->resample) {
+    kernel_size = 9; // 2 x 2 resample
+  }
 
   GDALDatasetH source = GDALOpen(layer->source, GA_ReadOnly);
   if(source == NULL)
@@ -60,7 +81,9 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
   double dst_t[6];
   cairo_matrix_t mat;
+  // if(layer->resample) { map->width *= 2; map->height *= 2; }
   simplet_map_init_matrix(map, &mat);
+  // if(layer->resample) { map->width /= 2; map->height /= 2; }
   cairo_matrix_invert(&mat);
   dst_t[0] = mat.x0;
   dst_t[1] = mat.xx;
@@ -69,101 +92,118 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
   dst_t[4] = mat.yx;
   dst_t[5] = mat.yy;
 
-  GDALDriverH mem_driver = GDALGetDriverByName("MEM");
-  if(mem_driver == NULL)
-    return set_error(layer, SIMPLET_GDAL_ERR, "couldn't get memdriver");
-
-  GDALDatasetH out = GDALCreate(mem_driver, "simple_tiles_memory_dataset",
-                                width, height, bands, GDT_Byte, NULL);
-  if(out == NULL)
-    return set_error(layer, SIMPLET_GDAL_ERR, "couldn't allocate memory for image");
-
-  GDALSetGeoTransform(out, dst_t);
-  GDALWarpOptions *warp_opts = GDALCreateWarpOptions();
-  warp_opts->hSrcDS = source;
-  warp_opts->hDstDS = out;
-  warp_opts->nBandCount = bands;
-  warp_opts->panSrcBands = malloc(sizeof(int) * bands);
-  warp_opts->panDstBands = malloc(sizeof(int) * bands);
-  for(int i = 0; i < bands; i++)
-    warp_opts->panSrcBands[i] = warp_opts->panDstBands[i] = 1;
-
   // grab WKTs from source and dest
   const char *src_wkt  = GDALGetProjectionRef(source);
   char *dest_wkt;
   OSRExportToWkt(map->proj, &dest_wkt);
-  GDALSetProjection(out, dest_wkt);
 
   // get a transformer
-  warp_opts->pTransformerArg = GDALCreateGenImgProjTransformer(source, src_wkt,
-                                                               out, dest_wkt, FALSE,
-                                                               0.0, 1);
+  void *transform_args = GDALCreateGenImgProjTransformer3(src_wkt, src_t, dest_wkt, dst_t);
   free(dest_wkt);
-  if(warp_opts->pTransformerArg == NULL) {
-    set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
-    goto transformer_fail;
-  }
-  warp_opts->pfnTransformer = GDALGenImgProjTransform;
+  if(transform_args == NULL)
+    return set_error(layer, SIMPLET_GDAL_ERR, "transform failed");
 
-  GDALWarpOperationH warper = GDALCreateWarpOperation(warp_opts);
-  if(warper == NULL){
-    set_error(layer, SIMPLET_GDAL_ERR, "no warper");
-    goto warper_fail;
-  }
-
-  CPLErr err = GDALChunkAndWarpMulti(warper, 0, 0, width, height);
-  if(err != CPLE_None) {
-    set_error(layer, SIMPLET_GDAL_ERR, "warp failed");
-    goto warper_fail;
-  }
-
-  uint32_t *scanline = malloc(sizeof(uint32_t) * width);
+  double *x_lookup = malloc(width * sizeof(double));
+  double *y_lookup = malloc(width * sizeof(double));
+  double *z_lookup = malloc(width * sizeof(double));
+  int *test = malloc(width * sizeof(int));
+  uint32_t *data = malloc(sizeof(uint32_t) * width * height);
+  memset(data, 0, sizeof(uint32_t) * width * height);
 
   // draw to cairo
   for(int y = 0; y < height; y++){
-    memset(scanline, 0, sizeof(uint32_t) * width);
+    // write center of our pixel positions to the destination scanline
+    for(int k = 0; k < width; k++){
+      x_lookup[k] = k + 0.5;
+      y_lookup[k] = y + 0.5;
+      z_lookup[k] = 0.0;
+    }
+    uint32_t *scanline = data + y * width;
 
     // set an opaque alpha value for RGB images
     if(bands < 4)
       for(int i = 0; i < width; i++)
         scanline[i] = 0xff << 24;
 
+    GDALGenImgProjTransform(transform_args, TRUE, width, x_lookup, y_lookup, z_lookup, test);
+
     for(int x = 0; x < width; x++) {
+      // could not transform the point, skip this pixel
+      if(!test[x]) continue;
+
+      // sanity check? From gdalsimplewarp
+      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) continue;
+
+      // check to see if we are outside of the raster
+      if(x_lookup[x] > GDALGetRasterXSize(source)
+         || y_lookup[x] > GDALGetRasterYSize(source)) continue;
+
+      // clean up needed here
       for(int band = 1; band <= bands; band++) {
         GByte pixel = 0;
-        GDALRasterBandH b = GDALGetRasterBand(out, band);
-        GDALRasterIO(b, GF_Read, x, y, 1, 1, &pixel, 1, 1, GDT_Byte, 0, 0);
+        GByte window[kernel_size * kernel_size];
+        memset(window, 0, kernel_size * kernel_size);
+        GDALRasterBandH b = GDALGetRasterBand(source, band);
 
-        // set the pixel to fully transparent if we don't have a value
+        GDALRasterIO(
+          b, GF_Read,
+          (int) x_lookup[x] - kernel_size / 2,
+          (int) y_lookup[x] - kernel_size / 2,
+          kernel_size,
+          kernel_size,
+          window,
+          kernel_size,
+          kernel_size,
+          GDT_Byte, 0, 0
+        );
+
+        // float kernel[3] = {0.25, 0.5, 0.25};
+        // float kernel[5] = {0.127,0.235,0.276,0.235,0.127};
+        float kernel[9] = {-0.008,0.000,0.095,0.249,0.327,0.249,0.095,0.000,-0.008};
+        // float kernel[9] = {-6.475609741217127e-05, 0.021588636731247567, -0.020329729322874697, 0.007184793695574433, 0.98324210998693, 0.007184793695574433, -0.020329729322874697, 0.021588636731247567, -6.475609741217127e-05};
+        // var hw = 9 / 2;
+        // var ihw = 1 / hw;
+        // var icw = 1 / 3; <- that is weird, but I can intuit why we need it
+        // var x_raw = (x - hw) + 0.5;
+        // return sinc(x_raw * icw) * sinc(x_raw * ihw);
+
+        for(int kx = 0; kx < kernel_size; kx++) {
+          for(int ky = 0; ky < kernel_size; ky++) {
+            GByte px = window[kx * kernel_size + ky];
+            pixel += px * kernel[kx] * kernel[ky];
+          }
+        }
+
+        // set the pixel to fully transparent if we don't have a pixel value
         int has_no_data = 0;
         double no_data = GDALGetRasterNoDataValue(b, &has_no_data);
-        if(has_no_data && no_data == pixel) {
+        if(has_no_data && no_data == window[(kernel_size * kernel_size) / 2]) {
           scanline[x] = 0x00 << 24;
           continue;
         }
 
         int band_remap[5] = {0, 2, 1, 0, 3};
-        scanline[x] |= pixel << ((band_remap[band]) * 8);
+        scanline[x] |= ((int)pixel) << ((band_remap[band]) * 8);
       }
     }
-
-    int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, width);
-    cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) scanline, CAIRO_FORMAT_ARGB32, width, 1, stride);
-
-    if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-      set_error(layer, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
-
-    cairo_set_source_surface(ctx, surface, 0, y);
-    cairo_paint(ctx);
-    cairo_surface_destroy(surface);
   }
 
-  free(scanline);
-warper_fail:
-  GDALDestroyGenImgProjTransformer(warp_opts->pTransformerArg);
-transformer_fail:
+  int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, map->width);
+  cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char *) data, CAIRO_FORMAT_ARGB32, map->width, map->height, stride);
+
+  if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+    set_error(layer, SIMPLET_CAIRO_ERR, (const char *)cairo_status_to_string(cairo_surface_status(surface)));
+
+  cairo_set_source_surface(ctx, surface, 0, 0);
+  cairo_paint(ctx);
+  cairo_surface_destroy(surface);
+
+  free(x_lookup);
+  free(y_lookup);
+  free(z_lookup);
+  free(test);
+  free(data);
+  GDALDestroyGenImgProjTransformer(transform_args);
   GDALClose(source);
-  GDALClose(out);
-  GDALDestroyWarpOptions(warp_opts);
   return layer->status;
 }

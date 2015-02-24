@@ -1,10 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "math.h"
+#include <math.h>
 #include "bounds.h"
 #include "memory.h"
-
-
 
 // Extend the bounds to include the x, y point.
 void
