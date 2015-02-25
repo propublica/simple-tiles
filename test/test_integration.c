@@ -208,28 +208,28 @@ test_stream(){
 }
 
 TASK(integration){
-  // test(projection);
-  // puts("check projection.png");
-  // test(many_queries);
-  // puts("check queries.png");
-  // test(many_layers);
-  // puts("check layers.png");
+  test(projection);
+  puts("check projection.png");
+  test(many_queries);
+  puts("check queries.png");
+  test(many_layers);
+  puts("check layers.png");
   test(raster);
   puts("check raster.png");
   test(raster_bilinear);
   puts("check raster-bilinear.png");
   test(raster_lanczos);
   puts("check raster-lanczos.png");
-  // test(slippy_gen);
-  // puts("check slippy.png");
-  // test(stream);
-  // puts("check holes.png");
-  // test(holes);
-  // puts("check lines.png");
-  // test(lines);
-  // puts("check points.png");
-  // test(points);
-  // puts("check background.png");
-  // test(background);
-  // test(bunk);
+  test(slippy_gen);
+  puts("check slippy.png");
+  test(stream);
+  puts("check holes.png");
+  test(holes);
+  puts("check lines.png");
+  test(lines);
+  puts("check points.png");
+  test(points);
+  puts("check background.png");
+  test(background);
+  test(bunk);
 }

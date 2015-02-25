@@ -166,7 +166,6 @@ simplet_map_set_height(simplet_map_t *map, unsigned int height){
   return SIMPLET_OK;
 }
 
-
 // Set the background color of the map to a copy of str.
 simplet_status_t
 simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
@@ -217,7 +216,6 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
 
   return SIMPLET_OK;
 }
-
 
 static void*
 add_layer(simplet_map_t *map, simplet_layer_t *layer){
