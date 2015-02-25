@@ -17,7 +17,7 @@ def build(bld):
         ],
         use='simple-tiles',
         target='runner',
-        uselib='CAIRO GDAL',
+        uselib='CAIRO GDAL M GL',
         install_path=None
     )
 
@@ -26,7 +26,7 @@ def build(bld):
         source='api.c',
         use='simple-tiles',
         target='api',
-        uselib='CAIRO GDAL',
+        uselib='CAIRO GDAL M GL',
         install_path=None
     )
 
@@ -35,6 +35,6 @@ def build(bld):
         source='benchmark.c',
         use='simple-tiles',
         target='benchmark',
-        uselib='CAIRO GDAL',
+        uselib='CAIRO GDAL M GL',
         install_path=None
     )
