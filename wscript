@@ -48,7 +48,7 @@ def build(bld):
 
     includes = ' '.join(['-I' + ' -I'.join(bld.env[k]) for k in ['INCLUDES_CAIRO', 'INCLUDES_GDAL']])
 
-    bld(source='src/simple-tiles.pc.in', VERSION='0.5.0',
+    bld(source='src/simple-tiles.pc.in', VERSION='0.6.0',
         LIBS=' '.join(libs), INCLUDES=includes)
 
     bld.install_files('${PREFIX}/include/simple-tiles',
