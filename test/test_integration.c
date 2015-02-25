@@ -1,6 +1,6 @@
-#include <string.h>
 #include "map.h"
 #include "vector_layer.h"
+#include "raster_layer.h"
 #include "query.h"
 #include "list.h"
 #include "test.h"
@@ -35,18 +35,31 @@ test_background(){
 }
 
 void
-test_raster() {
+run_test_raster(simplet_kern_t resample, char* filename){
   simplet_map_t *map;
   assert((map = simplet_map_new()));
-  simplet_map_set_srs(map, "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs");
-  simplet_map_set_size(map, 256, 256);
-  simplet_map_set_bounds(map,
-      -89.47711944580078, 29.176444945842512, -89.33361053466797, 29.27082676918198);
-  simplet_map_add_raster_layer(map, "./data/loss_1932_2010.tif");
+  simplet_map_set_slippy(map, 1219, 1539, 12);
+  simplet_raster_layer_t *layer = simplet_map_add_raster_layer(map, "./data/nyc2-rgb-pansharpened-8bit-nodata.tif");
+  layer->resample = resample;
   assert(simplet_map_is_valid(map));
-  simplet_map_render_to_png(map, "./raster.png");
+  simplet_map_render_to_png(map, filename);
   assert(SIMPLET_OK == simplet_map_get_status(map));
   simplet_map_free(map);
+}
+
+void
+test_raster() {
+  run_test_raster(SIMPLET_NEAREST, "./raster.png");
+}
+
+void
+test_raster_bilinear() {
+  run_test_raster(SIMPLET_BILINEAR, "./raster-bilinear.png");
+}
+
+void
+test_raster_lanczos() {
+  run_test_raster(SIMPLET_LANCZOS, "./raster-lanczos.png");
 }
 
 void
@@ -180,7 +193,7 @@ test_bunk(){
 
 cairo_status_t
 stream(void *closure, const unsigned char *data, unsigned int length){
-  data = NULL, length = 0, closure = NULL; /* suppress warnings */
+  (void)data, (void)length, (void)closure; /* suppress warnings */
   return CAIRO_STATUS_SUCCESS;
 }
 
@@ -195,24 +208,28 @@ test_stream(){
 }
 
 TASK(integration){
-	test(projection);
-  puts("check projection.png");
-  test(many_queries);
-  puts("check queries.png");
-  test(many_layers);
-  puts("check layers.png");
+  // test(projection);
+  // puts("check projection.png");
+  // test(many_queries);
+  // puts("check queries.png");
+  // test(many_layers);
+  // puts("check layers.png");
   test(raster);
   puts("check raster.png");
-  test(slippy_gen);
-  puts("check slippy.png");
-  test(stream);
-  puts("check holes.png");
-  test(holes);
-  puts("check lines.png");
-  test(lines);
-  puts("check points.png");
-  test(points);
-  puts("check background.png");
-  test(background);
-  test(bunk);
+  test(raster_bilinear);
+  puts("check raster-bilinear.png");
+  test(raster_lanczos);
+  puts("check raster-lanczos.png");
+  // test(slippy_gen);
+  // puts("check slippy.png");
+  // test(stream);
+  // puts("check holes.png");
+  // test(holes);
+  // puts("check lines.png");
+  // test(lines);
+  // puts("check points.png");
+  // test(points);
+  // puts("check background.png");
+  // test(background);
+  // test(bunk);
 }

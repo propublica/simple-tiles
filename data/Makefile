@@ -1,5 +1,5 @@
 all: ne_10m_admin_0_countries.shp tl_2010_55_cd108.shp tl_2010_36047_roads.shp \
-	 ne_10m_populated_places.shp loss_1932_2010.tif
+	 ne_10m_populated_places.shp loss_1932_2010.tif nyc2-rgb-pansharpened-8bit-nodata.tif
 
 tl_2010_36047_roads.shp:
 	wget ftp://ftp2.census.gov/geo/tiger/TIGER2010/ROADS/tl_2010_36047_roads.zip
@@ -20,5 +20,8 @@ tl_2010_55_cd108.shp:
 loss_1932_2010.tif:
 	wget http://propublica.s3.amazonaws.com/projects/simple-tiles/test_data/loss_1932_2010.zip
 	unzip loss_1932_2010.zip
+
+nyc2-rgb-pansharpened-8bit-nodata.tif:
+	wget http://propublica.s3.amazonaws.com/nyc-raster-demo/nyc2-rgb-pansharpened-8bit-nodata.tif
 
 .PHONY: all

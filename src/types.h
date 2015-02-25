@@ -6,23 +6,12 @@
 #include <gdal.h>
 #include <cairo.h>
 #include <pango/pangocairo.h>
+#include <stdbool.h>
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* bounds and simple points */
-typedef struct {
-  double x;
-  double y;
-} simplet_point_t;
-
-typedef struct {
-  simplet_point_t nw;
-  simplet_point_t se;
-  double width;
-  double height;
-} simplet_bounds_t;
 
 typedef void (*simplet_user_data_free)(void *val);
 #define SIMPLET_USER_DATA \
@@ -53,9 +42,9 @@ typedef enum {
   SIMPLET_ERR = 0,   // Generic error
   SIMPLET_OOM,       // Out of memory for allocation
   SIMPLET_CAIRO_ERR, // Cairo error
-  SIMPLET_OGR_ERR,   // OGR Error
-  SIMPLET_GDAL_ERR,  // GDAL Error
-  SIMPLET_OK         // OK
+  SIMPLET_OGR_ERR,   // OGR error
+  SIMPLET_GDAL_ERR,  // GDAL error
+  SIMPLET_OK        // OK, needs be here because of legacy reasons
 } simplet_status_t;
 
 #define SIMPLET_ERROR_FIELDS \
@@ -80,6 +69,22 @@ typedef struct {
   SIMPLET_USER_DATA
   SIMPLET_RETAIN
 } simplet_retainable_t;
+
+/* bounds and simple points */
+typedef struct {
+  double x;
+  double y;
+} simplet_point_t;
+
+typedef struct {
+  SIMPLET_ERROR_FIELDS
+  SIMPLET_USER_DATA
+  SIMPLET_RETAIN
+  simplet_point_t nw;
+  simplet_point_t se;
+  double width;
+  double height;
+} simplet_bounds_t;
 
 typedef struct {
   SIMPLET_ERROR_FIELDS
@@ -115,8 +120,15 @@ typedef struct {
   simplet_list_t *queries;
 } simplet_vector_layer_t;
 
+typedef enum {
+  SIMPLET_NEAREST = 0,
+  SIMPLET_BILINEAR,
+  SIMPLET_LANCZOS
+} simplet_kern_t;
+
 typedef struct {
   SIMPLET_LAYER_FIELDS
+  simplet_kern_t resample;
 } simplet_raster_layer_t;
 
 typedef struct {

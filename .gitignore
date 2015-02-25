@@ -18,3 +18,5 @@ data/loss_1932_2010*
 
 .waf-*
 .lock-*
+.vagrant/
+*.tif
