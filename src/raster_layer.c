@@ -119,7 +119,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
       kernel[2] = 0.25;
       break;
     case SIMPLET_LANCZOS:
-      kernel_size = 5;
+      kernel_size = 9;
       double tot = 0;
       kernel = calloc(kernel_size, sizeof(double));
       for(int i = 0; i < kernel_size; i++){
@@ -165,7 +165,7 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
       // clean up needed here
       for(int band = 1; band <= bands; band++) {
-        GByte pixel = 0;
+        double pixel = 0;
         GByte window[kernel_size * kernel_size];
         memset(window, 0, kernel_size * kernel_size);
         GDALRasterBandH b = GDALGetRasterBand(source, band);
@@ -181,7 +181,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
           kernel_size,
           GDT_Byte, 0, 0
         );
-
 
         for(int kx = 0; kx < kernel_size; kx++) {
           for(int ky = 0; ky < kernel_size; ky++) {
@@ -199,7 +198,8 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         }
 
         int band_remap[5] = {0, 2, 1, 0, 3};
-        scanline[x] |= ((int)pixel) << ((band_remap[band]) * 8);
+        //
+        scanline[x] |= ((int) fmax(0, fmin(255, pixel))) << ((band_remap[band]) * 8);
       }
     }
   }
