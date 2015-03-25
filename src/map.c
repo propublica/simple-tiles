@@ -166,7 +166,6 @@ simplet_map_set_height(simplet_map_t *map, unsigned int height){
   return SIMPLET_OK;
 }
 
-
 // Set the background color of the map to a copy of str.
 simplet_status_t
 simplet_map_set_bgcolor(simplet_map_t *map, const char *str){
@@ -185,8 +184,7 @@ simplet_map_get_bgcolor(simplet_map_t *map, char **str){
 // Set the bounds of the map.
 simplet_status_t
 simplet_map_set_bounds(simplet_map_t *map, double maxx, double maxy, double minx, double miny){
-  if(map->bounds)
-    simplet_bounds_free(map->bounds);
+  simplet_bounds_free(map->bounds);
 
   if(!(map->bounds = simplet_bounds_new()))
     return set_error(map, SIMPLET_OOM, "couldn't create bounds");
@@ -202,7 +200,7 @@ simplet_status_t
 simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsigned int z){
   simplet_map_set_size(map, SIMPLET_SLIPPY_SIZE, SIMPLET_SLIPPY_SIZE);
 
-  if(!simplet_map_set_srs(map, SIMPLET_MERCATOR) == SIMPLET_OK)
+  if(!(simplet_map_set_srs(map, SIMPLET_MERCATOR) == SIMPLET_OK))
     return set_error(map, SIMPLET_OGR_ERR, "couldn't set slippy projection");
 
   double zfactor, length, origin;
@@ -218,8 +216,6 @@ simplet_map_set_slippy(simplet_map_t *map, unsigned int x, unsigned int y, unsig
 
   return SIMPLET_OK;
 }
-
-
 
 static void*
 add_layer(simplet_map_t *map, simplet_layer_t *layer){

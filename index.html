@@ -234,19 +234,15 @@ documentation layout inspired by backbone and underscore, obvs
 
     <p>The library's source is over at <a href="http://github.com/propublica/simple-tiles">github</a>.
     Please report issues or ask questions in the
-    <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a>,
-    or head on over to <tt>#newsapps</tt> or <tt>#propublica</tt> on Freenode IRC.</p>
+    <a href="https://github.com/propublica/simple-tiles/issues">issue tracker</a></p>
 
-    <p>There are currently Ruby bindings in
-      <a href="http://github.com/propublica/simpler-tiles">Simpler Tiles</a>, and
-      two sets of Python Bindings, <a href="https://github.com/sashahart/python-simple-tiles">python-simple-tiles</a>
-      by Sasha Hart, and <a href="https://github.com/albertsun/simpyl_tiles">simpyl_tiles</a> by Albert
-      Sun.
+    <p>There are Ruby bindings over at
+      <a href="http://github.com/propublica/simpler-tiles">Simpler Tiles</a>.
     </p>
 
-    <p>Download version 0.5.0:
-      <a href="https://github.com/propublica/simple-tiles/archive/v0.5.0.zip">ZIP</a>
-      <a href="https://github.com/propublica/simple-tiles/archive/v0.5.0.tar.gz">tar.gz</a>
+    <p>Download version 0.6.0:
+      <a href="https://github.com/propublica/simple-tiles/archive/v0.6.0.zip">ZIP</a>
+      <a href="https://github.com/propublica/simple-tiles/archive/v0.6.0.tar.gz">tar.gz</a>
     </p>
 
     <h2 id="dependencies">Dependencies</h2>
@@ -602,6 +598,23 @@ typedef enum {
       Deallocate the <tt>simplet_raster_layer_t</tt>.
     </p>
 
+    <h4 id="simplet_raster_layer_set_resample"><code>void simplet_raster_layer_set_resample(simplet_raster_layer_t *layer, simplet_kern_t resample)</code></h4>
+    <p>
+      Sets the resampling algorithm the algorithm can be one of the following:
+<pre>
+typedef enum {
+  SIMPLET_NEAREST = 0, // nearest neighbor resampling, very fast but low quality
+  SIMPLET_BILINEAR,    // bilinear resampling
+  SIMPLET_LANCZOS      // lanczos highest quality, slowest resampling method
+} simplet_kern_t;
+</pre>
+    </p>
+
+    <h4 id="simplet_raster_layer_get_resample"><code>simplet_kern_t simplet_raster_layer_get_resample(simplet_raster_layer_t *layer)</code></h4>
+    <p>
+      Returns the resampling algorithm used for this layer.
+    </p>
+
     <h2 id="queries">Filters</h2>
     <p>
       Each <tt>simplet_query_t</tt> contains <a href="http://www.gdal.org/ogr/ogr_sql.html">OGR SQL</a>
@@ -750,6 +763,10 @@ typedef enum {
     </div>
     <h2 id="changelog">Change Log</h2>
     <dl>
+      <dd><b>0.6.0</b></dd>
+      <dt>
+        Added raster resampling because <a href="https://github.com/briantjacobs">Brian Jacobs</a> asked for it.
+      </dt>
       <dd><b>0.5.0</b></dd>
       <dt>
         Added raster support thanks to <a href="https://github.com/ashaw">Al Shaw</a>.

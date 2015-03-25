@@ -76,10 +76,13 @@ test_pop(){
   wrap_t *ret;
   ret = simplet_list_pop(list);
   assert(ret->val == 7);
+  free(ret);
   ret = simplet_list_pop(list);
   assert(ret->val == 6);
+  free(ret);
   ret = simplet_list_pop(list);
   assert(ret->val == 5);
+  free(ret);
   simplet_list_set_item_free(list, free_wrap);
   simplet_list_free(list);
 }
