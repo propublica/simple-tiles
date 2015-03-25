@@ -154,14 +154,23 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
 
     for(int x = 0; x < width; x++) {
       // could not transform the point, skip this pixel
-      if(!test[x]) continue;
+      if(!test[x]) {
+        scanline[x] = 0x00 << 24;
+        continue;
+      }
 
       // sanity check? From gdalsimplewarp
-      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) continue;
+      if(x_lookup[x] < 0.0 || y_lookup[x] < 0.0) {
+        scanline[x] = 0x00 << 24;
+        continue;        
+      }
 
       // check to see if we are outside of the raster
       if(x_lookup[x] > GDALGetRasterXSize(source)
-         || y_lookup[x] > GDALGetRasterYSize(source)) continue;
+         || y_lookup[x] > GDALGetRasterYSize(source)) {
+        scanline[x] = 0x00 << 24;
+        continue;
+      }
 
       // clean up needed here
       for(int band = 1; band <= bands; band++) {
@@ -198,7 +207,6 @@ simplet_raster_layer_process(simplet_raster_layer_t *layer, simplet_map_t *map, 
         }
 
         int band_remap[5] = {0, 2, 1, 0, 3};
-        //
         scanline[x] |= ((int) fmax(0, fmin(255, pixel))) << ((band_remap[band]) * 8);
       }
     }
