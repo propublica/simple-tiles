@@ -274,7 +274,7 @@ simplet_map_status_to_string(simplet_map_t *map){
 simplet_status_t
 simplet_map_is_valid(simplet_map_t *map){
   // Does it have a previously set error.
-  if(!map->status == SIMPLET_OK)
+  if(!(map->status == SIMPLET_OK))
     return SIMPLET_ERR;
 
   // Does it have a bounds?
