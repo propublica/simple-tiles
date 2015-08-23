@@ -2,24 +2,19 @@
 #include "query.h"
 #include "style.h"
 
-
-static void
-test_style(){
+static void test_style() {
   simplet_style_t *style;
-  if(!(style = simplet_style_new("fill", "#CCCCCC")))
-    assert(0);
+  if (!(style = simplet_style_new("fill", "#CCCCCC"))) assert(0);
   assert(!strcmp(style->key, "fill"));
   assert(!strcmp(style->arg, "#CCCCCC"));
   simplet_style_free(style);
 }
 
-static void
-test_lookup(){
+static void test_lookup() {
   simplet_query_t *query;
-  if(!(query = simplet_query_new("SELECT * FROM TEST;")))
-    assert(0);
-  simplet_query_add_style(query, "fill",     "#CCCCCC");
-  simplet_query_add_style(query, "stroke",   "#CCCCAA");
+  if (!(query = simplet_query_new("SELECT * FROM TEST;"))) assert(0);
+  simplet_query_add_style(query, "fill", "#CCCCCC");
+  simplet_query_add_style(query, "stroke", "#CCCCAA");
   simplet_query_add_style(query, "line-cap", "round");
 
   assert(query->styles->length == 3);
