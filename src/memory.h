@@ -3,10 +3,8 @@
 
 #include "types.h"
 
-int
-simplet_retain(simplet_retainable_t *obj);
+int simplet_retain(simplet_retainable_t *obj);
 
-int
-simplet_release(simplet_retainable_t *obj);
+int simplet_release(simplet_retainable_t *obj);
 
 #endif
