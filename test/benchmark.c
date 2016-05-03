@@ -169,14 +169,21 @@ typedef struct {
 } bench_wrap_t;
 
 #define BENCH(around, name)                                         \
-  { #name, &setup_##around, &bench_##name, &teardown_##around, 10 } \
-  ,
+  { #name, &setup_##around, &bench_##name, &teardown_##around, 10 },
 
 bench_wrap_t benchmarks[] = {
-    BENCH(map, render) BENCH(map, unprojected) BENCH(map, text)
-        BENCH(map, seamless) BENCH(map, empty) BENCH(map, many_queries) BENCH(
-            map, raster) BENCH(map, raster_resample) BENCH(map, many_raster)
-            BENCH(list, list){NULL, NULL, NULL, NULL, 0}};
+  BENCH(map, render)
+  BENCH(map, unprojected)
+  BENCH(map, text)
+  BENCH(map, seamless)
+  BENCH(map, empty)
+  BENCH(map, many_queries)
+  BENCH(map, raster)
+  BENCH(map, raster_resample)
+  BENCH(map, many_raster)
+  BENCH(list, list)
+  {NULL, NULL, NULL, NULL, 0}
+};
 
 static double sum(double *arr, int count) {
   double sum = 0;
@@ -200,6 +207,7 @@ int main() {
     double runs[bench->times];
     memset(runs, 0, sizeof(double) * bench->times);
     for (int i = 0; i < bench->times; i++) {
+      runs[i] = 0;
       void *data = bench->setup();
       clock_t start = clock();
       bench->call(data);
