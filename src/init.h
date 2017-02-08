@@ -5,8 +5,7 @@
 extern "C" {
 #endif
 
-void
-simplet_init();
+void simplet_init();
 
 #ifdef __cplusplus
 }

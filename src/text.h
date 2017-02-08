@@ -17,19 +17,17 @@ typedef struct {
   simplet_list_t *placements;
 } simplet_lithograph_t;
 
+simplet_lithograph_t *simplet_lithograph_new(cairo_t *ctx);
 
-simplet_lithograph_t *
-simplet_lithograph_new(cairo_t *ctx);
+void simplet_lithograph_free(simplet_lithograph_t *litho);
 
-void
-simplet_lithograph_free(simplet_lithograph_t *litho);
+void simplet_lithograph_add_placement(simplet_lithograph_t *litho,
+                                      OGRFeatureH feature,
+                                      simplet_list_t *styles,
+                                      cairo_t *proj_ctx);
 
-void
-simplet_lithograph_add_placement(simplet_lithograph_t *litho, OGRFeatureH feature,
-  simplet_list_t *styles, cairo_t *proj_ctx);
-
-void
-simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles);
+void simplet_lithograph_apply(simplet_lithograph_t *litho,
+                              simplet_list_t *styles);
 
 #ifdef __cplusplus
 }

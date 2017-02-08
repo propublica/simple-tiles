@@ -1,8 +1,8 @@
 #include "bounds.h"
 #include "test.h"
 
-void
-is_intersecting(simplet_bounds_t *bounds, double maxx, double maxy, double minx, double miny, int flag){
+void is_intersecting(simplet_bounds_t *bounds, double maxx, double maxy,
+                     double minx, double miny, int flag) {
   simplet_bounds_t *other = simplet_bounds_new();
   simplet_bounds_extend(other, maxx, maxy);
   simplet_bounds_extend(other, minx, miny);
@@ -11,8 +11,7 @@ is_intersecting(simplet_bounds_t *bounds, double maxx, double maxy, double minx,
   assert(intersects == flag);
 }
 
-void
-test_intersects(){
+void test_intersects() {
   simplet_bounds_t *unit = simplet_bounds_new();
   simplet_bounds_extend(unit, 1, 1);
   simplet_bounds_extend(unit, -1, -1);
@@ -24,8 +23,7 @@ test_intersects(){
   simplet_bounds_free(unit);
 }
 
-void
-test_buffer(){
+void test_buffer() {
   simplet_bounds_t *unit = simplet_bounds_new();
   simplet_bounds_extend(unit, 1, 1);
   simplet_bounds_extend(unit, -1, -1);
@@ -38,7 +36,7 @@ test_buffer(){
   simplet_bounds_free(unit);
 }
 
-TASK(bounds){
+TASK(bounds) {
   test(intersects);
   test(buffer);
 }

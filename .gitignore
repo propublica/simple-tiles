@@ -16,7 +16,9 @@ data/n*
 data/loss_1932_2010*
 *.orig
 
-.waf-*
+.waf*
 .lock-*
 .vagrant/
 *.tif
+*.pyc
+.#*

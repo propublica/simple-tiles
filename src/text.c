@@ -18,15 +18,13 @@ typedef struct {
 } placement_t;
 
 // Create and return a new lithograph, returns NULL on failure.
-simplet_lithograph_t *
-simplet_lithograph_new(cairo_t *ctx){
+simplet_lithograph_t *simplet_lithograph_new(cairo_t *ctx) {
   simplet_lithograph_t *litho;
-  if(!(litho = malloc(sizeof(*litho))))
-    return NULL;
+  if (!(litho = malloc(sizeof(*litho)))) return NULL;
 
   memset(litho, 0, sizeof(*litho));
 
-  if(!(litho->placements = simplet_list_new(litho))){
+  if (!(litho->placements = simplet_list_new(litho))) {
     free(litho);
     return NULL;
   }
@@ -40,8 +38,7 @@ simplet_lithograph_new(cairo_t *ctx){
 }
 
 // Free a placement.
-void
-placement_vfree(void *placement){
+void placement_vfree(void *placement) {
   placement_t *plc = placement;
   simplet_bounds_free(plc->bounds);
   g_object_unref(plc->layout);
@@ -49,9 +46,8 @@ placement_vfree(void *placement){
 }
 
 // Free a lithograph and unref the stored ctx.
-void
-simplet_lithograph_free(simplet_lithograph_t *litho){
-  if(simplet_release((simplet_retainable_t *)litho) > 0) return;
+void simplet_lithograph_free(simplet_lithograph_t *litho) {
+  if (simplet_release((simplet_retainable_t *)litho) > 0) return;
 
   cairo_destroy(litho->ctx);
   simplet_list_set_item_free(litho->placements, placement_vfree);
@@ -61,11 +57,9 @@ simplet_lithograph_free(simplet_lithograph_t *litho){
 }
 
 // Create and return a new placement.
-placement_t *
-placement_new(PangoLayout *layout, simplet_bounds_t *bounds){
+placement_t *placement_new(PangoLayout *layout, simplet_bounds_t *bounds) {
   placement_t *placement;
-  if(!(placement = malloc(sizeof(*placement))))
-    return NULL;
+  if (!(placement = malloc(sizeof(*placement)))) return NULL;
 
   memset(placement, 0, sizeof(*placement));
 
@@ -79,13 +73,13 @@ placement_new(PangoLayout *layout, simplet_bounds_t *bounds){
 // Before placing a new label we need to see if the label overlaps over
 // previously placed labels. This algorithm will be refactored a bit to try
 // NE SE SW NW placements in the future.
-void
-try_and_insert_placement(simplet_lithograph_t *litho, PangoLayout *layout, double x, double y){
+void try_and_insert_placement(simplet_lithograph_t *litho, PangoLayout *layout,
+                              double x, double y) {
   int width, height;
   // Find the computed width and height of a layout in image pixels
   pango_layout_get_pixel_size(layout, &width, &height);
   simplet_bounds_t *bounds = simplet_bounds_new();
-  if(!bounds) return;
+  if (!bounds) return;
   // Create a bounds to test for intersection
   simplet_bounds_extend(bounds, floor(x - width / 2), floor(y - height / 2));
   simplet_bounds_extend(bounds, floor(x + width / 2), floor(y + height / 2));
@@ -93,8 +87,8 @@ try_and_insert_placement(simplet_lithograph_t *litho, PangoLayout *layout, doubl
   // Iterate through the list of already placed labels and check for overlaps.
   simplet_listiter_t *iter = simplet_get_list_iter(litho->placements);
   placement_t *placement;
-  while((placement = (placement_t *) simplet_list_next(iter))){
-    if(simplet_bounds_intersects(placement->bounds, bounds)){
+  while ((placement = (placement_t *)simplet_list_next(iter))) {
+    if (simplet_bounds_intersects(placement->bounds, bounds)) {
       simplet_bounds_free(bounds);
       g_object_unref(layout);
       simplet_list_iter_free(iter);
@@ -104,7 +98,7 @@ try_and_insert_placement(simplet_lithograph_t *litho, PangoLayout *layout, doubl
 
   // If we get here we can create and insert a new placement.
   placement_t *plc = placement_new(layout, bounds);
-  if(!plc) {
+  if (!plc) {
     simplet_bounds_free(bounds);
     g_object_unref(layout);
     return;
@@ -113,15 +107,14 @@ try_and_insert_placement(simplet_lithograph_t *litho, PangoLayout *layout, doubl
   simplet_list_push(litho->placements, (void *)plc);
 }
 
-
 // Apply the labels to the map.
-void
-simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
+void simplet_lithograph_apply(simplet_lithograph_t *litho,
+                              simplet_list_t *styles) {
   simplet_listiter_t *iter = simplet_get_list_iter(litho->placements);
   placement_t *placement;
   cairo_save(litho->ctx);
-  while((placement = (placement_t *) simplet_list_next(iter))){
-    if(placement->placed == TRUE) continue;
+  while ((placement = (placement_t *)simplet_list_next(iter))) {
+    if (placement->placed == TRUE) continue;
     cairo_move_to(litho->ctx, placement->bounds->nw.x, placement->bounds->se.y);
 
     // Draw the placement
@@ -129,7 +122,8 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
 
     placement->placed = TRUE;
   }
-  simplet_apply_styles(litho->ctx, styles, "text-stroke-weight", "text-stroke-color", "color",  NULL);
+  simplet_apply_styles(litho->ctx, styles, "text-stroke-weight",
+                       "text-stroke-color", "color", NULL);
 
   // Apply and draw various outline options.
   cairo_restore(litho->ctx);
@@ -137,52 +131,51 @@ simplet_lithograph_apply(simplet_lithograph_t *litho, simplet_list_t *styles){
 
 // Create and add a placement to the current lithograph if it doesn't overlap
 // with current labels.
-void
-simplet_lithograph_add_placement(simplet_lithograph_t *litho,
-  OGRFeatureH feature, simplet_list_t *styles, cairo_t *proj_ctx) {
-
+void simplet_lithograph_add_placement(simplet_lithograph_t *litho,
+                                      OGRFeatureH feature,
+                                      simplet_list_t *styles,
+                                      cairo_t *proj_ctx) {
   simplet_style_t *field = simplet_lookup_style(styles, "text-field");
-  if(!field) return;
+  if (!field) return;
 
   OGRFeatureDefnH defn;
-  if(!(defn = OGR_F_GetDefnRef(feature))) return;
+  if (!(defn = OGR_F_GetDefnRef(feature))) return;
 
-  int idx = OGR_FD_GetFieldIndex(defn, (const char*) field->arg);
-  if(idx < 0) return;
+  int idx = OGR_FD_GetFieldIndex(defn, (const char *)field->arg);
+  if (idx < 0) return;
 
   // Find the largest sub geometry of a particular multi-geometry.
   OGRGeometryH super = OGR_F_GetGeometryRef(feature);
   OGRGeometryH geom = super;
   double area = 0.0;
-  switch(wkbFlatten(OGR_G_GetGeometryType(super))) {
+  switch (wkbFlatten(OGR_G_GetGeometryType(super))) {
     case wkbMultiPolygon:
     case wkbGeometryCollection:
-      for(int i = 0; i < OGR_G_GetGeometryCount(super); i++) {
+      for (int i = 0; i < OGR_G_GetGeometryCount(super); i++) {
         OGRGeometryH subgeom = OGR_G_GetGeometryRef(super, i);
-        if(subgeom == NULL) continue;
+        if (subgeom == NULL) continue;
         double ar = OGR_G_Area(subgeom);
-        if(ar > area) {
+        if (ar > area) {
           geom = subgeom;
           area = ar;
         }
       }
       break;
-    default:
-      ;
+    default:;
   }
 
   // Find the center of our geometry. This sometimes throws an invalid geometry
   // error, so there is a slight bug here somehow.
   OGRGeometryH center;
-  if(!(center = OGR_G_CreateGeometry(wkbPoint))) return;
-  if(OGR_G_Centroid(geom, center) == OGRERR_FAILURE) {
+  if (!(center = OGR_G_CreateGeometry(wkbPoint))) return;
+  if (OGR_G_Centroid(geom, center) == OGRERR_FAILURE) {
     OGR_G_DestroyGeometry(center);
     return;
   }
 
   // Turn font hinting off
   cairo_font_options_t *opts;
-  if(!(opts = cairo_font_options_create())){
+  if (!(opts = cairo_font_options_create())) {
     OGR_G_DestroyGeometry(center);
     return;
   }
@@ -204,7 +197,7 @@ simplet_lithograph_add_placement(simplet_lithograph_t *litho,
 
   const char *font_family;
 
-  if(!font)
+  if (!font)
     font_family = "helvetica 12px";
   else
     font_family = font->arg;
