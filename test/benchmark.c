@@ -31,7 +31,7 @@ static void initialize_map(simplet_map_t *map) {
   simplet_vector_layer_t *layer =
       simplet_map_add_vector_layer(map, "./data/ne_10m_admin_0_countries.shp");
   simplet_query_t *query = simplet_vector_layer_add_query(
-      layer, "SELECT * from 'ne_10m_admin_0_countries'");
+      layer, "SELECT * from ne_10m_admin_0_countries");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "fill", "#061F37ff");
 }
@@ -68,17 +68,17 @@ static void bench_many_queries(void *ctx) {
 
   simplet_vector_layer_t *layer = simplet_list_tail(map->layers);
   simplet_query_t *query = simplet_vector_layer_add_query(
-      layer, "SELECT * from 'ne_10m_admin_0_countries'");
+      layer, "SELECT * from ne_10m_admin_0_countries");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "stroke", "#ffffffff");
 
   query = simplet_vector_layer_add_query(
-      layer, "SELECT * from 'ne_10m_admin_0_countries'");
+      layer, "SELECT * from ne_10m_admin_0_countries");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "stroke", "#ffffffff");
 
   query = simplet_vector_layer_add_query(
-      layer, "SELECT * from 'ne_10m_admin_0_countries'");
+      layer, "SELECT * from ne_10m_admin_0_countries");
   simplet_query_add_style(query, "weight", "0.1");
   simplet_query_add_style(query, "stroke", "#ffffffff");
 

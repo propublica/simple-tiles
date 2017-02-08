@@ -19,13 +19,13 @@ int main() {
   simplet_vector_layer_t *layer =
       simplet_map_add_vector_layer(map, "./data/ne_10m_admin_0_countries.shp");
   simplet_query_t *query = simplet_vector_layer_add_query(
-      layer, "SELECT * from 'ne_10m_admin_0_countries'");
+      layer, "SELECT * from ne_10m_admin_0_countries");
   simplet_query_add_style(query, "stroke", "#226688");
   simplet_query_add_style(query, "line-join", "round");
   simplet_query_add_style(query, "weight", "3");
 
   simplet_query_t *query2 = simplet_vector_layer_add_query(
-      layer, "SELECT * from 'ne_10m_admin_0_countries'");
+      layer, "SELECT * from ne_10m_admin_0_countries");
   simplet_query_add_style(query, "blend", "over");
 
   simplet_query_add_style(query2, "weight", "0.5");
