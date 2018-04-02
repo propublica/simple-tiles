@@ -38,8 +38,8 @@ def build(bld):
         'target': 'simple-tiles'
     }
 
-    bld.shlib(**dict(kwargs.items() + [('features', 'c cshlib')]))
-    bld.stlib(**dict(kwargs.items() + [('features', 'c cstlib')]))
+    bld.shlib(**dict(list(kwargs.items()) + [('features', 'c cshlib')]))
+    bld.stlib(**dict(list(kwargs.items()) + [('features', 'c cstlib')]))
 
     libs = []
     for k in ['LIB_GDAL', 'LIB_M']:
