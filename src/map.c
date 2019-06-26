@@ -59,7 +59,7 @@ void simplet_map_free(simplet_map_t *map) {
     simplet_list_free(map->layers);
   }
 
-  if (map->proj) OSRRelease(map->proj);
+  if (map->proj) OSRDestroySpatialReference(map->proj);
 
   if (map->bgcolor) free(map->bgcolor);
 
@@ -248,7 +248,7 @@ const char *simplet_map_status_to_string(simplet_map_t *map) {
 
 // Check if the map is valid for rendering
 simplet_status_t simplet_map_is_valid(simplet_map_t *map) {
-  // Does it have a previously set error.
+  // Does it have a previously set error?
   if (!(map->status == SIMPLET_OK)) return SIMPLET_ERR;
 
   // Does it have a bounds?

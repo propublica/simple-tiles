@@ -80,9 +80,6 @@ simplet_status_t simplet_vector_layer_process(simplet_vector_layer_t *layer,
   if (!(source = OGROpenShared(layer->source, 0, NULL)))
     return set_error(layer, SIMPLET_OGR_ERR, "error opening layer source");
 
-  // Retain the datasource because we want to cache open connections to a
-  // data source like postgres.
-  if (OGR_DS_GetRefCount(source) == 1) OGR_DS_Reference(source);
   if (!(iter = simplet_get_list_iter(layer->queries))) {
     OGRReleaseDataSource(source);
     return set_error(layer, SIMPLET_OOM, "out of memory getting list iterator");

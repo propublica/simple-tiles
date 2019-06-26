@@ -216,6 +216,7 @@ simplet_status_t simplet_query_process(simplet_query_t *query,
   if (!(olayer = OGR_DS_ExecuteSQL(source, query->ogrsql, NULL, NULL))) {
     int err = CPLGetLastErrorNo();
     if (!err) {
+      // FIXME: This should be a problem, but it is ignored right now.
       return SIMPLET_OK;
     } else {
       return set_error(query, SIMPLET_OGR_ERR, CPLGetLastErrorMsg());
