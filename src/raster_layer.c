@@ -178,12 +178,12 @@ simplet_status_t simplet_raster_layer_process(simplet_raster_layer_t *layer,
         memset(window, 0, kernel_size * kernel_size);
         GDALRasterBandH b = GDALGetRasterBand(source, band);
 
-        CPLErr err = GDALRasterIO(b, GF_Read, (int)x_lookup[x] - kernel_size / 2,
-                                  (int)y_lookup[x] - kernel_size / 2,
-                                  kernel_size, kernel_size,
-                                  window,
-                                  kernel_size, kernel_size,
-                                  GDT_Byte, 0, 0);
+        GDALRasterIO(b, GF_Read, (int)x_lookup[x] - kernel_size / 2,
+                     (int)y_lookup[x] - kernel_size / 2,
+                     kernel_size, kernel_size,
+                     window,
+                     kernel_size, kernel_size,
+                     GDT_Byte, 0, 0);
 
         for (int kx = 0; kx < kernel_size; kx++) {
           for (int ky = 0; ky < kernel_size; ky++) {
