@@ -2,7 +2,7 @@ all: ne_10m_admin_0_countries.shp tl_2010_55_cd108.shp tl_2010_36047_roads.shp \
 	 ne_10m_populated_places.shp loss_1932_2010.tif nyc2-rgb-pansharpened-8bit-nodata.tif
 
 tl_2010_36047_roads.shp:
-	wget ftp://ftp2.census.gov/geo/tiger/TIGER2010/ROADS/tl_2010_36047_roads.zip
+	wget https://www2.census.gov/geo/tiger/TIGER2010/ROADS/tl_2010_36047_roads.zip
 	unzip tl_2010_36047_roads.zip
 
 ne_10m_admin_0_countries.shp:
@@ -14,7 +14,7 @@ ne_10m_populated_places.shp:
 	unzip ne_10m_populated_places.zip
 
 tl_2010_55_cd108.shp:
-	wget ftp://ftp2.census.gov/geo/tiger/TIGER2010/CD/108/tl_2010_55_cd108.zip
+	wget https://www2.census.gov/geo/tiger/TIGER2010/CD/108/tl_2010_55_cd108.zip
 	unzip tl_2010_55_cd108.zip
 
 loss_1932_2010.tif:
