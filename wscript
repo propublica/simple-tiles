@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+
 from waflib import Options
-import os
+import os             #!for imorting os
 
 
 def options(opt):
